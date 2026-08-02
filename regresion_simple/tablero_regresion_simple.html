@@ -176,6 +176,21 @@ strong{color:var(--heading);font-weight:600}
 .assumption-name{font-family:var(--font-d);font-weight:700;color:var(--heading);font-size:.95rem;margin-bottom:.2rem}
 .assumption-desc{font-size:.88rem;color:var(--text-sec);line-height:1.5}
 
+/* Simulation labs */
+.sim-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem;margin-bottom:1rem}
+.sim-control{display:flex;flex-direction:column;gap:.2rem}
+.sim-control label{font-size:.78rem;font-weight:600;color:var(--text-sec);text-transform:uppercase;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:baseline}
+.sim-control input[type="range"]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--border);outline:none;transition:background .15s}
+.sim-control input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg-canvas);box-shadow:0 1px 4px var(--shadow)}
+.sim-control input[type="range"]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg-canvas);box-shadow:0 1px 4px var(--shadow)}
+.sim-val{font-family:var(--font-m);font-size:.88rem;color:var(--accent)}
+.sim-canvas-wrap{position:relative;width:100%;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--bg-canvas)}
+.sim-canvas-wrap canvas{display:block;width:100%}
+.sim-result-row{display:flex;flex-wrap:wrap;gap:1rem;margin-top:.75rem;padding:.75rem;background:var(--bg-alt);border-radius:6px;font-size:.9rem;align-items:center}
+.sim-result-item{display:flex;align-items:center;gap:.3rem}
+.sim-result-label{color:var(--text-sec);font-size:.82rem}
+.sim-result-val{font-family:var(--font-m);font-weight:600;color:var(--heading)}
+
 /* Hidden by default */
 .results-section{display:none}
 .results-section.visible{display:block}
@@ -345,6 +360,99 @@ strong{color:var(--heading);font-weight:600}
 </div>
 
 <p>Los errores estándar miden la <strong>precisión</strong> de los estimadores: cuanto menores sean, más confiable es la estimación. Son fundamentales para construir intervalos de confianza y realizar tests de hipótesis.</p>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>Simulación: insesgadez de OLS</h2>
+
+<p>Si los supuestos SLR.1–SLR.4 se cumplen, <span class="math">E(&beta;&#770;<sub>1</sub>) = &beta;<sub>1</sub></span>: el estimador OLS es <strong>insesgado</strong>. Esto significa que, si repitiéramos el muestreo muchas veces, el promedio de todas las estimaciones se centraría en el verdadero parámetro.</p>
+
+<p>Configurá los parámetros poblacionales y presioná <strong>Simular</strong> para generar muchas muestras y verificar la insesgadez.</p>
+
+<div class="lab">
+  <div class="lab-title">Laboratorio de insesgadez</div>
+
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label>&beta;<sub>1</sub> verdadero <span class="sim-val" id="simB1Val">3.00</span></label>
+      <input type="range" id="simB1" min="-5" max="5" step="0.25" value="3" oninput="updateSimParam()">
+    </div>
+    <div class="sim-control">
+      <label>&beta;<sub>0</sub> verdadero <span class="sim-val" id="simB0Val">2.00</span></label>
+      <input type="range" id="simB0" min="-5" max="10" step="0.5" value="2" oninput="updateSimParam()">
+    </div>
+    <div class="sim-control">
+      <label>&sigma; (desvío del error) <span class="sim-val" id="simSigmaVal">3.00</span></label>
+      <input type="range" id="simSigma" min="0.5" max="10" step="0.5" value="3" oninput="updateSimParam()">
+    </div>
+    <div class="sim-control">
+      <label>n (tamaño muestral) <span class="sim-val" id="simNVal">30</span></label>
+      <input type="range" id="simN" min="10" max="200" step="5" value="30" oninput="updateSimParam()">
+    </div>
+    <div class="sim-control">
+      <label>Repeticiones <span class="sim-val" id="simRepsVal">1000</span></label>
+      <input type="range" id="simReps" min="100" max="5000" step="100" value="1000" oninput="updateSimParam()">
+    </div>
+  </div>
+
+  <div class="lab-btns">
+    <button class="btn btn-primary" onclick="runUnbiasedSim()">Simular</button>
+  </div>
+
+  <div id="simResultsSection" style="display:none">
+    <div style="margin-top:1rem">
+      <span class="lab-title">Distribución de &beta;&#770;<sub>1</sub> en las simulaciones</span>
+    </div>
+    <div class="sim-canvas-wrap" style="margin-top:.5rem">
+      <canvas id="histCanvas" width="760" height="320"></canvas>
+    </div>
+    <div class="sim-result-row" id="simStats"></div>
+
+    <div class="tip" style="margin-top:1rem">
+      <strong>Observá:</strong> la <span style="color:var(--red);font-weight:700">línea roja</span> marca el verdadero &beta;<sub>1</sub> y la <span style="color:var(--green);font-weight:700">línea verde</span> marca la media de las estimaciones. Si el estimador es insesgado, ambas líneas deben coincidir. Además, el desvío estándar simulado debería aproximar al error estándar teórico &sigma;/&radic;SST<sub>x</sub>.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>¿Qué determina la precisión de &beta;&#770;<sub>1</sub>?</h2>
+
+<p>La varianza del estimador de la pendiente es:</p>
+
+<div class="formula-block">
+  <span class="math"><span class="n">Var</span>(&beta;&#770;<sub>1</sub>) = <span class="frac"><span class="num">&sigma;&sup2;</span><span class="den"><span class="n">SST</span><sub>x</sub></span></span> = <span class="frac"><span class="num">&sigma;&sup2;</span><span class="den">&sum;(x<sub>i</sub> &minus; x&#772;)&sup2;</span></span></span>
+</div>
+
+<p>Tres factores determinan la precisión: más <strong>ruido</strong> (&sigma; mayor) empeora la estimación; más <strong>variación en X</strong> la mejora; y un <strong>tamaño muestral</strong> mayor también la mejora (porque aumenta SST<sub>x</sub>). Exploralo con los controles:</p>
+
+<div class="lab">
+  <div class="lab-header">
+    <span class="lab-title">Laboratorio de precisión</span>
+    <button class="btn btn-sm" onclick="regeneratePrecision()">Regenerar muestra</button>
+  </div>
+
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label>&sigma; (desvío del error) <span class="sim-val" id="precSigmaVal">2.00</span></label>
+      <input type="range" id="precSigma" min="0.5" max="10" step="0.25" value="2" oninput="updatePrecision()">
+    </div>
+    <div class="sim-control">
+      <label>Dispersión de X <span class="sim-val" id="precSpreadVal">5.00</span></label>
+      <input type="range" id="precSpread" min="1" max="20" step="0.5" value="5" oninput="updatePrecision()">
+    </div>
+    <div class="sim-control">
+      <label>n (tamaño muestral) <span class="sim-val" id="precNVal">30</span></label>
+      <input type="range" id="precN" min="10" max="200" step="5" value="30" oninput="updatePrecision()">
+    </div>
+  </div>
+
+  <div class="sim-canvas-wrap">
+    <canvas id="precCanvas" width="760" height="380"></canvas>
+  </div>
+
+  <div class="lab-stats" id="precStats" style="margin-top:.75rem"></div>
+
+  <div class="sim-result-row" id="precFormula" style="margin-top:.5rem;font-family:var(--font-d);font-style:italic;font-size:1rem"></div>
+</div>
 
 <!-- ═══════════════════════════════════════════════════ -->
 <h2>Supuestos del modelo (SLR.1–SLR.5)</h2>
@@ -815,15 +923,324 @@ function renderSESection() {
   $('#seSection').innerHTML = html;
 }
 
+// ══════════════════════════════════════════════════════
+// Lab 1: Unbiasedness simulation
+// ══════════════════════════════════════════════════════
+
+function randn() {
+  let u1, u2;
+  do { u1 = Math.random(); } while (u1 === 0);
+  u2 = Math.random();
+  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}
+
+function updateSimParam() {
+  ['simB1','simB0','simSigma','simN','simReps'].forEach(id => {
+    const el = document.getElementById(id);
+    const valEl = document.getElementById(id + 'Val');
+    valEl.textContent = (id === 'simN' || id === 'simReps') ? el.value : parseFloat(el.value).toFixed(2);
+  });
+}
+
+function runUnbiasedSim() {
+  const trueB1 = parseFloat($('#simB1').value);
+  const trueB0 = parseFloat($('#simB0').value);
+  const sigma = parseFloat($('#simSigma').value);
+  const n = parseInt($('#simN').value);
+  const reps = parseInt($('#simReps').value);
+
+  const xvals = [];
+  for (let i = 0; i < n; i++) xvals.push(i * 10 / (n - 1));
+  const xbar = xvals.reduce((a, b) => a + b, 0) / n;
+  const SSTx = xvals.reduce((a, xi) => a + (xi - xbar) ** 2, 0);
+
+  const b1_est = [];
+  for (let r = 0; r < reps; r++) {
+    const y = xvals.map(xi => trueB0 + trueB1 * xi + sigma * randn());
+    const ybar = y.reduce((a, b) => a + b, 0) / n;
+    let sxy = 0;
+    for (let i = 0; i < n; i++) sxy += (xvals[i] - xbar) * (y[i] - ybar);
+    b1_est.push(sxy / SSTx);
+  }
+
+  const meanB1 = b1_est.reduce((a, b) => a + b, 0) / reps;
+  const sdB1 = Math.sqrt(b1_est.reduce((a, b) => a + (b - meanB1) ** 2, 0) / (reps - 1));
+  const theoSE = sigma / Math.sqrt(SSTx);
+
+  drawHistogram(b1_est, trueB1, meanB1);
+
+  const fmt = v => v.toFixed(4);
+  $('#simStats').innerHTML = [
+    ['β₁ verdadero', fmt(trueB1), ''],
+    ['Media de β̂₁', fmt(meanB1), 'color:var(--accent)'],
+    ['Sesgo', fmt(meanB1 - trueB1), 'color:var(--green)'],
+    ['DE simulado', fmt(sdB1), ''],
+    ['se teórico (σ/√SSTx)', fmt(theoSE), ''],
+  ].map(([l, v, s]) => `<div class="sim-result-item"><span class="sim-result-label">${l}:</span><span class="sim-result-val" style="${s}">${v}</span></div>`).join('');
+
+  $('#simResultsSection').style.display = 'block';
+}
+
+function drawHistogram(data, trueVal, mean) {
+  const canvas = $('#histCanvas');
+  const dpr = window.devicePixelRatio || 1;
+  const cw = canvas.parentElement.clientWidth;
+  const ch = 320;
+  canvas.width = cw * dpr; canvas.height = ch * dpr;
+  canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const cs = getComputedStyle(document.documentElement);
+  const col = k => cs.getPropertyValue(k).trim();
+
+  const pad = { t: 25, r: 20, b: 45, l: 50 };
+  const pw = cw - pad.l - pad.r;
+  const ph = ch - pad.t - pad.b;
+
+  const dMin = Math.min(...data), dMax = Math.max(...data);
+  const range = dMax - dMin || 1;
+  const nBins = Math.min(50, Math.max(15, Math.ceil(Math.sqrt(data.length))));
+  const binW = range / nBins;
+  const bins = new Array(nBins).fill(0);
+  data.forEach(v => { let i = Math.floor((v - dMin) / binW); if (i >= nBins) i = nBins - 1; bins[i]++; });
+  const maxC = Math.max(...bins);
+
+  ctx.fillStyle = col('--bg-canvas');
+  ctx.fillRect(0, 0, cw, ch);
+
+  // Grid
+  ctx.strokeStyle = col('--border'); ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + ph * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + pw, y); ctx.stroke();
+  }
+
+  // Bars
+  ctx.fillStyle = col('--accent'); ctx.globalAlpha = 0.7;
+  const bw = pw / nBins;
+  for (let i = 0; i < nBins; i++) {
+    const h = (bins[i] / maxC) * ph;
+    ctx.fillRect(pad.l + i * bw, pad.t + ph - h, bw - 1, h);
+  }
+  ctx.globalAlpha = 1;
+
+  // True value line (red, solid)
+  const trueX = pad.l + ((trueVal - dMin) / range) * pw;
+  if (trueX >= pad.l && trueX <= pad.l + pw) {
+    ctx.strokeStyle = col('--red'); ctx.lineWidth = 2.5; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(trueX, pad.t); ctx.lineTo(trueX, pad.t + ph); ctx.stroke();
+    ctx.fillStyle = col('--red'); ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('β₁ = ' + trueVal.toFixed(2), trueX, pad.t - 6);
+  }
+
+  // Mean line (green, dashed)
+  const meanX = pad.l + ((mean - dMin) / range) * pw;
+  if (meanX >= pad.l && meanX <= pad.l + pw) {
+    ctx.strokeStyle = col('--green'); ctx.lineWidth = 2; ctx.setLineDash([6, 3]);
+    ctx.beginPath(); ctx.moveTo(meanX, pad.t); ctx.lineTo(meanX, pad.t + ph); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = col('--green'); ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Media = ' + mean.toFixed(4), meanX, pad.t + 14);
+  }
+
+  // X axis ticks
+  ctx.fillStyle = col('--text-sec'); ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+  for (let i = 0; i <= 8; i++) {
+    const v = dMin + range * i / 8;
+    ctx.fillText(v.toFixed(2), pad.l + (i / 8) * pw, pad.t + ph + 16);
+  }
+  // Y axis ticks
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) {
+    ctx.fillText(Math.round(maxC * (4 - i) / 4), pad.l - 8, pad.t + ph * i / 4 + 4);
+  }
+
+  // Axes
+  ctx.strokeStyle = col('--text-sec'); ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t + ph); ctx.lineTo(pad.l + pw, pad.t + ph); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t + ph); ctx.stroke();
+
+  ctx.fillStyle = col('--heading'); ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('β̂₁', pad.l + pw / 2, ch - 4);
+  ctx.save(); ctx.translate(12, pad.t + ph / 2); ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Frecuencia', 0, 0); ctx.restore();
+}
+
+// ══════════════════════════════════════════════════════
+// Lab 2: Precision
+// ══════════════════════════════════════════════════════
+
+let precSeed = 42;
+
+function regeneratePrecision() {
+  precSeed = Math.floor(Math.random() * 100000);
+  updatePrecision();
+}
+
+function updatePrecision() {
+  const sigma = parseFloat($('#precSigma').value);
+  const spread = parseFloat($('#precSpread').value);
+  const n = parseInt($('#precN').value);
+  $('#precSigmaVal').textContent = sigma.toFixed(2);
+  $('#precSpreadVal').textContent = spread.toFixed(2);
+  $('#precNVal').textContent = n;
+  drawPrecisionPlot(sigma, spread, n);
+}
+
+function drawPrecisionPlot(sigma, spread, n) {
+  const trueB0 = 2, trueB1 = 3;
+
+  const xvals = [];
+  for (let i = 0; i < n; i++) xvals.push(5 - spread + 2 * spread * i / (n - 1));
+  const xbar = xvals.reduce((a, b) => a + b, 0) / n;
+  const SSTx = xvals.reduce((a, xi) => a + (xi - xbar) ** 2, 0);
+
+  // Seeded RNG for stable display
+  let s = precSeed;
+  function sRand() { s = (s * 16807) % 2147483647; return s / 2147483647; }
+  function sRandn() { let u1; do { u1 = sRand(); } while (u1 === 0); return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * sRand()); }
+
+  const y = xvals.map(xi => trueB0 + trueB1 * xi + sigma * sRandn());
+  const ybar = y.reduce((a, b) => a + b, 0) / n;
+  let sxy = 0;
+  for (let i = 0; i < n; i++) sxy += (xvals[i] - xbar) * (y[i] - ybar);
+  const b1hat = sxy / SSTx;
+  const b0hat = ybar - b1hat * xbar;
+
+  const varB1 = sigma ** 2 / SSTx;
+  const seB1 = Math.sqrt(varB1);
+
+  // Canvas setup
+  const canvas = $('#precCanvas');
+  const dpr = window.devicePixelRatio || 1;
+  const cw = canvas.parentElement.clientWidth;
+  const ch = 380;
+  canvas.width = cw * dpr; canvas.height = ch * dpr;
+  canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const cs = getComputedStyle(document.documentElement);
+  const col = k => cs.getPropertyValue(k).trim();
+
+  const pad = { t: 20, r: 25, b: 45, l: 55 };
+  const pw = cw - pad.l - pad.r;
+  const ph = ch - pad.t - pad.b;
+
+  const trueYs = xvals.map(xi => trueB0 + trueB1 * xi);
+  const allY = [...y, ...trueYs.map(v => v + 2 * sigma), ...trueYs.map(v => v - 2 * sigma)];
+  const xmin = Math.min(...xvals), xmax = Math.max(...xvals);
+  const ymin = Math.min(...allY, ...y), ymax = Math.max(...allY, ...y);
+  const xp = (xmax - xmin) * 0.08 || 1, yp = (ymax - ymin) * 0.08 || 1;
+  const x0 = xmin - xp, x1 = xmax + xp, y0_ = ymin - yp, y1_ = ymax + yp;
+
+  const sx = v => pad.l + (v - x0) / (x1 - x0) * pw;
+  const sy = v => pad.t + ph - (v - y0_) / (y1_ - y0_) * ph;
+
+  // Background
+  ctx.fillStyle = col('--bg-canvas');
+  ctx.fillRect(0, 0, cw, ch);
+
+  // Grid
+  ctx.strokeStyle = col('--border'); ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 6; i++) {
+    const v = x0 + (x1 - x0) * i / 6;
+    ctx.beginPath(); ctx.moveTo(sx(v), pad.t); ctx.lineTo(sx(v), pad.t + ph); ctx.stroke();
+    ctx.fillStyle = col('--text-sec'); ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(v.toFixed(1), sx(v), pad.t + ph + 16);
+  }
+  for (let i = 0; i <= 5; i++) {
+    const v = y0_ + (y1_ - y0_) * i / 5;
+    ctx.beginPath(); ctx.moveTo(pad.l, sy(v)); ctx.lineTo(pad.l + pw, sy(v)); ctx.stroke();
+    ctx.fillStyle = col('--text-sec'); ctx.font = '11px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText(v.toFixed(1), pad.l - 8, sy(v) + 4);
+  }
+
+  // ±2σ band around true line
+  ctx.fillStyle = col('--purple');
+  ctx.globalAlpha = 0.1;
+  ctx.beginPath();
+  ctx.moveTo(sx(x0), sy(trueB0 + trueB1 * x0 + 2 * sigma));
+  ctx.lineTo(sx(x1), sy(trueB0 + trueB1 * x1 + 2 * sigma));
+  ctx.lineTo(sx(x1), sy(trueB0 + trueB1 * x1 - 2 * sigma));
+  ctx.lineTo(sx(x0), sy(trueB0 + trueB1 * x0 - 2 * sigma));
+  ctx.closePath(); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // True regression line (purple dashed)
+  ctx.strokeStyle = col('--purple'); ctx.lineWidth = 2; ctx.setLineDash([8, 4]);
+  ctx.beginPath();
+  ctx.moveTo(sx(x0), sy(trueB0 + trueB1 * x0));
+  ctx.lineTo(sx(x1), sy(trueB0 + trueB1 * x1));
+  ctx.stroke(); ctx.setLineDash([]);
+
+  // Estimated regression line (green solid)
+  ctx.strokeStyle = col('--green'); ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(sx(x0), sy(b0hat + b1hat * x0));
+  ctx.lineTo(sx(x1), sy(b0hat + b1hat * x1));
+  ctx.stroke();
+
+  // Points
+  for (let i = 0; i < n; i++) {
+    ctx.fillStyle = col('--accent');
+    ctx.beginPath(); ctx.arc(sx(xvals[i]), sy(y[i]), 4, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = col('--bg-canvas'); ctx.lineWidth = 1; ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = col('--text-sec'); ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t + ph); ctx.lineTo(pad.l + pw, pad.t + ph); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t + ph); ctx.stroke();
+
+  // Legend
+  const lx = pad.l + 10, ly = pad.t + 14;
+  ctx.font = '11px sans-serif'; ctx.textAlign = 'left';
+  ctx.setLineDash([8, 4]); ctx.strokeStyle = col('--purple'); ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(lx + 20, ly); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = col('--text-sec');
+  ctx.fillText('Recta verdadera (± 2σ)', lx + 25, ly + 4);
+  ctx.strokeStyle = col('--green'); ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(lx, ly + 18); ctx.lineTo(lx + 20, ly + 18); ctx.stroke();
+  ctx.fillText('Recta estimada (esta muestra)', lx + 25, ly + 22);
+
+  // Axis labels
+  ctx.fillStyle = col('--heading'); ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('X', pad.l + pw / 2, ch - 4);
+  ctx.save(); ctx.translate(14, pad.t + ph / 2); ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Y', 0, 0); ctx.restore();
+
+  // Stats
+  const fmt = v => v.toFixed(4);
+  $('#precStats').innerHTML = [
+    { l: 'σ²', v: fmt(sigma ** 2), c: '' },
+    { l: 'SSTx = Σ(xi−x̄)²', v: fmt(SSTx), c: '' },
+    { l: 'Var(β̂₁) = σ²/SSTx', v: fmt(varB1), c: 'accent' },
+    { l: 'se(β̂₁) = σ/√SSTx', v: fmt(seB1), c: 'orange' },
+    { l: 'β̂₁ (esta muestra)', v: fmt(b1hat), c: 'green' },
+  ].map(s => `<div class="stat-card"><div class="stat-label">${s.l}</div><div class="stat-value ${s.c}">${s.v}</div></div>`).join('');
+
+  $('#precFormula').innerHTML = `Var(β̂<sub>1</sub>) = <span class="frac"><span class="num">${fmt(sigma**2)}</span><span class="den">${fmt(SSTx)}</span></span> = ${fmt(varB1)} &nbsp;&rarr;&nbsp; se(β̂<sub>1</sub>) = ${fmt(seB1)}`;
+}
+
 // ── Resize handler ──
-window.addEventListener('resize', () => { if (result) drawScatter(); });
+window.addEventListener('resize', () => {
+  if (result) drawScatter();
+  if ($('#precCanvas').parentElement.clientWidth > 0) updatePrecision();
+});
 
 // ── Theme detection for canvas redraw ──
 const mqDark = window.matchMedia('(prefers-color-scheme:dark)');
-mqDark.addEventListener('change', () => { if (result) drawScatter(); });
+mqDark.addEventListener('change', () => {
+  if (result) drawScatter();
+  updatePrecision();
+});
 
-// ── Init: start with 5 empty rows ──
+// ── Init ──
 for (let i = 0; i < 5; i++) addRow();
+updatePrecision();
 </script>
 </body>
 </html>
