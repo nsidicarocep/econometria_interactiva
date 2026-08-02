@@ -7,7 +7,7 @@ Repositorio de materiales complementarios para la materia **Econometria I** (UAD
 Aqui se publican dos tipos de materiales:
 
 - **Paginas interactivas** (HTML y aplicaciones web): disponibles a traves de GitHub Pages, tienen el objetivo de que los estudiantes puedan poner en practica los contenidos vistos en cada clase de una forma visual y a traves de sistemas interactivos y simulaciones. Permiten explorar conceptos econometricos manipulando parametros, observando graficos en tiempo real y experimentando con datos simulados.
-- **Notebooks para Google Colab**: codigos en Python listos para ejecutar en la nube, orientados a la aplicacion practica con datos.
+- **Notebooks para Google Colab**: codigos en R listos para ejecutar en la nube, orientados a la aplicacion practica con datos.
 
 ## Materiales por clase
 
