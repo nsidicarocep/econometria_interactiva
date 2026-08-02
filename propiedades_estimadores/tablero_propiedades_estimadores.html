@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propiedades de los Estimadores — Laboratorio Interactivo</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+:root {
+  --bg: #F7F5F0;
+  --bg-alt: #EDEAE3;
+  --bg-canvas: #FFFFFF;
+  --text: #2C2C2E;
+  --text-sec: #636366;
+  --heading: #1A2744;
+  --accent: #3170A2;
+  --accent-light: #E3EEF6;
+  --green: #2D8659;
+  --green-light: #D4EDDF;
+  --red: #D45A3A;
+  --red-light: #FBEAE5;
+  --orange: #C87A1A;
+  --orange-light: #FDF0DB;
+  --purple: #7B5EA7;
+  --purple-light: #EDE7F6;
+  --blue: #5B9BD5;
+  --border: #DCDAD4;
+  --shadow: rgba(28,28,30,.07);
+  --font-d: Georgia,"Palatino Linotype","Book Antiqua",Palatino,serif;
+  --font-b: "Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-m: "Cascadia Code","Fira Code",Consolas,monospace;
+  --cw: 780px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --green:#4DBB7F;--green-light:#1A3329;
+  --red:#F07A5A;--red-light:#3D2219;
+  --orange:#E8A84C;--orange-light:#3D2E14;
+  --purple:#A78BDB;--purple-light:#2A2040;
+  --blue:#7FC4F5;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --green:#4DBB7F;--green-light:#1A3329;
+  --red:#F07A5A;--red-light:#3D2219;
+  --orange:#E8A84C;--orange-light:#3D2E14;
+  --purple:#A78BDB;--purple-light:#2A2040;
+  --blue:#7FC4F5;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}
+:root[data-theme="light"]{
+  --bg:#F7F5F0;--bg-alt:#EDEAE3;--bg-canvas:#FFFFFF;
+  --text:#2C2C2E;--text-sec:#636366;--heading:#1A2744;
+  --accent:#3170A2;--accent-light:#E3EEF6;
+  --green:#2D8659;--green-light:#D4EDDF;
+  --red:#D45A3A;--red-light:#FBEAE5;
+  --orange:#C87A1A;--orange-light:#FDF0DB;
+  --purple:#7B5EA7;--purple-light:#EDE7F6;
+  --blue:#5B9BD5;
+  --border:#DCDAD4;--shadow:rgba(28,28,30,.07);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:17px;line-height:1.72;-webkit-font-smoothing:antialiased}
+article{max-width:var(--cw);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+
+h1{font-family:var(--font-d);font-size:clamp(2rem,5vw,2.8rem);color:var(--heading);line-height:1.12;text-wrap:balance;letter-spacing:-.025em;margin-bottom:.4rem}
+h2{font-family:var(--font-d);font-size:1.55rem;color:var(--heading);line-height:1.3;text-wrap:balance;margin-top:3.5rem;margin-bottom:.75rem;padding-bottom:.45rem;border-bottom:2px solid var(--accent)}
+h3{font-family:var(--font-d);font-size:1.15rem;color:var(--heading);margin-top:1.5rem;margin-bottom:.5rem}
+p{margin-bottom:1.15rem;max-width:65ch}
+strong{color:var(--heading);font-weight:600}
+
+.eyebrow{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:600;margin-bottom:.5rem}
+.subtitle{font-family:var(--font-d);font-size:1.15rem;color:var(--text-sec);font-style:italic;margin-bottom:2rem;max-width:55ch}
+.lead{font-size:1.05rem;color:var(--text-sec);max-width:60ch}
+
+.formula-block{background:var(--bg-alt);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.25rem 0;border-radius:0 6px 6px 0;overflow-x:auto;text-align:center}
+.math{font-family:var(--font-d);font-style:italic;font-size:1.05em}
+.math .n{font-style:normal}
+
+.tip{background:var(--green-light);border-left:3px solid var(--green);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.callout{background:var(--red-light);border-left:3px solid var(--red);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.info{background:var(--accent-light);border-left:3px solid var(--accent);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+
+/* Navigation */
+nav.side-nav{position:fixed;top:50%;right:1.2rem;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:.5rem}
+nav.side-nav a{display:block;width:10px;height:10px;border-radius:50%;background:var(--border);transition:all .2s;text-indent:-9999px}
+nav.side-nav a:hover,nav.side-nav a.active{background:var(--accent);transform:scale(1.3)}
+@media(max-width:900px){nav.side-nav{display:none}}
+
+/* Lab containers */
+.lab{background:var(--bg-canvas);border:1px solid var(--border);border-radius:8px;padding:1.25rem;margin:1.5rem -1rem;box-shadow:0 2px 12px var(--shadow)}
+@media(min-width:800px){.lab{margin:1.5rem -2rem;padding:1.5rem}}
+.lab-title{font-family:var(--font-d);font-size:1.1rem;color:var(--heading);font-weight:700;margin-bottom:.75rem}
+
+.lab-chart{width:100%;overflow:hidden}
+.lab-chart svg{width:100%;display:block}
+
+.lab-controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.75rem 0}
+.lab-controls label{font-size:.85rem;color:var(--text-sec);display:flex;align-items:center;gap:.4rem}
+.lab-controls input[type=range]{width:120px;accent-color:var(--accent)}
+.lab-controls .val{font-family:var(--font-m);font-size:.85rem;min-width:40px;color:var(--heading);font-weight:600}
+
+.btn{font-family:var(--font-b);font-size:.82rem;padding:.4rem .85rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);cursor:pointer;transition:all .15s;font-weight:500}
+.btn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.primary:hover{background:var(--heading);border-color:var(--heading)}
+
+.lab-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;margin-top:1rem}
+.stat-card{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.6rem .8rem}
+.stat-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-sec);margin-bottom:.15rem}
+.stat-value{font-family:var(--font-d);font-size:1.2rem;color:var(--heading);font-variant-numeric:tabular-nums}
+
+/* Section-specific */
+.targets-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0}
+@media(max-width:600px){.targets-row{grid-template-columns:1fr}}
+.target-card{text-align:center;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:1rem .5rem}
+.target-card h4{font-family:var(--font-d);font-size:.9rem;color:var(--heading);margin-bottom:.5rem}
+.target-card canvas{display:block;margin:0 auto}
+
+/* Estimator table */
+.est-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:1rem 0}
+.est-table th{background:var(--bg-alt);padding:.5rem .6rem;text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-sec);border-bottom:2px solid var(--border)}
+.est-table td{padding:.5rem .6rem;border-bottom:1px solid var(--border);vertical-align:middle}
+.est-table tr:hover{background:var(--accent-light)}
+.badge{display:inline-block;padding:.1rem .4rem;border-radius:3px;font-size:.75rem;font-weight:600}
+.badge.yes{background:var(--green-light);color:var(--green)}
+.badge.no{background:var(--red-light);color:var(--red)}
+.badge.partial{background:var(--orange-light);color:var(--orange)}
+.color-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:.4rem;vertical-align:middle}
+
+/* Legend */
+.chart-legend{display:flex;flex-wrap:wrap;gap:.75rem;margin:.5rem 0;font-size:.82rem}
+.chart-legend-item{display:flex;align-items:center;gap:.3rem}
+.chart-legend-line{width:18px;height:3px;border-radius:2px}
+.chart-legend-dash{width:18px;height:0;border-top:2px dashed}
+
+footer.page-footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:.8rem;color:var(--text-sec)}
+
+@media(max-width:600px){
+  article{padding:2rem 1rem 4rem}
+  .lab{margin:1.25rem -.5rem;padding:1rem}
+  .lab-stats{grid-template-columns:1fr 1fr}
+  .targets-row{grid-template-columns:1fr}
+  h2{font-size:1.35rem}
+}
+</style>
+</head>
+<body>
+<nav class="side-nav">
+  <a href="#sec-dist" title="Distribución Muestral">1</a>
+  <a href="#sec-sesgo" title="Insesgadez">2</a>
+  <a href="#sec-eficiencia" title="Eficiencia">3</a>
+  <a href="#sec-consistencia" title="Consistencia">4</a>
+  <a href="#sec-tradeoff" title="Trade-off">5</a>
+  <a href="#sec-lab" title="Laboratorio">6</a>
+</nav>
+
+<article>
+<header>
+  <p class="eyebrow">Econometría I &mdash; UADE</p>
+  <h1>Propiedades de los Estimadores</h1>
+  <p class="subtitle">Un laboratorio interactivo para explorar insesgadez, eficiencia, consistencia y el trade-off sesgo-varianza</p>
+  <p class="lead">Un estimador es una fórmula que aplicamos a una muestra para aproximar un parámetro poblacional desconocido. Como cada muestra es distinta, el estimador es una <strong>variable aleatoria</strong>. En esta página vas a poder generar datos, simular miles de muestras y ver con tus propios ojos qué hace "bueno" o "malo" a un estimador.</p>
+</header>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 1: DISTRIBUCIÓN MUESTRAL            -->
+<!-- =========================================== -->
+<section id="sec-dist">
+<h2>1. Distribución Muestral</h2>
+<p>La <strong>distribución muestral</strong> de un estimador es la distribución que surge de calcular ese estimador en todas las muestras posibles de tamaño <em>n</em>. Simulemos este proceso: generamos una muestra, estimamos por OLS el coeficiente &beta;<sub>1</sub>, y repetimos miles de veces.</p>
+
+<div class="info">
+  <strong>Modelo:</strong> <span class="math">salario = 5 + 1.8 &times; educ + u</span>, donde el valor verdadero es <span class="math">&beta;<sub>1</sub> = 1.8</span>. Cada muestra genera una estimación diferente de &beta;<sub>1</sub>.
+</div>
+
+<div class="lab">
+  <div class="lab-title">Simulador de distribución muestral de &beta;&#770;<sub>1</sub></div>
+  <div class="lab-controls">
+    <label>Tamaño de muestra <em>n</em>: <input type="range" id="dist-n" min="10" max="500" value="100" step="10"><span class="val" id="dist-n-val">100</span></label>
+  </div>
+  <div class="lab-controls">
+    <button class="btn primary" id="dist-btn-1">Tomar 1 muestra</button>
+    <button class="btn primary" id="dist-btn-50">+ 50 muestras</button>
+    <button class="btn primary" id="dist-btn-500">+ 500 muestras</button>
+    <button class="btn" id="dist-btn-reset">Reiniciar</button>
+  </div>
+  <div class="lab-chart" id="dist-chart"></div>
+  <div class="chart-legend">
+    <span class="chart-legend-item"><span class="chart-legend-dash" style="border-color:var(--red)"></span> &beta;<sub>1</sub> = 1.8 (real)</span>
+    <span class="chart-legend-item"><span class="chart-legend-line" style="background:var(--green)"></span> Media de las estimaciones</span>
+  </div>
+  <div class="lab-stats">
+    <div class="stat-card"><div class="stat-label">Muestras tomadas</div><div class="stat-value" id="dist-count">0</div></div>
+    <div class="stat-card"><div class="stat-label">Media de &beta;&#770;<sub>1</sub></div><div class="stat-value" id="dist-mean">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Desvío estándar</div><div class="stat-value" id="dist-sd">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Sesgo</div><div class="stat-value" id="dist-bias">&mdash;</div></div>
+  </div>
+</div>
+<div class="tip"><strong>Observá:</strong> a medida que tomás más muestras, el histograma se centra alrededor de 1.8. Esto anticipa la propiedad de <strong>insesgadez</strong>.</div>
+</section>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 2: INSESGADEZ                       -->
+<!-- =========================================== -->
+<section id="sec-sesgo">
+<h2>2. Insesgadez (ausencia de sesgo)</h2>
+<p>Un estimador &theta;&#770; es <strong>insesgado</strong> si su valor esperado coincide con el parámetro:</p>
+<div class="formula-block">
+  <span class="math">E[&theta;&#770;] = &theta; &nbsp;&nbsp;&rArr;&nbsp;&nbsp; Sesgo(&theta;&#770;) = E[&theta;&#770;] &minus; &theta; = 0</span>
+</div>
+<p>Comparemos un estimador insesgado (la media muestral) con uno al que le sumamos una constante (sesgo controlable). Ambos estiman <span class="math">&mu; = 10</span>.</p>
+
+<div class="lab">
+  <div class="lab-title">Insesgado vs. sesgado</div>
+  <div class="lab-controls">
+    <label>Sesgo del estimador 2: <input type="range" id="bias-slider" min="-3" max="3" value="2" step="0.1"><span class="val" id="bias-val">+2.0</span></label>
+    <label>n: <input type="range" id="bias-n" min="10" max="200" value="50" step="10"><span class="val" id="bias-n-val">50</span></label>
+    <button class="btn primary" id="bias-btn-run">Simular 2000 muestras</button>
+  </div>
+  <div class="lab-chart" id="bias-chart"></div>
+  <div class="chart-legend">
+    <span class="chart-legend-item"><span class="color-dot" style="background:var(--green)"></span> Insesgado (X&#772;)</span>
+    <span class="chart-legend-item"><span class="color-dot" style="background:var(--red)"></span> Sesgado (X&#772; + c)</span>
+    <span class="chart-legend-item"><span class="chart-legend-dash" style="border-color:#333"></span> &theta; = 10</span>
+  </div>
+  <div class="lab-stats">
+    <div class="stat-card"><div class="stat-label">E[&theta;&#770;] insesgado</div><div class="stat-value" id="bias-e1">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">E[&theta;&#770;] sesgado</div><div class="stat-value" id="bias-e2">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Sesgo</div><div class="stat-value" id="bias-sesgo">&mdash;</div></div>
+  </div>
+</div>
+<div class="callout"><strong>Clave:</strong> que un estimador sea sesgado no significa que <em>cada</em> estimación sea incorrecta. Significa que <em>en promedio</em>, a lo largo de muchas muestras, no acierta al valor verdadero.</div>
+</section>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 3: EFICIENCIA                       -->
+<!-- =========================================== -->
+<section id="sec-eficiencia">
+<h2>3. Eficiencia</h2>
+<p>Entre dos estimadores <strong>insesgados</strong>, preferimos el de <strong>menor varianza</strong>. Un estimador más eficiente produce estimaciones más concentradas alrededor del valor verdadero.</p>
+<div class="formula-block">
+  <span class="math">Var(&theta;&#770;<sub>1</sub>) < Var(&theta;&#770;<sub>2</sub>) &nbsp;&rArr;&nbsp; &theta;&#770;<sub>1</sub> es más eficiente</span>
+</div>
+<p>Comparemos la <strong>media muestral</strong> (eficiente) con la <strong>mediana muestral</strong> y con el <strong>primer valor X<sub>1</sub></strong>. Los tres son insesgados para datos normales simétricos, pero tienen varianzas muy diferentes.</p>
+
+<div class="lab">
+  <div class="lab-title">Eficiencia: media vs. mediana vs. X<sub>1</sub></div>
+  <div class="lab-controls">
+    <label>n: <input type="range" id="eff-n" min="10" max="200" value="50" step="10"><span class="val" id="eff-n-val">50</span></label>
+    <button class="btn primary" id="eff-btn-run">Simular 2000 muestras</button>
+  </div>
+  <div class="lab-chart" id="eff-chart"></div>
+  <div class="chart-legend">
+    <span class="chart-legend-item"><span class="color-dot" style="background:var(--accent)"></span> Media muestral (eficiente)</span>
+    <span class="chart-legend-item"><span class="color-dot" style="background:var(--orange)"></span> Mediana muestral</span>
+    <span class="chart-legend-item"><span class="color-dot" style="background:var(--purple)"></span> Primer valor X<sub>1</sub></span>
+    <span class="chart-legend-item"><span class="chart-legend-dash" style="border-color:#333"></span> &mu; = 10</span>
+  </div>
+  <div class="lab-stats">
+    <div class="stat-card"><div class="stat-label">Var(media)</div><div class="stat-value" id="eff-var1">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Var(mediana)</div><div class="stat-value" id="eff-var2">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Var(X<sub>1</sub>)</div><div class="stat-value" id="eff-var3">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Efic. relativa med/media</div><div class="stat-value" id="eff-rel">&mdash;</div></div>
+  </div>
+</div>
+<div class="tip"><strong>Observá:</strong> la media muestral siempre tiene la distribución más concentrada. La mediana es más ancha, y X<sub>1</sub> es extremadamente disperso (no usa casi información de la muestra).</div>
+</section>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 4: CONSISTENCIA                     -->
+<!-- =========================================== -->
+<section id="sec-consistencia">
+<h2>4. Consistencia</h2>
+<p>Un estimador es <strong>consistente</strong> si converge en probabilidad al valor verdadero cuando <em>n &rarr; &infin;</em>:</p>
+<div class="formula-block">
+  <span class="math">&theta;&#770;<sub>n</sub> &xrarr; &theta; &nbsp;cuando&nbsp; n &rarr; &infin;</span>
+</div>
+<p>Intuitivamente: con más datos, el estimador se acerca cada vez más al parámetro. Mové el slider para ver cómo la distribución se "aprieta" al aumentar <em>n</em>.</p>
+
+<div class="lab">
+  <div class="lab-title">Consistencia: la distribución se concentra con más datos</div>
+  <div class="lab-controls">
+    <label>Tamaño de muestra <em>n</em>: <input type="range" id="cons-n" min="5" max="2000" value="50" step="5"><span class="val" id="cons-n-val">50</span></label>
+    <button class="btn" id="cons-btn-animate">Animar n: 10 &rarr; 1000</button>
+  </div>
+  <div class="lab-chart" id="cons-chart"></div>
+  <div class="chart-legend">
+    <span class="chart-legend-item"><span class="chart-legend-line" style="background:var(--accent)"></span> Distribución muestral de X&#772;</span>
+    <span class="chart-legend-item"><span class="chart-legend-dash" style="border-color:var(--red)"></span> &mu; = 10 (valor verdadero)</span>
+  </div>
+  <div class="lab-stats">
+    <div class="stat-card"><div class="stat-label">n actual</div><div class="stat-value" id="cons-n-show">50</div></div>
+    <div class="stat-card"><div class="stat-label">Var teórica (&sigma;²/n)</div><div class="stat-value" id="cons-var">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Desvío estándar</div><div class="stat-value" id="cons-sd">&mdash;</div></div>
+  </div>
+</div>
+
+<h3>Estimador consistente vs. inconsistente</h3>
+<p>No todos los estimadores son consistentes. El <strong>primer valor X<sub>1</sub></strong> es insesgado pero <em>no</em> consistente: su varianza no decrece con <em>n</em> porque siempre usa solo una observación.</p>
+
+<div class="lab">
+  <div class="lab-title">Consistente (X&#772;) vs. Inconsistente (X<sub>1</sub>)</div>
+  <div class="lab-controls">
+    <label>n: <input type="range" id="cons2-n" min="10" max="500" value="30" step="10"><span class="val" id="cons2-n-val">30</span></label>
+    <button class="btn primary" id="cons2-btn-run">Simular 2000 muestras</button>
+  </div>
+  <div class="lab-chart" id="cons2-chart"></div>
+  <div class="chart-legend">
+    <span class="chart-legend-item"><span class="color-dot" style="background:var(--green)"></span> X&#772; (consistente)</span>
+    <span class="chart-legend-item"><span class="color-dot" style="background:var(--red)"></span> X<sub>1</sub> (inconsistente)</span>
+  </div>
+</div>
+<div class="callout"><strong>Clave:</strong> aumentá <em>n</em> y observá que X&#772; se concentra cada vez más, pero X<sub>1</sub> sigue igual de disperso. Por eso X<sub>1</sub> no es consistente.</div>
+</section>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 5: TRADE-OFF SESGO-VARIANZA         -->
+<!-- =========================================== -->
+<section id="sec-tradeoff">
+<h2>5. Trade-off Sesgo-Varianza</h2>
+<p>No siempre el mejor estimador es el insesgado. El <strong>Error Cuadrático Medio (ECM)</strong> captura ambas dimensiones:</p>
+<div class="formula-block">
+  <span class="math">ECM(&theta;&#770;) = Var(&theta;&#770;) + [Sesgo(&theta;&#770;)]²</span>
+</div>
+<p>Un estimador con un poco de sesgo pero mucha menos varianza puede tener un ECM menor.</p>
+
+<h3>Analogía del tiro al blanco</h3>
+<p>Cada punto es una estimación de una muestra distinta. El centro del blanco es el valor verdadero &theta;.</p>
+<div class="targets-row">
+  <div class="target-card"><h4>Insesgado + Eficiente</h4><canvas id="target1" width="180" height="180"></canvas><p style="font-size:.8rem;color:var(--text-sec);margin-top:.4rem">Centrado y preciso</p></div>
+  <div class="target-card"><h4>Insesgado + Ineficiente</h4><canvas id="target2" width="180" height="180"></canvas><p style="font-size:.8rem;color:var(--text-sec);margin-top:.4rem">Centrado pero disperso</p></div>
+  <div class="target-card"><h4>Sesgado + Eficiente</h4><canvas id="target3" width="180" height="180"></canvas><p style="font-size:.8rem;color:var(--text-sec);margin-top:.4rem">Preciso pero desplazado</p></div>
+</div>
+
+<h3>Calculadora de ECM</h3>
+<div class="lab">
+  <div class="lab-title">Comparar dos estimadores por ECM</div>
+  <div class="lab-controls">
+    <label>Sesgo estimador A: <input type="range" id="ecm-bias-a" min="0" max="3" value="0" step="0.1"><span class="val" id="ecm-bias-a-val">0.0</span></label>
+    <label>Varianza A: <input type="range" id="ecm-var-a" min="0.1" max="5" value="1" step="0.1"><span class="val" id="ecm-var-a-val">1.0</span></label>
+  </div>
+  <div class="lab-controls">
+    <label>Sesgo estimador B: <input type="range" id="ecm-bias-b" min="0" max="3" value="1" step="0.1"><span class="val" id="ecm-bias-b-val">1.0</span></label>
+    <label>Varianza B: <input type="range" id="ecm-var-b" min="0.1" max="5" value="0.3" step="0.1"><span class="val" id="ecm-var-b-val">0.3</span></label>
+  </div>
+  <div class="lab-chart" id="ecm-chart"></div>
+  <div class="lab-stats">
+    <div class="stat-card"><div class="stat-label">ECM(A)</div><div class="stat-value" id="ecm-a">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">ECM(B)</div><div class="stat-value" id="ecm-b">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Mejor estimador</div><div class="stat-value" id="ecm-winner">&mdash;</div></div>
+  </div>
+</div>
+</section>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 6: LABORATORIO DE ESTIMADORES       -->
+<!-- =========================================== -->
+<section id="sec-lab">
+<h2>6. Laboratorio de Estimadores</h2>
+<p>Comparemos múltiples estimadores simultáneamente. Generamos datos de una población <span class="math">X ~ N(&mu;=10, &sigma;²=4)</span> y evaluamos cómo se comporta cada estimador a través de miles de muestras repetidas.</p>
+
+<h3>Estimadores de la media &mu;</h3>
+<div class="lab">
+  <div class="lab-title">Comparación de estimadores</div>
+  <div class="lab-controls">
+    <label>n: <input type="range" id="lab-n" min="10" max="300" value="50" step="10"><span class="val" id="lab-n-val">50</span></label>
+    <button class="btn primary" id="lab-btn-run">Simular 2000 muestras</button>
+  </div>
+  <div class="lab-chart" id="lab-chart"></div>
+  <div class="chart-legend" id="lab-legend"></div>
+  <div style="overflow-x:auto">
+  <table class="est-table" id="lab-table">
+    <thead>
+      <tr><th>Estimador</th><th>E[&theta;&#770;]</th><th>Sesgo</th><th>Varianza</th><th>ECM</th><th>Insesgado</th><th>Eficiente</th><th>Consistente</th></tr>
+    </thead>
+    <tbody id="lab-tbody"></tbody>
+  </table>
+  </div>
+</div>
+
+<h3>Estimadores de la varianza &sigma;²</h3>
+<p>Un ejemplo clásico de sesgo es la <strong>varianza muestral dividida por <em>n</em></strong> en lugar de <em>n&minus;1</em>. Veamos por qué usamos <em>n&minus;1</em> en la fórmula.</p>
+
+<div class="lab">
+  <div class="lab-title">Varianza con n vs. n&minus;1</div>
+  <div class="lab-controls">
+    <label>n: <input type="range" id="var-n" min="5" max="100" value="10" step="1"><span class="val" id="var-n-val">10</span></label>
+    <button class="btn primary" id="var-btn-run">Simular 2000 muestras</button>
+  </div>
+  <div class="lab-chart" id="var-chart"></div>
+  <div class="chart-legend">
+    <span class="chart-legend-item"><span class="color-dot" style="background:var(--green)"></span> s² con n&minus;1 (insesgado)</span>
+    <span class="chart-legend-item"><span class="color-dot" style="background:var(--red)"></span> s² con n (sesgado)</span>
+    <span class="chart-legend-item"><span class="chart-legend-dash" style="border-color:#333"></span> &sigma;² = 4 (real)</span>
+  </div>
+  <div class="lab-stats">
+    <div class="stat-card"><div class="stat-label">E[s² con n&minus;1]</div><div class="stat-value" id="var-e1">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">E[s² con n]</div><div class="stat-value" id="var-e2">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Sesgo (n)</div><div class="stat-value" id="var-bias">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Sesgo teórico</div><div class="stat-value" id="var-bias-t">&mdash;</div></div>
+  </div>
+</div>
+<div class="tip"><strong>Observá:</strong> con <em>n</em> chico el sesgo de la varianza con <em>n</em> es notable. Con <em>n</em> grande el sesgo se achica (es <em>consistente</em>). Pero la versión con <em>n&minus;1</em> siempre es insesgada.</div>
+
+<h3>El desvío muestral: sesgado por Jensen</h3>
+<p>Aunque <span class="math">s² = &Sigma;(X<sub>i</sub>&minus;X&#772;)²/(n&minus;1)</span> es insesgado para &sigma;², su raíz cuadrada <span class="math">s = &radic;s²</span> <strong>no</strong> es insesgada para &sigma;. Esto es consecuencia de la <strong>desigualdad de Jensen</strong>: para una función cóncava como la raíz cuadrada, <span class="math">E[&radic;X] &le; &radic;E[X]</span>.</p>
+
+<div class="lab">
+  <div class="lab-title">Desvío muestral s como estimador de &sigma;</div>
+  <div class="lab-controls">
+    <label>n: <input type="range" id="sd-n" min="3" max="100" value="10" step="1"><span class="val" id="sd-n-val">10</span></label>
+    <button class="btn primary" id="sd-btn-run">Simular 3000 muestras</button>
+  </div>
+  <div class="lab-chart" id="sd-chart"></div>
+  <div class="chart-legend">
+    <span class="chart-legend-item"><span class="color-dot" style="background:var(--purple)"></span> s = &radic;(s²) (desvío muestral)</span>
+    <span class="chart-legend-item"><span class="chart-legend-dash" style="border-color:#333"></span> &sigma; = 2 (real)</span>
+  </div>
+  <div class="lab-stats">
+    <div class="stat-card"><div class="stat-label">E[s]</div><div class="stat-value" id="sd-e">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">&sigma; real</div><div class="stat-value">2.000</div></div>
+    <div class="stat-card"><div class="stat-label">Sesgo</div><div class="stat-value" id="sd-bias">&mdash;</div></div>
+  </div>
+</div>
+<div class="callout"><strong>Clave:</strong> el sesgo del desvío muestral es pequeño y desaparece con <em>n</em> grande. Por eso es <strong>sesgado</strong> pero <strong>consistente</strong>. Probá con n=5 vs n=100 para verlo.</div>
+</section>
+
+<footer class="page-footer">
+  <p>Econometría I &mdash; UADE &mdash; N. Sidicaro | E. Lorenzo | A. Quintero</p>
+  <p>Laboratorio interactivo para explorar propiedades de los estimadores.</p>
+</footer>
+</article>
+
+<script>
+// ============================================================
+// SIMULATION ENGINE
+// ============================================================
+const S = {
+  randn() {
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  },
+  rnorm(mu, sigma) { return mu + sigma * S.randn(); },
+  runif(a, b) { return a + Math.random() * (b - a); },
+  mean(arr) { return arr.reduce((s, x) => s + x, 0) / arr.length; },
+  median(arr) {
+    const sorted = [...arr].sort((a, b) => a - b);
+    const m = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[m] : (sorted[m - 1] + sorted[m]) / 2;
+  },
+  mode(arr) {
+    const binW = 0.5;
+    const mn = Math.min(...arr), mx = Math.max(...arr);
+    const nBins = Math.max(1, Math.ceil((mx - mn) / binW));
+    const counts = new Array(nBins).fill(0);
+    for (const x of arr) {
+      const i = Math.min(nBins - 1, Math.floor((x - mn) / binW));
+      counts[i]++;
+    }
+    let best = 0;
+    for (let i = 1; i < nBins; i++) if (counts[i] > counts[best]) best = i;
+    return mn + (best + 0.5) * binW;
+  },
+  variance(arr, ddof = 1) {
+    const m = S.mean(arr);
+    return arr.reduce((s, x) => s + (x - m) ** 2, 0) / (arr.length - ddof);
+  },
+  sd(arr, ddof = 1) { return Math.sqrt(S.variance(arr, ddof)); },
+  generateNormal(n, mu, sigma) {
+    return Array.from({ length: n }, () => S.rnorm(mu, sigma));
+  },
+  ols(x, y) {
+    const xm = S.mean(x), ym = S.mean(y);
+    let num = 0, den = 0;
+    for (let i = 0; i < x.length; i++) {
+      num += (x[i] - xm) * (y[i] - ym);
+      den += (x[i] - xm) ** 2;
+    }
+    const b1 = num / den;
+    return { b0: ym - b1 * xm, b1 };
+  },
+  kde(data, points, bandwidth) {
+    const n = data.length;
+    return points.map(x => {
+      let sum = 0;
+      for (let i = 0; i < n; i++) {
+        const z = (x - data[i]) / bandwidth;
+        sum += Math.exp(-0.5 * z * z) / Math.sqrt(2 * Math.PI);
+      }
+      return sum / (n * bandwidth);
+    });
+  }
+};
+
+// ============================================================
+// CHART HELPERS
+// ============================================================
+function getCSS(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+function makeHistogram(containerId, cfg) {
+  const el = document.getElementById(containerId);
+  const W = Math.min(el.clientWidth, 740);
+  const H = cfg.height || 320;
+  const M = { t: 20, r: 20, b: 40, l: 50 };
+  const w = W - M.l - M.r, h = H - M.t - M.b;
+
+  d3.select('#' + containerId).select('svg').remove();
+  const svg = d3.select('#' + containerId).append('svg')
+    .attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'xMidYMid meet');
+  const g = svg.append('g').attr('transform', `translate(${M.l},${M.t})`);
+
+  const xScale = d3.scaleLinear().domain(cfg.xDomain).range([0, w]);
+  const bins = cfg.datasets.map(ds => {
+    const hist = d3.bin().domain(cfg.xDomain).thresholds(cfg.bins || 40);
+    return hist(ds.data);
+  });
+  const maxCount = d3.max(bins.flat(), d => d.length);
+  const yScale = d3.scaleLinear().domain([0, maxCount * 1.1]).range([h, 0]);
+
+  g.append('g').attr('transform', `translate(0,${h})`).call(d3.axisBottom(xScale).ticks(8))
+    .selectAll('text').style('fill', getCSS('--text-sec')).style('font-size', '11px');
+  g.append('g').call(d3.axisLeft(yScale).ticks(5))
+    .selectAll('text').style('fill', getCSS('--text-sec')).style('font-size', '11px');
+  g.selectAll('.domain,.tick line').attr('stroke', getCSS('--border'));
+
+  bins.forEach((b, i) => {
+    const ds = cfg.datasets[i];
+    g.selectAll(`.bar-${i}`).data(b).enter().append('rect')
+      .attr('x', d => xScale(d.x0) + 1)
+      .attr('width', d => Math.max(0, xScale(d.x1) - xScale(d.x0) - 2))
+      .attr('y', d => yScale(d.length))
+      .attr('height', d => h - yScale(d.length))
+      .attr('fill', ds.color).attr('opacity', ds.opacity || 0.5);
+  });
+
+  if (cfg.vlines) {
+    cfg.vlines.forEach(vl => {
+      g.append('line').attr('x1', xScale(vl.x)).attr('x2', xScale(vl.x))
+        .attr('y1', 0).attr('y2', h)
+        .attr('stroke', vl.color).attr('stroke-width', vl.width || 2)
+        .attr('stroke-dasharray', vl.dash || '');
+    });
+  }
+  return { svg, g, xScale, yScale, w, h };
+}
+
+function makeDensity(containerId, cfg) {
+  const el = document.getElementById(containerId);
+  const W = Math.min(el.clientWidth, 740);
+  const H = cfg.height || 320;
+  const M = { t: 20, r: 20, b: 40, l: 55 };
+  const w = W - M.l - M.r, h = H - M.t - M.b;
+
+  d3.select('#' + containerId).select('svg').remove();
+  const svg = d3.select('#' + containerId).append('svg')
+    .attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'xMidYMid meet');
+  const g = svg.append('g').attr('transform', `translate(${M.l},${M.t})`);
+
+  const xScale = d3.scaleLinear().domain(cfg.xDomain).range([0, w]);
+  const nPts = 200;
+  const xPts = Array.from({ length: nPts }, (_, i) => cfg.xDomain[0] + i * (cfg.xDomain[1] - cfg.xDomain[0]) / (nPts - 1));
+
+  let maxY = 0;
+  const curves = cfg.datasets.map(ds => {
+    const bw = ds.bandwidth || 0.3;
+    const ys = S.kde(ds.data, xPts, bw);
+    const m = d3.max(ys);
+    if (m > maxY) maxY = m;
+    return { xs: xPts, ys, color: ds.color, width: ds.width || 2, dash: ds.dash || '' };
+  });
+
+  const yScale = d3.scaleLinear().domain([0, maxY * 1.15]).range([h, 0]);
+  g.append('g').attr('transform', `translate(0,${h})`).call(d3.axisBottom(xScale).ticks(8))
+    .selectAll('text').style('fill', getCSS('--text-sec')).style('font-size', '11px');
+  g.append('g').call(d3.axisLeft(yScale).ticks(5))
+    .selectAll('text').style('fill', getCSS('--text-sec')).style('font-size', '11px');
+  g.selectAll('.domain,.tick line').attr('stroke', getCSS('--border'));
+
+  const line = d3.line().x((_, i) => xScale(xPts[i])).y((d) => yScale(d)).curve(d3.curveBasis);
+  curves.forEach(c => {
+    g.append('path').datum(c.ys).attr('d', line)
+      .attr('fill', 'none').attr('stroke', c.color).attr('stroke-width', c.width).attr('stroke-dasharray', c.dash);
+  });
+
+  if (cfg.vlines) {
+    cfg.vlines.forEach(vl => {
+      g.append('line').attr('x1', xScale(vl.x)).attr('x2', xScale(vl.x))
+        .attr('y1', 0).attr('y2', h)
+        .attr('stroke', vl.color).attr('stroke-width', vl.width || 2)
+        .attr('stroke-dasharray', vl.dash || '');
+    });
+  }
+}
+
+function makeBarChart(containerId, cfg) {
+  const el = document.getElementById(containerId);
+  const W = Math.min(el.clientWidth, 740);
+  const H = cfg.height || 200;
+  const M = { t: 20, r: 20, b: 50, l: 50 };
+  const w = W - M.l - M.r, h = H - M.t - M.b;
+
+  d3.select('#' + containerId).select('svg').remove();
+  const svg = d3.select('#' + containerId).append('svg')
+    .attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'xMidYMid meet');
+  const g = svg.append('g').attr('transform', `translate(${M.l},${M.t})`);
+
+  const x = d3.scaleBand().domain(cfg.labels).range([0, w]).padding(0.3);
+  const maxVal = d3.max(cfg.stacks, stack => stack.reduce((a, b) => a + b, 0));
+  const y = d3.scaleLinear().domain([0, maxVal * 1.15]).range([h, 0]);
+
+  g.append('g').attr('transform', `translate(0,${h})`).call(d3.axisBottom(x))
+    .selectAll('text').style('fill', getCSS('--text-sec')).style('font-size', '11px');
+  g.append('g').call(d3.axisLeft(y).ticks(5))
+    .selectAll('text').style('fill', getCSS('--text-sec')).style('font-size', '11px');
+  g.selectAll('.domain,.tick line').attr('stroke', getCSS('--border'));
+
+  cfg.stacks.forEach((stack, si) => {
+    let cumY = 0;
+    stack.forEach((val, vi) => {
+      g.append('rect')
+        .attr('x', x(cfg.labels[si]))
+        .attr('width', x.bandwidth())
+        .attr('y', y(cumY + val))
+        .attr('height', h - y(val))
+        .attr('fill', cfg.colors[vi]).attr('opacity', 0.8);
+      if (val > 0.01) {
+        g.append('text')
+          .attr('x', x(cfg.labels[si]) + x.bandwidth() / 2)
+          .attr('y', y(cumY + val / 2))
+          .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
+          .style('fill', '#fff').style('font-size', '11px').style('font-weight', '600')
+          .text(val.toFixed(2));
+      }
+      cumY += val;
+    });
+  });
+}
+
+// ============================================================
+// SECTION 1: DISTRIBUCIÓN MUESTRAL
+// ============================================================
+(function initDist() {
+  let betas = [];
+  const TRUE_B1 = 1.8;
+
+  function simulate(nSamples) {
+    const n = +document.getElementById('dist-n').value;
+    for (let s = 0; s < nSamples; s++) {
+      const x = Array.from({ length: n }, () => S.runif(6, 20));
+      const y = x.map(xi => 5 + TRUE_B1 * xi + S.rnorm(0, 4));
+      betas.push(S.ols(x, y).b1);
+    }
+    render();
+  }
+
+  function render() {
+    document.getElementById('dist-count').textContent = betas.length;
+    if (betas.length === 0) {
+      d3.select('#dist-chart').select('svg').remove();
+      document.getElementById('dist-mean').textContent = '—';
+      document.getElementById('dist-sd').textContent = '—';
+      document.getElementById('dist-bias').textContent = '—';
+      return;
+    }
+    const m = S.mean(betas);
+    const sd = S.sd(betas, 0);
+    document.getElementById('dist-mean').textContent = m.toFixed(4);
+    document.getElementById('dist-sd').textContent = sd.toFixed(4);
+    document.getElementById('dist-bias').textContent = (m - TRUE_B1).toFixed(4);
+
+    makeHistogram('dist-chart', {
+      xDomain: [TRUE_B1 - 0.6, TRUE_B1 + 0.6],
+      bins: 50,
+      datasets: [{ data: betas, color: getCSS('--accent'), opacity: 0.55 }],
+      vlines: [
+        { x: TRUE_B1, color: getCSS('--red'), width: 2.5, dash: '8 4' },
+        { x: m, color: getCSS('--green'), width: 2 }
+      ]
+    });
+  }
+
+  document.getElementById('dist-n').oninput = function () {
+    document.getElementById('dist-n-val').textContent = this.value;
+  };
+  document.getElementById('dist-btn-1').onclick = () => simulate(1);
+  document.getElementById('dist-btn-50').onclick = () => simulate(50);
+  document.getElementById('dist-btn-500').onclick = () => simulate(500);
+  document.getElementById('dist-btn-reset').onclick = () => { betas = []; render(); };
+  render();
+})();
+
+// ============================================================
+// SECTION 2: INSESGADEZ
+// ============================================================
+(function initBias() {
+  const MU = 10, SIGMA = 2;
+
+  function run() {
+    const bias = +document.getElementById('bias-slider').value;
+    const n = +document.getElementById('bias-n').value;
+    const N = 2000;
+    const est1 = [], est2 = [];
+    for (let i = 0; i < N; i++) {
+      const sample = S.generateNormal(n, MU, SIGMA);
+      const m = S.mean(sample);
+      est1.push(m);
+      est2.push(m + bias);
+    }
+    const e1 = S.mean(est1), e2 = S.mean(est2);
+    document.getElementById('bias-e1').textContent = e1.toFixed(3);
+    document.getElementById('bias-e2').textContent = e2.toFixed(3);
+    document.getElementById('bias-sesgo').textContent = (e2 - MU).toFixed(3);
+
+    const lo = Math.min(d3.min(est1), d3.min(est2)) - 0.5;
+    const hi = Math.max(d3.max(est1), d3.max(est2)) + 0.5;
+    makeHistogram('bias-chart', {
+      xDomain: [lo, hi], bins: 50,
+      datasets: [
+        { data: est1, color: getCSS('--green'), opacity: 0.45 },
+        { data: est2, color: getCSS('--red'), opacity: 0.4 }
+      ],
+      vlines: [{ x: MU, color: '#333', width: 2.5, dash: '8 4' }]
+    });
+  }
+
+  document.getElementById('bias-slider').oninput = function () {
+    document.getElementById('bias-val').textContent = (+this.value >= 0 ? '+' : '') + (+this.value).toFixed(1);
+  };
+  document.getElementById('bias-n').oninput = function () {
+    document.getElementById('bias-n-val').textContent = this.value;
+  };
+  document.getElementById('bias-btn-run').onclick = run;
+})();
+
+// ============================================================
+// SECTION 3: EFICIENCIA
+// ============================================================
+(function initEff() {
+  const MU = 10, SIGMA = 2;
+
+  function run() {
+    const n = +document.getElementById('eff-n').value;
+    const N = 2000;
+    const means = [], medians = [], firsts = [];
+    for (let i = 0; i < N; i++) {
+      const sample = S.generateNormal(n, MU, SIGMA);
+      means.push(S.mean(sample));
+      medians.push(S.median(sample));
+      firsts.push(sample[0]);
+    }
+    const v1 = S.variance(means, 0), v2 = S.variance(medians, 0), v3 = S.variance(firsts, 0);
+    document.getElementById('eff-var1').textContent = v1.toFixed(4);
+    document.getElementById('eff-var2').textContent = v2.toFixed(4);
+    document.getElementById('eff-var3').textContent = v3.toFixed(4);
+    document.getElementById('eff-rel').textContent = (v2 / v1).toFixed(2) + 'x';
+
+    const lo = Math.min(d3.min(firsts), 6);
+    const hi = Math.max(d3.max(firsts), 14);
+    makeHistogram('eff-chart', {
+      xDomain: [lo, hi], bins: 60,
+      datasets: [
+        { data: firsts, color: getCSS('--purple'), opacity: 0.3 },
+        { data: medians, color: getCSS('--orange'), opacity: 0.4 },
+        { data: means, color: getCSS('--accent'), opacity: 0.5 }
+      ],
+      vlines: [{ x: MU, color: '#333', width: 2.5, dash: '8 4' }]
+    });
+  }
+
+  document.getElementById('eff-n').oninput = function () {
+    document.getElementById('eff-n-val').textContent = this.value;
+  };
+  document.getElementById('eff-btn-run').onclick = run;
+})();
+
+// ============================================================
+// SECTION 4: CONSISTENCIA
+// ============================================================
+(function initCons() {
+  const MU = 10, SIGMA = 2;
+
+  function run() {
+    const n = +document.getElementById('cons-n').value;
+    document.getElementById('cons-n-show').textContent = n;
+    const varT = SIGMA * SIGMA / n;
+    document.getElementById('cons-var').textContent = varT.toFixed(4);
+    document.getElementById('cons-sd').textContent = Math.sqrt(varT).toFixed(4);
+
+    const N = 1500;
+    const means = [];
+    for (let i = 0; i < N; i++) {
+      means.push(S.mean(S.generateNormal(n, MU, SIGMA)));
+    }
+
+    const spread = Math.max(3 * Math.sqrt(varT), 0.5);
+    makeDensity('cons-chart', {
+      xDomain: [MU - 4, MU + 4],
+      datasets: [{ data: means, color: getCSS('--accent'), bandwidth: Math.max(0.05, spread / 5), width: 2.5 }],
+      vlines: [{ x: MU, color: getCSS('--red'), width: 2, dash: '8 4' }]
+    });
+  }
+
+  document.getElementById('cons-n').oninput = function () {
+    document.getElementById('cons-n-val').textContent = this.value;
+    run();
+  };
+
+  let animId = null;
+  document.getElementById('cons-btn-animate').onclick = function () {
+    if (animId) { clearInterval(animId); animId = null; this.textContent = 'Animar n: 10 → 1000'; return; }
+    const slider = document.getElementById('cons-n');
+    slider.value = 10;
+    this.textContent = 'Detener';
+    animId = setInterval(() => {
+      let v = +slider.value + 20;
+      if (v > 1000) { v = 1000; clearInterval(animId); animId = null; document.getElementById('cons-btn-animate').textContent = 'Animar n: 10 → 1000'; }
+      slider.value = v;
+      document.getElementById('cons-n-val').textContent = v;
+      run();
+    }, 200);
+  };
+})();
+
+// Consistencia: consistente vs inconsistente
+(function initCons2() {
+  const MU = 10, SIGMA = 2;
+
+  function run() {
+    const n = +document.getElementById('cons2-n').value;
+    const N = 2000;
+    const means = [], firsts = [];
+    for (let i = 0; i < N; i++) {
+      const sample = S.generateNormal(n, MU, SIGMA);
+      means.push(S.mean(sample));
+      firsts.push(sample[0]);
+    }
+    makeDensity('cons2-chart', {
+      xDomain: [MU - 6, MU + 6],
+      datasets: [
+        { data: firsts, color: getCSS('--red'), bandwidth: 0.4, width: 2 },
+        { data: means, color: getCSS('--green'), bandwidth: Math.max(0.05, S.sd(means, 0) / 3), width: 2.5 }
+      ],
+      vlines: [{ x: MU, color: '#333', width: 2, dash: '8 4' }]
+    });
+  }
+
+  document.getElementById('cons2-n').oninput = function () {
+    document.getElementById('cons2-n-val').textContent = this.value;
+  };
+  document.getElementById('cons2-btn-run').onclick = run;
+})();
+
+// ============================================================
+// SECTION 5: TARGETS + ECM
+// ============================================================
+(function initTargets() {
+  function drawTarget(canvasId, biasX, biasY, spread, color) {
+    const c = document.getElementById(canvasId);
+    const ctx = c.getContext('2d');
+    const cx = c.width / 2, cy = c.height / 2, r = c.width * 0.42;
+    ctx.clearRect(0, 0, c.width, c.height);
+
+    for (let i = 3; i >= 1; i--) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r * i / 3, 0, 2 * Math.PI);
+      ctx.strokeStyle = getCSS('--border');
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.moveTo(cx - 8, cy); ctx.lineTo(cx + 8, cy);
+    ctx.moveTo(cx, cy - 8); ctx.lineTo(cx, cy + 8);
+    ctx.strokeStyle = getCSS('--red');
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    for (let i = 0; i < 25; i++) {
+      const px = cx + biasX + S.randn() * spread;
+      const py = cy + biasY + S.randn() * spread;
+      ctx.beginPath();
+      ctx.arc(px, py, 3, 0, 2 * Math.PI);
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.7;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  drawTarget('target1', 0, 0, 10, getCSS('--accent'));
+  drawTarget('target2', 0, 0, 30, getCSS('--orange'));
+  drawTarget('target3', 30, -15, 8, getCSS('--purple'));
+})();
+
+(function initECM() {
+  function update() {
+    const biasA = +document.getElementById('ecm-bias-a').value;
+    const varA = +document.getElementById('ecm-var-a').value;
+    const biasB = +document.getElementById('ecm-bias-b').value;
+    const varB = +document.getElementById('ecm-var-b').value;
+    document.getElementById('ecm-bias-a-val').textContent = biasA.toFixed(1);
+    document.getElementById('ecm-var-a-val').textContent = varA.toFixed(1);
+    document.getElementById('ecm-bias-b-val').textContent = biasB.toFixed(1);
+    document.getElementById('ecm-var-b-val').textContent = varB.toFixed(1);
+
+    const ecmA = varA + biasA * biasA;
+    const ecmB = varB + biasB * biasB;
+    document.getElementById('ecm-a').textContent = ecmA.toFixed(2);
+    document.getElementById('ecm-b').textContent = ecmB.toFixed(2);
+    document.getElementById('ecm-winner').textContent = ecmA < ecmB ? 'A' : ecmA > ecmB ? 'B' : 'Empate';
+
+    makeBarChart('ecm-chart', {
+      labels: ['Estimador A', 'Estimador B'],
+      stacks: [
+        [varA, biasA * biasA],
+        [varB, biasB * biasB]
+      ],
+      colors: [getCSS('--accent'), getCSS('--red')],
+      height: 200
+    });
+  }
+
+  ['ecm-bias-a', 'ecm-var-a', 'ecm-bias-b', 'ecm-var-b'].forEach(id => {
+    document.getElementById(id).oninput = update;
+  });
+  update();
+})();
+
+// ============================================================
+// SECTION 6: LABORATORIO
+// ============================================================
+(function initLab() {
+  const MU = 10, SIGMA = 2;
+  const ESTIMATORS = [
+    {
+      name: 'Media muestral (X̄)',
+      fn: sample => S.mean(sample),
+      color: getCSS('--accent'),
+      unbiased: true, efficient: true, consistent: true,
+      desc: 'ΣXi/n'
+    },
+    {
+      name: 'Mediana muestral',
+      fn: sample => S.median(sample),
+      color: getCSS('--orange'),
+      unbiased: true, efficient: false, consistent: true,
+      desc: 'Med(X₁,...,Xn)'
+    },
+    {
+      name: 'Primer valor X₁',
+      fn: sample => sample[0],
+      color: getCSS('--purple'),
+      unbiased: true, efficient: false, consistent: false,
+      desc: 'Solo usa X₁'
+    },
+    {
+      name: 'Media + 2 (sesgado)',
+      fn: sample => S.mean(sample) + 2,
+      color: getCSS('--red'),
+      unbiased: false, efficient: false, consistent: false,
+      desc: 'X̄ + 2'
+    },
+    {
+      name: 'Promedio extremos',
+      fn: sample => (Math.min(...sample) + Math.max(...sample)) / 2,
+      color: '#2196F3',
+      unbiased: true, efficient: false, consistent: true,
+      desc: '(Xmin + Xmax)/2'
+    },
+    {
+      name: 'Moda muestral (aprox.)',
+      fn: sample => S.mode(sample),
+      color: '#795548',
+      unbiased: false, efficient: false, consistent: false,
+      desc: 'Bin más frecuente'
+    }
+  ];
+
+  function run() {
+    const n = +document.getElementById('lab-n').value;
+    const N = 2000;
+    const results = ESTIMATORS.map(e => ({ ...e, values: [] }));
+
+    for (let i = 0; i < N; i++) {
+      const sample = S.generateNormal(n, MU, SIGMA);
+      results.forEach(r => r.values.push(r.fn(sample)));
+    }
+
+    results.forEach(r => {
+      r.eMean = S.mean(r.values);
+      r.bias = r.eMean - MU;
+      r.var = S.variance(r.values, 0);
+      r.ecm = r.var + r.bias * r.bias;
+    });
+
+    const lo = Math.min(...results.map(r => d3.min(r.values))) - 0.5;
+    const hi = Math.max(...results.map(r => d3.max(r.values))) + 0.5;
+    const clampLo = Math.max(lo, MU - 8);
+    const clampHi = Math.min(hi, MU + 10);
+
+    makeHistogram('lab-chart', {
+      xDomain: [clampLo, clampHi], bins: 70,
+      datasets: results.map(r => ({ data: r.values, color: r.color, opacity: 0.3 })),
+      vlines: [{ x: MU, color: '#333', width: 2.5, dash: '8 4' }]
+    });
+
+    const legendEl = document.getElementById('lab-legend');
+    legendEl.innerHTML = results.map(r =>
+      `<span class="chart-legend-item"><span class="color-dot" style="background:${r.color}"></span> ${r.name}</span>`
+    ).join('');
+
+    const tbody = document.getElementById('lab-tbody');
+    const minVar = Math.min(...results.filter(r => Math.abs(r.bias) < 0.3).map(r => r.var));
+    tbody.innerHTML = results.map(r => {
+      const ubBadge = Math.abs(r.bias) < 0.3 ? '<span class="badge yes">Sí</span>' : '<span class="badge no">No</span>';
+      const effBadge = r.var <= minVar * 1.1 && Math.abs(r.bias) < 0.3 ? '<span class="badge yes">Sí</span>' : '<span class="badge no">No</span>';
+      const consBadge = r.consistent ? '<span class="badge yes">Sí</span>' : '<span class="badge no">No</span>';
+      return `<tr>
+        <td><span class="color-dot" style="background:${r.color}"></span>${r.name}</td>
+        <td>${r.eMean.toFixed(3)}</td>
+        <td>${r.bias.toFixed(3)}</td>
+        <td>${r.var.toFixed(3)}</td>
+        <td>${r.ecm.toFixed(3)}</td>
+        <td>${ubBadge}</td>
+        <td>${effBadge}</td>
+        <td>${consBadge}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  document.getElementById('lab-n').oninput = function () {
+    document.getElementById('lab-n-val').textContent = this.value;
+  };
+  document.getElementById('lab-btn-run').onclick = run;
+})();
+
+// Varianza con n vs n-1
+(function initVar() {
+  const MU = 10, SIGMA = 2, SIGMA2 = 4;
+
+  function run() {
+    const n = +document.getElementById('var-n').value;
+    const N = 2000;
+    const v1 = [], v2 = [];
+    for (let i = 0; i < N; i++) {
+      const sample = S.generateNormal(n, MU, SIGMA);
+      v1.push(S.variance(sample, 1));
+      v2.push(S.variance(sample, 0));
+    }
+    const e1 = S.mean(v1), e2 = S.mean(v2);
+    document.getElementById('var-e1').textContent = e1.toFixed(3);
+    document.getElementById('var-e2').textContent = e2.toFixed(3);
+    document.getElementById('var-bias').textContent = (e2 - SIGMA2).toFixed(3);
+    document.getElementById('var-bias-t').textContent = (-SIGMA2 / n).toFixed(3);
+
+    const lo = Math.max(0, Math.min(d3.min(v1), d3.min(v2)) - 0.5);
+    const hi = Math.max(d3.max(v1), d3.max(v2)) + 0.5;
+    makeHistogram('var-chart', {
+      xDomain: [lo, Math.min(hi, 15)], bins: 50,
+      datasets: [
+        { data: v1, color: getCSS('--green'), opacity: 0.45 },
+        { data: v2, color: getCSS('--red'), opacity: 0.4 }
+      ],
+      vlines: [{ x: SIGMA2, color: '#333', width: 2.5, dash: '8 4' }]
+    });
+  }
+
+  document.getElementById('var-n').oninput = function () {
+    document.getElementById('var-n-val').textContent = this.value;
+  };
+  document.getElementById('var-btn-run').onclick = run;
+})();
+
+// Desvío muestral
+(function initSD() {
+  const MU = 10, SIGMA = 2;
+
+  function run() {
+    const n = +document.getElementById('sd-n').value;
+    const N = 3000;
+    const sds = [];
+    for (let i = 0; i < N; i++) {
+      sds.push(S.sd(S.generateNormal(n, MU, SIGMA), 1));
+    }
+    const esd = S.mean(sds);
+    document.getElementById('sd-e').textContent = esd.toFixed(4);
+    document.getElementById('sd-bias').textContent = (esd - SIGMA).toFixed(4);
+
+    makeHistogram('sd-chart', {
+      xDomain: [0, Math.min(d3.max(sds) + 0.3, 5)], bins: 50,
+      datasets: [{ data: sds, color: getCSS('--purple'), opacity: 0.5 }],
+      vlines: [{ x: SIGMA, color: '#333', width: 2.5, dash: '8 4' }]
+    });
+  }
+
+  document.getElementById('sd-n').oninput = function () {
+    document.getElementById('sd-n-val').textContent = this.value;
+  };
+  document.getElementById('sd-btn-run').onclick = run;
+})();
+
+// ============================================================
+// NAVIGATION HIGHLIGHT
+// ============================================================
+(function initNav() {
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('nav.side-nav a');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const link = document.querySelector(`nav.side-nav a[href="#${e.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+  sections.forEach(s => obs.observe(s));
+})();
+</script>
+</body>
+</html>

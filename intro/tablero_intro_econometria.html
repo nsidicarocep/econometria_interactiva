@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introducción a la Econometría — Laboratorio Interactivo</title>
+<style>
+:root {
+  --bg: #F7F5F0;
+  --bg-alt: #EDEAE3;
+  --bg-canvas: #FFFFFF;
+  --text: #2C2C2E;
+  --text-sec: #636366;
+  --heading: #1A2744;
+  --accent: #3170A2;
+  --accent-light: #E3EEF6;
+  --point: #5B9BD5;
+  --point-stroke: #3A7ABD;
+  --line-color: #2D8659;
+  --line-light: #D4EDDF;
+  --resid: #D45A3A;
+  --resid-light: #FBEAE5;
+  --border: #DCDAD4;
+  --shadow: rgba(28,28,30,.07);
+  --font-d: Georgia,"Palatino Linotype","Book Antiqua",Palatino,serif;
+  --font-b: "Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-m: "Cascadia Code","Fira Code",Consolas,monospace;
+  --cw: 720px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --point:#7FC4F5;--point-stroke:#9DD4F8;
+  --line-color:#4DBB7F;--line-light:#1A3329;
+  --resid:#F07A5A;--resid-light:#3D2219;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --point:#7FC4F5;--point-stroke:#9DD4F8;
+  --line-color:#4DBB7F;--line-light:#1A3329;
+  --resid:#F07A5A;--resid-light:#3D2219;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}
+:root[data-theme="light"]{
+  --bg:#F7F5F0;--bg-alt:#EDEAE3;--bg-canvas:#FFFFFF;
+  --text:#2C2C2E;--text-sec:#636366;--heading:#1A2744;
+  --accent:#3170A2;--accent-light:#E3EEF6;
+  --point:#5B9BD5;--point-stroke:#3A7ABD;
+  --line-color:#2D8659;--line-light:#D4EDDF;
+  --resid:#D45A3A;--resid-light:#FBEAE5;
+  --border:#DCDAD4;--shadow:rgba(28,28,30,.07);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:17px;line-height:1.72;-webkit-font-smoothing:antialiased}
+article{max-width:var(--cw);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+
+h1{font-family:var(--font-d);font-size:clamp(2rem,5vw,2.8rem);color:var(--heading);line-height:1.12;text-wrap:balance;letter-spacing:-.025em;margin-bottom:.4rem}
+h2{font-family:var(--font-d);font-size:1.55rem;color:var(--heading);line-height:1.3;text-wrap:balance;margin-top:3.5rem;margin-bottom:.75rem;padding-bottom:.45rem;border-bottom:2px solid var(--accent)}
+h3{font-family:var(--font-d);font-size:1.15rem;color:var(--heading);margin-top:1.5rem;margin-bottom:.5rem}
+p{margin-bottom:1.15rem;max-width:65ch}
+strong{color:var(--heading);font-weight:600}
+
+.eyebrow{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:600;margin-bottom:.5rem}
+.subtitle{font-family:var(--font-d);font-size:1.15rem;color:var(--text-sec);font-style:italic;margin-bottom:2rem;max-width:55ch}
+.lead{font-size:1.05rem;color:var(--text-sec);max-width:60ch}
+
+.formula-block{background:var(--bg-alt);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.25rem 0;border-radius:0 6px 6px 0;overflow-x:auto}
+.math{font-family:var(--font-d);font-style:italic;font-size:1.05em}
+.math .n{font-style:normal}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 2px}
+.frac .num{border-bottom:1.5px solid currentColor;padding:0 5px 3px;line-height:1.3;text-align:center}
+.frac .den{padding:3px 5px 0;line-height:1.3;text-align:center}
+
+.callout{background:var(--resid-light);border-left:3px solid var(--resid);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.callout-title{font-weight:700;color:var(--resid);margin-bottom:.25rem}
+.tip{background:var(--line-light);border-left:3px solid var(--line-color);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+
+.props{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0;list-style:none}
+.props li{background:var(--bg-alt);padding:.35rem .75rem;border-radius:4px;font-size:.9rem;border:1px solid var(--border)}
+
+/* Interactive Lab */
+.lab{background:var(--bg-canvas);border:1px solid var(--border);border-radius:8px;padding:1.25rem;margin:1.5rem -1rem;box-shadow:0 2px 12px var(--shadow)}
+@media(min-width:800px){.lab{margin:1.5rem -3rem;padding:1.5rem}}
+
+.lab-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:1rem}
+.lab-title{font-family:var(--font-d);font-size:1.1rem;color:var(--heading);font-weight:700}
+
+.lab-canvas-wrap{position:relative;width:100%;border:1px solid var(--border);border-radius:4px;overflow:hidden;cursor:crosshair;touch-action:none;background:var(--bg-canvas)}
+.lab-canvas-wrap canvas{display:block;width:100%}
+.lab-canvas-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--text-sec);font-size:.95rem;pointer-events:none;text-align:center;opacity:.7;transition:opacity .3s}
+.lab-canvas-hint.hidden{opacity:0}
+
+.lab-btns{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem}
+.btn{font-family:var(--font-b);font-size:.82rem;padding:.4rem .85rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);cursor:pointer;transition:all .15s;font-weight:500}
+.btn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.btn:active{transform:scale(.97)}
+.btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-sm{font-size:.78rem;padding:.3rem .6rem}
+.btn-icon{display:inline-flex;align-items:center;gap:.3rem}
+
+.lab-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.6rem;margin-top:1rem}
+.stat-card{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.6rem .8rem}
+.stat-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-sec);margin-bottom:.15rem}
+.stat-value{font-family:var(--font-d);font-size:1.3rem;color:var(--heading);font-variant-numeric:tabular-nums}
+.stat-value.accent{color:var(--accent)}
+.stat-value.green{color:var(--line-color)}
+.stat-value.orange{color:var(--resid)}
+
+.lab-equation{background:var(--accent-light);border-radius:6px;padding:.75rem 1rem;margin-top:.75rem;text-align:center;font-family:var(--font-d);font-size:1.15rem;color:var(--heading);font-style:italic}
+.lab-eq-compare{display:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.75rem 1rem;margin-top:.5rem}
+.lab-eq-compare .eq-row{display:flex;align-items:center;gap:.5rem;padding:.3rem 0;font-family:var(--font-d);font-size:.95rem;font-style:italic}
+.lab-eq-compare .eq-row .eq-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.lab-eq-compare .eq-row .eq-label{font-style:normal;font-family:var(--font-b);font-size:.78rem;color:var(--text-sec);min-width:90px}
+.lab-eq-compare .eq-row.noint{color:var(--resid)}
+.lab-eq-compare .eq-compare-note{font-style:normal;font-family:var(--font-b);font-size:.82rem;color:var(--text-sec);margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--border)}
+
+.lab-toggles{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:.75rem;align-items:center}
+.toggle-label{display:flex;align-items:center;gap:.4rem;font-size:.85rem;cursor:pointer;user-select:none}
+.toggle-label input{accent-color:var(--accent);width:16px;height:16px}
+
+.lab-prediction{margin-top:1rem;padding:1rem;background:var(--bg);border:1px solid var(--border);border-radius:6px}
+.lab-prediction label{font-size:.85rem;font-weight:600;color:var(--heading);display:block;margin-bottom:.5rem}
+.lab-prediction .slider-row{display:flex;align-items:center;gap:.75rem}
+.lab-prediction input[type=range]{flex:1;accent-color:var(--accent)}
+.lab-prediction .pred-val{font-family:var(--font-d);font-size:.95rem;min-width:50px;text-align:right}
+.lab-prediction .pred-result{margin-top:.5rem;font-family:var(--font-d);font-size:1rem;color:var(--line-color)}
+
+/* Causation section */
+.confound-diagram{display:flex;flex-direction:column;align-items:center;gap:1rem;margin:2rem 0;padding:1.5rem;background:var(--bg-canvas);border:1px solid var(--border);border-radius:8px}
+.confound-row{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;justify-content:center}
+.confound-box{padding:.6rem 1.2rem;border-radius:6px;font-weight:600;font-size:.95rem;text-align:center;min-width:120px}
+.confound-box.x{background:var(--accent-light);color:var(--accent);border:1.5px solid var(--accent)}
+.confound-box.y{background:var(--resid-light);color:var(--resid);border:1.5px solid var(--resid)}
+.confound-box.z{background:var(--line-light);color:var(--line-color);border:1.5px solid var(--line-color);opacity:0;transition:opacity .5s}
+.confound-box.z.visible{opacity:1}
+.confound-arrow{font-size:1.5rem;color:var(--text-sec);transition:opacity .5s,transform .5s}
+.confound-arrow.hidden{opacity:0;transform:scale(.8)}
+.confound-arrow.visible{opacity:1;transform:scale(1)}
+
+.example-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.75rem;margin:1.5rem 0}
+.example-card{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:1rem}
+.example-card h4{font-family:var(--font-d);font-size:.95rem;color:var(--heading);margin-bottom:.3rem}
+.example-card p{font-size:.8rem;color:var(--text-sec);margin:0;line-height:1.4}
+
+footer.page-footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:.8rem;color:var(--text-sec)}
+
+@media(max-width:600px){
+  article{padding:2rem 1rem 4rem}
+  .lab{margin:1.25rem -.5rem;padding:1rem}
+  .lab-stats{grid-template-columns:1fr 1fr}
+  h2{font-size:1.35rem}
+}
+</style>
+</head>
+<body>
+<article>
+
+<header>
+  <p class="eyebrow">Econometría I &mdash; UADE</p>
+  <h1>Introducción a la Econometría</h1>
+  <p class="subtitle">Un laboratorio interactivo para explorar correlación, regresión lineal y causalidad</p>
+  <p class="lead">La econometría combina teoría económica, matemática y estadística para cuantificar relaciones entre variables usando datos. En esta página vas a poder experimentar con los conceptos fundamentales: colocar datos en un gráfico, calcular correlaciones y ajustar modelos de regresión lineal.</p>
+</header>
+
+<!-- ============================================ -->
+<!-- SECTION: CORRELACIÓN                          -->
+<!-- ============================================ -->
+<section>
+<h2>Correlación</h2>
+<p>El <strong>coeficiente de correlación</strong> <span class="math">r</span> mide la fuerza y dirección de la <strong>asociación lineal</strong> entre dos variables:</p>
+
+<div class="formula-block">
+  <span class="math">r = <span class="frac"><span class="num">Σ(x<sub>i</sub> − x̄)(y<sub>i</sub> − ȳ)</span><span class="den">√[Σ(x<sub>i</sub> − x̄)² · Σ(y<sub>i</sub> − ȳ)²]</span></span></span>
+</div>
+
+<ul class="props">
+  <li><span class="math">−1 ≤ r ≤ 1</span></li>
+  <li><span class="math">r > 0</span>: asociación positiva</li>
+  <li><span class="math">r < 0</span>: asociación negativa</li>
+  <li><span class="math">r = 0</span>: sin asociación lineal</li>
+  <li><span class="math">|r| = 1</span>: lineal perfecta</li>
+</ul>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: REGRESIÓN POR MCO                    -->
+<!-- ============================================ -->
+<section>
+<h2>Regresión Lineal Simple por MCO</h2>
+<p><strong>Mínimos Cuadrados Ordinarios (MCO)</strong> busca la recta que minimiza la suma de los residuos al cuadrado. Dado el modelo:</p>
+
+<div class="formula-block">
+  <span class="math">y<sub>i</sub> = β<sub>0</sub> + β<sub>1</sub>x<sub>i</sub> + u<sub>i</sub></span>
+</div>
+
+<p>Los estimadores MCO son:</p>
+<div class="formula-block">
+  <span class="math">β̂<sub>1</sub> = <span class="frac"><span class="num">Σ(x<sub>i</sub> − x̄)(y<sub>i</sub> − ȳ)</span><span class="den">Σ(x<sub>i</sub> − x̄)²</span></span></span>
+  &emsp;&emsp;
+  <span class="math">β̂<sub>0</sub> = ȳ − β̂<sub>1</sub> · x̄</span>
+</div>
+
+<p>Donde <span class="math">β̂<sub>0</sub></span> es el <strong>intercepto</strong> (valor de <span class="math">ŷ</span> cuando <span class="math">x = 0</span>) y <span class="math">β̂<sub>1</sub></span> es la <strong>pendiente</strong>: cuánto cambia <span class="math">ŷ</span> cuando <span class="math">x</span> aumenta en una unidad.</p>
+</section>
+
+<!-- ============================================ -->
+<!-- INTERACTIVE LAB                               -->
+<!-- ============================================ -->
+<section>
+<h2>Laboratorio Interactivo</h2>
+<p>Hacé click en el gráfico para agregar observaciones, o cargá un dataset de ejemplo. La correlación, la recta MCO y los residuos se actualizan en tiempo real.</p>
+
+<div class="lab" id="lab">
+  <div class="lab-header">
+    <span class="lab-title" id="lab-context">Hacé click para agregar puntos</span>
+    <div style="display:flex;gap:.3rem;flex-wrap:wrap">
+      <button class="btn btn-sm" id="btn-clear">Limpiar</button>
+      <button class="btn btn-sm" id="btn-undo">Deshacer</button>
+    </div>
+  </div>
+
+  <div class="lab-canvas-wrap" id="canvas-wrap">
+    <canvas id="scatter"></canvas>
+    <div class="lab-canvas-hint" id="canvas-hint">Click aquí para agregar puntos</div>
+  </div>
+
+  <div class="lab-btns">
+    <span style="font-size:.78rem;color:var(--text-sec);margin-right:.25rem">Datos de ejemplo:</span>
+    <button class="btn btn-sm" data-example="consumo">Consumo Keynesiano</button>
+    <button class="btn btn-sm" data-example="salario">Salario y Educación</button>
+    <button class="btn btn-sm" data-example="random">Sin relación</button>
+    <button class="btn btn-sm" data-example="negative">Precio y Demanda</button>
+  </div>
+
+  <div class="lab-toggles">
+    <label class="toggle-label"><input type="checkbox" id="tog-line" checked> Recta MCO</label>
+    <label class="toggle-label"><input type="checkbox" id="tog-resid"> Residuos</label>
+    <label class="toggle-label"><input type="checkbox" id="tog-means"> Medias (x̄, ȳ)</label>
+    <label class="toggle-label" style="border-left:1px solid var(--border);padding-left:.75rem"><input type="checkbox" id="tog-noint"> Comparar sin intercepto (β₀=0)</label>
+  </div>
+
+  <div class="lab-stats">
+    <div class="stat-card"><div class="stat-label">Observaciones</div><div class="stat-value" id="st-n">0</div></div>
+    <div class="stat-card"><div class="stat-label">Correlación (r)</div><div class="stat-value accent" id="st-r">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">β̂₁ (pendiente)</div><div class="stat-value green" id="st-b1">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">β̂₀ (intercepto)</div><div class="stat-value green" id="st-b0">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">R²</div><div class="stat-value accent" id="st-r2">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Σû² (SCR)</div><div class="stat-value orange" id="st-ssr">&mdash;</div></div>
+  </div>
+
+  <div class="lab-equation" id="lab-eq">ŷ = &mdash;</div>
+
+  <div class="lab-eq-compare" id="lab-eq-compare">
+    <div class="eq-row"><span class="eq-dot" style="background:var(--line-color)"></span><span class="eq-label">Con intercepto</span><span id="eq-with"></span></div>
+    <div class="eq-row noint"><span class="eq-dot" style="background:var(--resid)"></span><span class="eq-label">Sin intercepto</span><span id="eq-without"></span></div>
+    <div class="eq-compare-note" id="eq-compare-note"></div>
+  </div>
+
+  <div class="lab-prediction" id="lab-pred" style="display:none">
+    <label>Predicción: elegí un valor de <span class="math" id="pred-xname">x</span></label>
+    <div class="slider-row">
+      <span class="pred-val" id="pred-xval">5.0</span>
+      <input type="range" id="pred-slider" min="0" max="10" step="0.1" value="5">
+      <span class="pred-val" id="pred-xmax">10</span>
+    </div>
+    <div class="pred-result" id="pred-result"></div>
+  </div>
+</div>
+
+<div class="tip" style="margin-top:1.25rem">
+  <strong>Interpretación de β̂₁:</strong> si estimamos <span class="math">salario = 5.2 + 1.8 · educ</span>, entonces cada año adicional de educación se asocia con un aumento de $1.8 miles en el salario.
+</div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION: CORRELACIÓN ≠ CAUSALIDAD             -->
+<!-- ============================================ -->
+<section>
+<h2>Correlación ≠ Causalidad</h2>
+
+<div class="callout">
+  <div class="callout-title">Advertencia</div>
+  Una relación estadística, por más fuerte y sugerente que sea, nunca puede por sí sola establecer una conexión causal.
+</div>
+
+<p>Dos variables pueden estar altamente correlacionadas sin tener ninguna relación causal. Esto ocurre cuando una <strong>tercera variable</strong> (confundidor) afecta a ambas simultáneamente.</p>
+
+<h3>Ejemplo: helado y ahogamientos</h3>
+<p>Existe una correlación positiva entre el consumo de helado y la cantidad de ahogamientos. ¿El helado causa ahogamientos?</p>
+
+<div class="confound-diagram" id="confound">
+  <div class="confound-row">
+    <div class="confound-box x">Consumo de helado</div>
+    <span class="confound-arrow" id="arrow-xy">→</span>
+    <div class="confound-box y">Ahogamientos</div>
+  </div>
+  <div class="confound-row" style="margin-top:.5rem">
+    <span class="confound-arrow hidden" id="arrow-zx">↗</span>
+    <div class="confound-box z" id="box-z">Temperatura</div>
+    <span class="confound-arrow hidden" id="arrow-zy">↘</span>
+  </div>
+  <div style="margin-top:.75rem">
+    <button class="btn" id="btn-reveal">Revelar la variable omitida</button>
+  </div>
+  <p id="confound-text" style="font-size:.9rem;color:var(--text-sec);text-align:center;max-width:50ch;display:none">
+    La <strong style="color:var(--line-color)">temperatura</strong> es la variable confundidora: cuando hace calor, la gente come más helado <em>y</em> se baña más en piletas y ríos. Controlar por temperatura eliminaría la correlación espuria.
+  </p>
+</div>
+
+<p>Otros ejemplos clásicos de correlaciones espurias:</p>
+<div class="example-cards">
+  <div class="example-card">
+    <h4>Piratas y calentamiento</h4>
+    <p>La caída en el número de piratas correlaciona con el aumento de la temperatura global.</p>
+  </div>
+  <div class="example-card">
+    <h4>Gafas de sol y protector</h4>
+    <p>Las ventas de gafas de sol y protector solar están altamente correlacionadas.</p>
+  </div>
+  <div class="example-card">
+    <h4>Cigüeñas y nacimientos</h4>
+    <p>Países con más cigüeñas tienen más nacimientos. Variable omitida: ruralidad.</p>
+  </div>
+</div>
+
+<h3>Ceteris paribus</h3>
+<p>La idea central en econometría es medir el efecto de <span class="math">x</span> sobre <span class="math">y</span> <strong>manteniendo todo lo demás constante</strong>. La regresión múltiple es la herramienta principal para aproximar esto, aunque no siempre alcanza: a lo largo del curso veremos cuándo MCO falla y qué alternativas existen.</p>
+</section>
+
+<footer class="page-footer">
+  Econometría I &mdash; UADE &mdash; Basado en la Clase 1: Introducción a la Econometría.<br>
+  Bibliografía: Wooldridge, J.M. &mdash; <em>Introducción a la Econometría: Un Enfoque Moderno</em> (4ta ed.)
+</footer>
+
+</article>
+
+<script>
+(function(){
+'use strict';
+
+const PAD = {top:25, right:25, bottom:48, left:55};
+const EXAMPLES = {
+  consumo: {
+    label:'Función Consumo Keynesiana',
+    xLabel:'Ingreso ($)', yLabel:'Consumo ($)',
+    points:[
+      {x:1158,y:892},{x:1245,y:884},{x:2500,y:1597},{x:3100,y:2000},
+      {x:3800,y:2600},{x:4200,y:2850},{x:5100,y:3400},{x:6000,y:4110},
+      {x:7500,y:5050},{x:8200,y:5500},{x:9000,y:6100},{x:10000,y:6800},
+      {x:11319,y:8044},{x:11855,y:7832},{x:12500,y:8500}
+    ]
+  },
+  salario: {
+    label:'Salario y Educación',
+    xLabel:'Años de educación', yLabel:'Salario (miles $)',
+    points:(function(){
+      var pts=[], seed=123;
+      function rng(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646}
+      for(var i=0;i<50;i++){
+        var ed=Math.round(6+rng()*14);
+        var sal=5+1.8*ed+(rng()*8-4);
+        pts.push({x:ed,y:Math.round(sal*10)/10});
+      }
+      return pts;
+    })()
+  },
+  random: {
+    label:'Sin relación (r ≈ 0)',
+    xLabel:'X', yLabel:'Y',
+    points:(function(){
+      var pts=[], seed=42;
+      function rng(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646}
+      for(var i=0;i<40;i++) pts.push({x:Math.round(rng()*100)/10,y:Math.round(rng()*100)/10});
+      return pts;
+    })()
+  },
+  negative: {
+    label:'Precio y Cantidad Demandada',
+    xLabel:'Precio ($)', yLabel:'Cantidad demandada',
+    points:(function(){
+      var pts=[], seed=77;
+      function rng(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646}
+      for(var i=0;i<30;i++){
+        var p=2+rng()*18;
+        var q=50-2*p+(rng()*10-5);
+        pts.push({x:Math.round(p*10)/10,y:Math.round(Math.max(0,q)*10)/10});
+      }
+      return pts;
+    })()
+  }
+};
+
+let points=[], canvas, ctx, W, H, dpr;
+let showLine=true, showResid=false, showMeans=false, showNoInt=false;
+let xLabel='X', yLabel='Y';
+let xRange=[0,10], yRange=[0,10];
+let currentExample=null;
+
+function init(){
+  canvas=document.getElementById('scatter');
+  setupCanvas();
+  bindEvents();
+  draw();
+  window.addEventListener('resize', function(){setupCanvas();draw()});
+}
+
+function setupCanvas(){
+  var wrap=document.getElementById('canvas-wrap');
+  var w=wrap.clientWidth;
+  var h=Math.max(320, Math.min(450, w*0.55));
+  dpr=window.devicePixelRatio||1;
+  canvas.width=w*dpr;
+  canvas.height=h*dpr;
+  canvas.style.width=w+'px';
+  canvas.style.height=h+'px';
+  ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  W=w; H=h;
+}
+
+function computeRange(){
+  if(points.length===0){xRange=[0,10];yRange=[0,10];return}
+  var xs=points.map(function(p){return p.x}), ys=points.map(function(p){return p.y});
+  var xMin=Math.min.apply(null,xs), xMax=Math.max.apply(null,xs);
+  var yMin=Math.min.apply(null,ys), yMax=Math.max.apply(null,ys);
+  var xPad=(xMax-xMin)*0.12||1, yPad=(yMax-yMin)*0.12||1;
+  xRange=[xMin-xPad, xMax+xPad];
+  yRange=[yMin-yPad, yMax+yPad];
+  if(xRange[0]>0 && xRange[0]<xPad*2) xRange[0]=0;
+  if(yRange[0]>0 && yRange[0]<yPad*2) yRange[0]=0;
+}
+
+function niceStep(range, targetTicks){
+  var span=range[1]-range[0];
+  if(span<=0) return 1;
+  var rough=span/(targetTicks||6);
+  var mag=Math.pow(10,Math.floor(Math.log10(rough)));
+  var res=rough/mag;
+  if(res<=1.5) return mag;
+  if(res<=3) return 2*mag;
+  if(res<=7) return 5*mag;
+  return 10*mag;
+}
+
+function d2s(dx,dy){
+  var pw=W-PAD.left-PAD.right, ph=H-PAD.top-PAD.bottom;
+  return{
+    x:PAD.left+(dx-xRange[0])/(xRange[1]-xRange[0])*pw,
+    y:PAD.top+(yRange[1]-dy)/(yRange[1]-yRange[0])*ph
+  };
+}
+function s2d(sx,sy){
+  var pw=W-PAD.left-PAD.right, ph=H-PAD.top-PAD.bottom;
+  return{
+    x:xRange[0]+(sx-PAD.left)/pw*(xRange[1]-xRange[0]),
+    y:yRange[1]-(sy-PAD.top)/ph*(yRange[1]-yRange[0])
+  };
+}
+
+function computeOLS(){
+  var n=points.length;
+  if(n<2) return null;
+  var sx=0,sy=0;
+  for(var i=0;i<n;i++){sx+=points[i].x;sy+=points[i].y}
+  var xb=sx/n, yb=sy/n;
+  var num=0,den=0,syy=0;
+  for(var i=0;i<n;i++){
+    var dx=points[i].x-xb, dy=points[i].y-yb;
+    num+=dx*dy; den+=dx*dx; syy+=dy*dy;
+  }
+  if(den===0) return null;
+  var b1=num/den, b0=yb-b1*xb;
+  var ssTot=syy, ssRes=0;
+  for(var i=0;i<n;i++){
+    var yhat=b0+b1*points[i].x;
+    ssRes+=(points[i].y-yhat)*(points[i].y-yhat);
+  }
+  var r2=ssTot===0?0:1-ssRes/ssTot;
+  var r=den===0||syy===0?0:num/Math.sqrt(den*syy);
+  return{b0:b0,b1:b1,r2:r2,r:r,xBar:xb,yBar:yb,ssr:ssRes};
+}
+
+function computeOLSnoInt(){
+  var n=points.length;
+  if(n<2) return null;
+  var sxy=0,sxx=0,sy=0,syy=0;
+  for(var i=0;i<n;i++){
+    sxy+=points[i].x*points[i].y;
+    sxx+=points[i].x*points[i].x;
+    sy+=points[i].y;
+    syy+=points[i].y*points[i].y;
+  }
+  if(sxx===0) return null;
+  var b1=sxy/sxx;
+  var ssRes=0;
+  for(var i=0;i<n;i++){
+    var e=points[i].y-b1*points[i].x;
+    ssRes+=e*e;
+  }
+  var yb=sy/n, ssTot=0;
+  for(var i=0;i<n;i++){ssTot+=(points[i].y-yb)*(points[i].y-yb)}
+  var r2=ssTot===0?0:1-ssRes/ssTot;
+  return{b0:0,b1:b1,r2:r2,ssr:ssRes};
+}
+
+function getStyle(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+
+function draw(){
+  var bg=getStyle('--bg-canvas')||'#fff';
+  var txt=getStyle('--text')||'#2C2C2E';
+  var sec=getStyle('--text-sec')||'#636366';
+  var bdr=getStyle('--border')||'#DDD';
+  var ptC=getStyle('--point')||'#5B9BD5';
+  var ptS=getStyle('--point-stroke')||'#3A7ABD';
+  var lnC=getStyle('--line-color')||'#2D8659';
+  var rsC=getStyle('--resid')||'#D45A3A';
+  var accC=getStyle('--accent')||'#3170A2';
+
+  ctx.clearRect(0,0,W,H);
+  var pw=W-PAD.left-PAD.right, ph=H-PAD.top-PAD.bottom;
+
+  // Grid
+  var xStep=niceStep(xRange,6), yStep=niceStep(yRange,5);
+  ctx.strokeStyle=bdr;
+  ctx.lineWidth=0.5;
+  ctx.setLineDash([]);
+  var xStart=Math.ceil(xRange[0]/xStep)*xStep;
+  for(var v=xStart;v<=xRange[1];v+=xStep){
+    var sx=d2s(v,0).x;
+    if(sx<PAD.left||sx>W-PAD.right) continue;
+    ctx.beginPath();ctx.moveTo(sx,PAD.top);ctx.lineTo(sx,H-PAD.bottom);ctx.stroke();
+  }
+  var yStart=Math.ceil(yRange[0]/yStep)*yStep;
+  for(var v=yStart;v<=yRange[1];v+=yStep){
+    var sy=d2s(0,v).y;
+    if(sy<PAD.top||sy>H-PAD.bottom) continue;
+    ctx.beginPath();ctx.moveTo(PAD.left,sy);ctx.lineTo(W-PAD.right,sy);ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle=txt;
+  ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(PAD.left,PAD.top);ctx.lineTo(PAD.left,H-PAD.bottom);ctx.lineTo(W-PAD.right,H-PAD.bottom);ctx.stroke();
+
+  // Tick labels
+  ctx.fillStyle=sec;
+  ctx.font='11px '+getStyle('--font-b');
+  ctx.textAlign='center';
+  ctx.textBaseline='top';
+  for(var v=xStart;v<=xRange[1];v+=xStep){
+    var sx=d2s(v,0).x;
+    if(sx<PAD.left-5||sx>W-PAD.right+5) continue;
+    ctx.fillText(fmt(v),sx,H-PAD.bottom+6);
+  }
+  ctx.textAlign='right';
+  ctx.textBaseline='middle';
+  for(var v=yStart;v<=yRange[1];v+=yStep){
+    var sy=d2s(0,v).y;
+    if(sy<PAD.top-5||sy>H-PAD.bottom+5) continue;
+    ctx.fillText(fmt(v),PAD.left-8,sy);
+  }
+
+  // Axis labels
+  ctx.fillStyle=txt;
+  ctx.font='bold 12px '+getStyle('--font-b');
+  ctx.textAlign='center';
+  ctx.textBaseline='top';
+  ctx.fillText(xLabel,PAD.left+pw/2,H-PAD.bottom+28);
+  ctx.save();
+  ctx.translate(14,PAD.top+ph/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.textBaseline='middle';
+  ctx.fillText(yLabel,0,0);
+  ctx.restore();
+
+  var ols=computeOLS();
+
+  // Means
+  if(showMeans && ols){
+    ctx.setLineDash([5,5]);
+    ctx.strokeStyle=accC;
+    ctx.lineWidth=1;
+    var mxs=d2s(ols.xBar,0), mys=d2s(0,ols.yBar);
+    ctx.beginPath();ctx.moveTo(d2s(ols.xBar,yRange[0]).x,d2s(ols.xBar,yRange[0]).y);ctx.lineTo(d2s(ols.xBar,yRange[1]).x,d2s(ols.xBar,yRange[1]).y);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(d2s(xRange[0],ols.yBar).x,d2s(xRange[0],ols.yBar).y);ctx.lineTo(d2s(xRange[1],ols.yBar).x,d2s(xRange[1],ols.yBar).y);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=accC;
+    ctx.font='11px '+getStyle('--font-b');
+    ctx.textAlign='left';
+    ctx.fillText('x̄='+fmt(ols.xBar),d2s(ols.xBar,yRange[0]).x+4,H-PAD.bottom-14);
+    ctx.textBaseline='bottom';
+    ctx.fillText('ȳ='+fmt(ols.yBar),PAD.left+4,d2s(0,ols.yBar).y-4);
+    ctx.textBaseline='middle';
+  }
+
+  // Residuals
+  if(showResid && ols){
+    ctx.strokeStyle=rsC;
+    ctx.lineWidth=1.5;
+    ctx.setLineDash([]);
+    for(var i=0;i<points.length;i++){
+      var p=points[i], yhat=ols.b0+ols.b1*p.x;
+      var sp=d2s(p.x,p.y), sh=d2s(p.x,yhat);
+      ctx.beginPath();ctx.moveTo(sp.x,sp.y);ctx.lineTo(sh.x,sh.y);ctx.stroke();
+    }
+  }
+
+  // No-intercept regression line
+  var olsNI=showNoInt?computeOLSnoInt():null;
+  if(showNoInt && olsNI){
+    var x0=xRange[0], x1=xRange[1];
+    var y0ni=olsNI.b1*x0, y1ni=olsNI.b1*x1;
+    var s0=d2s(x0,y0ni), s1=d2s(x1,y1ni);
+    ctx.strokeStyle=rsC;
+    ctx.lineWidth=2;
+    ctx.setLineDash([8,5]);
+    ctx.beginPath();
+    ctx.moveTo(Math.max(PAD.left,s0.x),Math.min(H-PAD.bottom,Math.max(PAD.top,s0.y)));
+    ctx.lineTo(Math.min(W-PAD.right,s1.x),Math.min(H-PAD.bottom,Math.max(PAD.top,s1.y)));
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Regression line
+  if(showLine && ols){
+    var x0=xRange[0], x1=xRange[1];
+    var y0=ols.b0+ols.b1*x0, y1=ols.b0+ols.b1*x1;
+    var s0=d2s(x0,y0), s1=d2s(x1,y1);
+    ctx.strokeStyle=lnC;
+    ctx.lineWidth=2.5;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(Math.max(PAD.left,s0.x),Math.min(H-PAD.bottom,Math.max(PAD.top,s0.y)));
+    ctx.lineTo(Math.min(W-PAD.right,s1.x),Math.min(H-PAD.bottom,Math.max(PAD.top,s1.y)));
+    ctx.stroke();
+  }
+
+  // Prediction
+  var slider=document.getElementById('pred-slider');
+  if(ols && slider){
+    var px=parseFloat(slider.value);
+    var py=ols.b0+ols.b1*px;
+    var sp=d2s(px,py);
+    if(sp.x>=PAD.left && sp.x<=W-PAD.right){
+      ctx.setLineDash([4,4]);
+      ctx.strokeStyle=accC;
+      ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(sp.x,H-PAD.bottom);ctx.lineTo(sp.x,sp.y);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(PAD.left,sp.y);ctx.lineTo(sp.x,sp.y);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle=accC;
+      ctx.beginPath();ctx.arc(sp.x,sp.y,5,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  // Points
+  for(var i=0;i<points.length;i++){
+    var sp=d2s(points[i].x,points[i].y);
+    ctx.fillStyle=ptC;
+    ctx.strokeStyle=ptS;
+    ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(sp.x,sp.y,5.5,0,Math.PI*2);ctx.fill();ctx.stroke();
+  }
+
+  updateStats(ols, olsNI);
+}
+
+function fmt(v){
+  if(Math.abs(v)>=10000) return Math.round(v).toLocaleString('es-AR');
+  if(Math.abs(v)>=1000) return v.toFixed(0);
+  if(Math.abs(v)>=100) return v.toFixed(0);
+  if(Math.abs(v)>=10) return v.toFixed(1);
+  if(Math.abs(v)>=1) return v.toFixed(1);
+  return v.toFixed(2);
+}
+function fmtCoef(v){
+  if(Math.abs(v)>=100) return v.toFixed(1);
+  if(Math.abs(v)>=10) return v.toFixed(2);
+  return v.toFixed(4);
+}
+function fmt2(v){return Math.abs(v)>=100?v.toFixed(1):v.toFixed(2)}
+function fmt4(v){return v.toFixed(4)}
+
+function updateStats(ols, olsNI){
+  document.getElementById('st-n').textContent=points.length;
+  var pred=document.getElementById('lab-pred');
+  var cmpPanel=document.getElementById('lab-eq-compare');
+  if(!ols){
+    document.getElementById('st-r').textContent='—';
+    document.getElementById('st-b1').textContent='—';
+    document.getElementById('st-b0').textContent='—';
+    document.getElementById('st-r2').textContent='—';
+    document.getElementById('st-ssr').textContent='—';
+    document.getElementById('lab-eq').textContent='ŷ = —';
+    cmpPanel.style.display='none';
+    pred.style.display='none';
+    return;
+  }
+  document.getElementById('st-r').textContent=fmt4(ols.r);
+  document.getElementById('st-b1').textContent=fmtCoef(ols.b1);
+  document.getElementById('st-b0').textContent=fmtCoef(ols.b0);
+  document.getElementById('st-r2').textContent=fmt4(ols.r2);
+  document.getElementById('st-ssr').textContent=fmt(ols.ssr);
+
+  var sign=ols.b1>=0?' + ':' − ';
+  var b1abs=Math.abs(ols.b1);
+  var b0str=fmtCoef(ols.b0), b1str=fmtCoef(b1abs);
+  document.getElementById('lab-eq').innerHTML='ŷ = '+b0str+sign+b1str+' · '+xLabel;
+
+  if(olsNI && showNoInt){
+    cmpPanel.style.display='block';
+    document.getElementById('lab-eq').style.display='none';
+    document.getElementById('eq-with').innerHTML='ŷ = '+b0str+sign+b1str+' · '+xLabel+' &nbsp;(R²='+fmt4(ols.r2)+', SCR='+fmt(ols.ssr)+')';
+    var b1NIstr=fmtCoef(Math.abs(olsNI.b1));
+    document.getElementById('eq-without').innerHTML='ŷ = '+(olsNI.b1>=0?'':'−')+b1NIstr+' · '+xLabel+' &nbsp;(R²='+fmt4(olsNI.r2)+', SCR='+fmt(olsNI.ssr)+')';
+    var ssrDiff=olsNI.ssr-ols.ssr;
+    var ssrPct=ols.ssr>0?((ssrDiff/ols.ssr)*100).toFixed(1):'0';
+    document.getElementById('eq-compare-note').innerHTML=
+      'Forzar la recta por el origen aumenta la SCR en '+fmt(ssrDiff)+' (+'+ssrPct+'%). '+
+      'El intercepto libre permite un mejor ajuste absorbiendo el nivel medio de <em>y</em> que no se explica por <em>x</em>.';
+  } else {
+    cmpPanel.style.display='none';
+    document.getElementById('lab-eq').style.display='';
+  }
+
+  // Prediction
+  pred.style.display='block';
+  var slider=document.getElementById('pred-slider');
+  slider.min=xRange[0].toFixed(2);
+  slider.max=xRange[1].toFixed(2);
+  slider.step=((xRange[1]-xRange[0])/200).toFixed(4);
+  var px=parseFloat(slider.value);
+  document.getElementById('pred-xval').textContent=fmt(px);
+  document.getElementById('pred-xmax').textContent=fmt(xRange[1]);
+  var py=ols.b0+ols.b1*px;
+  document.getElementById('pred-result').innerHTML=
+    'ŷ = '+b0str+sign+b1str+' × '+fmt(px)+' = <strong>'+fmt(py)+'</strong>';
+
+  // Color r based on sign
+  var rEl=document.getElementById('st-r');
+  if(ols.r>0.3) rEl.style.color=getStyle('--line-color');
+  else if(ols.r<-0.3) rEl.style.color=getStyle('--resid');
+  else rEl.style.color=getStyle('--text-sec');
+}
+
+function bindEvents(){
+  canvas.addEventListener('click',function(e){
+    var rect=canvas.getBoundingClientRect();
+    var sx=(e.clientX-rect.left), sy=(e.clientY-rect.top);
+    if(sx<PAD.left||sx>W-PAD.right||sy<PAD.top||sy>H-PAD.bottom) return;
+    var d=s2d(sx,sy);
+    points.push({x:Math.round(d.x*100)/100, y:Math.round(d.y*100)/100});
+    currentExample=null;
+    document.getElementById('lab-context').textContent=points.length+' observaciones';
+    document.getElementById('canvas-hint').classList.add('hidden');
+    draw();
+  });
+
+  // Touch support
+  canvas.addEventListener('touchend',function(e){
+    e.preventDefault();
+    var rect=canvas.getBoundingClientRect();
+    var touch=e.changedTouches[0];
+    var sx=touch.clientX-rect.left, sy=touch.clientY-rect.top;
+    if(sx<PAD.left||sx>W-PAD.right||sy<PAD.top||sy>H-PAD.bottom) return;
+    var d=s2d(sx,sy);
+    points.push({x:Math.round(d.x*100)/100, y:Math.round(d.y*100)/100});
+    currentExample=null;
+    document.getElementById('lab-context').textContent=points.length+' observaciones';
+    document.getElementById('canvas-hint').classList.add('hidden');
+    draw();
+  });
+
+  document.getElementById('btn-clear').addEventListener('click',function(){
+    points=[];
+    currentExample=null;
+    xRange=[0,10];yRange=[0,10];
+    xLabel='X';yLabel='Y';
+    document.getElementById('lab-context').textContent='Hacé click para agregar puntos';
+    document.getElementById('canvas-hint').classList.remove('hidden');
+    document.getElementById('pred-xname').textContent='x';
+    var slider=document.getElementById('pred-slider');
+    slider.min='0';slider.max='10';slider.step='0.1';slider.value='5';
+    draw();
+  });
+
+  document.getElementById('btn-undo').addEventListener('click',function(){
+    if(points.length===0) return;
+    points.pop();
+    if(currentExample) computeRange();
+    else if(points.length===0){xRange=[0,10];yRange=[0,10]}
+    document.getElementById('lab-context').textContent=points.length?points.length+' observaciones':'Hacé click para agregar puntos';
+    if(points.length===0) document.getElementById('canvas-hint').classList.remove('hidden');
+    draw();
+  });
+
+  document.querySelectorAll('[data-example]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var key=this.getAttribute('data-example');
+      var ex=EXAMPLES[key];
+      if(!ex) return;
+      points=ex.points.map(function(p){return{x:p.x,y:p.y}});
+      xLabel=ex.xLabel;yLabel=ex.yLabel;
+      currentExample=key;
+      computeRange();
+      document.getElementById('lab-context').textContent=ex.label+' ('+points.length+' obs.)';
+      document.getElementById('canvas-hint').classList.add('hidden');
+      var slider=document.getElementById('pred-slider');
+      slider.min=xRange[0].toFixed(2);
+      slider.max=xRange[1].toFixed(2);
+      slider.step=((xRange[1]-xRange[0])/200).toFixed(4);
+      slider.value=((xRange[0]+xRange[1])/2).toFixed(2);
+      document.getElementById('pred-xname').textContent=ex.xLabel;
+      draw();
+    });
+  });
+
+  document.getElementById('tog-line').addEventListener('change',function(){showLine=this.checked;draw()});
+  document.getElementById('tog-resid').addEventListener('change',function(){showResid=this.checked;draw()});
+  document.getElementById('tog-means').addEventListener('change',function(){showMeans=this.checked;draw()});
+  document.getElementById('tog-noint').addEventListener('change',function(){showNoInt=this.checked;draw()});
+
+  document.getElementById('pred-slider').addEventListener('input',function(){
+    document.getElementById('pred-xval').textContent=fmt(parseFloat(this.value));
+    draw();
+  });
+
+  // Causation reveal
+  document.getElementById('btn-reveal').addEventListener('click',function(){
+    document.getElementById('box-z').classList.add('visible');
+    document.getElementById('arrow-zx').classList.remove('hidden');
+    document.getElementById('arrow-zx').classList.add('visible');
+    document.getElementById('arrow-zy').classList.remove('hidden');
+    document.getElementById('arrow-zy').classList.add('visible');
+    document.getElementById('arrow-xy').style.opacity='0.3';
+    document.getElementById('arrow-xy').textContent='⇸';
+    document.getElementById('confound-text').style.display='block';
+    this.style.display='none';
+  });
+}
+
+
+window.addEventListener('load', init);
+})();
+</script>
+</body>
+</html>
