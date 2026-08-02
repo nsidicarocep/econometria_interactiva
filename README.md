@@ -1,6 +1,6 @@
 # Econometria I - Materiales interactivos
 
-Repositorio de materiales complementarios para la materia **Econometria I** (UADE, 2C 2026).
+Repositorio de materiales complementarios para la materia **Econometria I** (UADE).
 
 ## Sobre este repositorio
 
