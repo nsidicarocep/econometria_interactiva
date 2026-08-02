@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Regresión Lineal Simple — Laboratorio Interactivo</title>
+<style>
+:root {
+  --bg: #F7F5F0;
+  --bg-alt: #EDEAE3;
+  --bg-canvas: #FFFFFF;
+  --text: #2C2C2E;
+  --text-sec: #636366;
+  --heading: #1A2744;
+  --accent: #3170A2;
+  --accent-light: #E3EEF6;
+  --green: #2D8659;
+  --green-light: #D4EDDF;
+  --red: #D45A3A;
+  --red-light: #FBEAE5;
+  --orange: #C87A1A;
+  --orange-light: #FDF0DB;
+  --purple: #7B5EA7;
+  --purple-light: #EDE7F6;
+  --blue: #5B9BD5;
+  --border: #DCDAD4;
+  --shadow: rgba(28,28,30,.07);
+  --font-d: Georgia,"Palatino Linotype","Book Antiqua",Palatino,serif;
+  --font-b: "Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-m: "Cascadia Code","Fira Code",Consolas,monospace;
+  --cw: 780px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --green:#4DBB7F;--green-light:#1A3329;
+  --red:#F07A5A;--red-light:#3D2219;
+  --orange:#E8A84C;--orange-light:#3D2E14;
+  --purple:#A78BDB;--purple-light:#2A2040;
+  --blue:#7FC4F5;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --green:#4DBB7F;--green-light:#1A3329;
+  --red:#F07A5A;--red-light:#3D2219;
+  --orange:#E8A84C;--orange-light:#3D2E14;
+  --purple:#A78BDB;--purple-light:#2A2040;
+  --blue:#7FC4F5;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}
+:root[data-theme="light"]{
+  --bg:#F7F5F0;--bg-alt:#EDEAE3;--bg-canvas:#FFFFFF;
+  --text:#2C2C2E;--text-sec:#636366;--heading:#1A2744;
+  --accent:#3170A2;--accent-light:#E3EEF6;
+  --green:#2D8659;--green-light:#D4EDDF;
+  --red:#D45A3A;--red-light:#FBEAE5;
+  --orange:#C87A1A;--orange-light:#FDF0DB;
+  --purple:#7B5EA7;--purple-light:#EDE7F6;
+  --blue:#5B9BD5;
+  --border:#DCDAD4;--shadow:rgba(28,28,30,.07);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:17px;line-height:1.72;-webkit-font-smoothing:antialiased}
+article{max-width:var(--cw);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+
+h1{font-family:var(--font-d);font-size:clamp(2rem,5vw,2.8rem);color:var(--heading);line-height:1.12;text-wrap:balance;letter-spacing:-.025em;margin-bottom:.4rem}
+h2{font-family:var(--font-d);font-size:1.55rem;color:var(--heading);line-height:1.3;text-wrap:balance;margin-top:3.5rem;margin-bottom:.75rem;padding-bottom:.45rem;border-bottom:2px solid var(--accent)}
+h3{font-family:var(--font-d);font-size:1.15rem;color:var(--heading);margin-top:1.5rem;margin-bottom:.5rem}
+p{margin-bottom:1.15rem;max-width:65ch}
+strong{color:var(--heading);font-weight:600}
+
+.eyebrow{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:600;margin-bottom:.5rem}
+.subtitle{font-family:var(--font-d);font-size:1.15rem;color:var(--text-sec);font-style:italic;margin-bottom:2rem;max-width:55ch}
+.lead{font-size:1.05rem;color:var(--text-sec);max-width:60ch}
+
+.formula-block{background:var(--bg-alt);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.25rem 0;border-radius:0 6px 6px 0;overflow-x:auto}
+.math{font-family:var(--font-d);font-style:italic;font-size:1.05em}
+.math .n{font-style:normal}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 2px}
+.frac .num{border-bottom:1.5px solid currentColor;padding:0 5px 3px;line-height:1.3;text-align:center}
+.frac .den{padding:3px 5px 0;line-height:1.3;text-align:center}
+
+.callout{background:var(--red-light);border-left:3px solid var(--red);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.callout-title{font-weight:700;color:var(--red);margin-bottom:.25rem}
+.tip{background:var(--green-light);border-left:3px solid var(--green);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+
+/* Lab */
+.lab{background:var(--bg-canvas);border:1px solid var(--border);border-radius:8px;padding:1.25rem;margin:1.5rem -1rem;box-shadow:0 2px 12px var(--shadow)}
+@media(min-width:800px){.lab{margin:1.5rem -3rem;padding:1.5rem}}
+.lab-title{font-family:var(--font-d);font-size:1.1rem;color:var(--heading);font-weight:700;margin-bottom:.75rem}
+.lab-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:1rem}
+
+.lab-canvas-wrap{position:relative;width:100%;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--bg-canvas)}
+.lab-canvas-wrap canvas{display:block;width:100%}
+
+.lab-btns{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem}
+.btn{font-family:var(--font-b);font-size:.82rem;padding:.4rem .85rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);cursor:pointer;transition:all .15s;font-weight:500}
+.btn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.btn:active{transform:scale(.97)}
+.btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;font-size:.88rem;padding:.5rem 1.2rem}
+.btn-primary:hover{background:var(--heading);border-color:var(--heading);color:#fff}
+.btn-danger{color:var(--red);border-color:var(--red)}
+.btn-danger:hover{background:var(--red-light);color:var(--red)}
+.btn-sm{font-size:.78rem;padding:.3rem .6rem}
+
+.lab-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.6rem;margin-top:1rem}
+.stat-card{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.6rem .8rem}
+.stat-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-sec);margin-bottom:.15rem}
+.stat-value{font-family:var(--font-d);font-size:1.3rem;color:var(--heading);font-variant-numeric:tabular-nums}
+.stat-value.accent{color:var(--accent)}
+.stat-value.green{color:var(--green)}
+.stat-value.orange{color:var(--red)}
+
+.lab-equation{background:var(--accent-light);border-radius:6px;padding:.75rem 1rem;margin-top:.75rem;text-align:center;font-family:var(--font-d);font-size:1.15rem;color:var(--heading);font-style:italic}
+
+/* Data entry table */
+.data-entry{width:100%;border-collapse:collapse;margin-bottom:.75rem}
+.data-entry th{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-sec);font-weight:600;padding:.4rem .5rem;text-align:center;border-bottom:2px solid var(--border)}
+.data-entry td{padding:.25rem .3rem;text-align:center;border-bottom:1px solid var(--border)}
+.data-entry td:first-child{font-family:var(--font-m);font-size:.8rem;color:var(--text-sec);width:2rem}
+.data-entry input[type="number"]{font-family:var(--font-m);font-size:.9rem;width:100%;max-width:100px;padding:.35rem .5rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);text-align:center;outline:none;transition:border-color .15s}
+.data-entry input[type="number"]:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-light)}
+.data-entry input::-webkit-outer-spin-button,
+.data-entry input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.data-entry input[type=number]{-moz-appearance:textfield}
+.data-entry .btn-del{background:none;border:none;color:var(--text-sec);cursor:pointer;font-size:.9rem;padding:.2rem .4rem;border-radius:3px;transition:all .15s}
+.data-entry .btn-del:hover{background:var(--red-light);color:var(--red)}
+.data-btns{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;align-items:center}
+
+/* Results table */
+.results-wrap{overflow-x:auto;margin-top:1rem;border:1px solid var(--border);border-radius:6px}
+.results-table{width:100%;border-collapse:collapse;font-size:.82rem;white-space:nowrap}
+.results-table th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-sec);font-weight:600;padding:.5rem .6rem;text-align:center;border-bottom:2px solid var(--border);background:var(--bg-alt);position:sticky;top:0}
+.results-table td{padding:.4rem .6rem;text-align:center;border-bottom:1px solid var(--border);font-family:var(--font-m);font-size:.8rem}
+.results-table tr:last-child td{font-weight:700;background:var(--accent-light);color:var(--accent);border-bottom:none}
+.results-table tr:hover:not(:last-child) td{background:var(--bg-alt)}
+
+/* Variance decomposition bar */
+.var-decomp{margin-top:1rem}
+.var-bar-wrap{display:flex;height:32px;border-radius:6px;overflow:hidden;border:1px solid var(--border);margin:.5rem 0}
+.var-bar-seg{display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#fff;transition:width .4s ease}
+.var-bar-sse{background:var(--accent)}
+.var-bar-ssr{background:var(--red)}
+.var-legend{display:flex;flex-wrap:wrap;gap:1rem;margin-top:.4rem;font-size:.82rem}
+.var-legend-item{display:flex;align-items:center;gap:.3rem}
+.var-legend-dot{width:10px;height:10px;border-radius:2px}
+
+/* Property checks */
+.prop-checks{list-style:none;margin:.75rem 0}
+.prop-checks li{display:flex;align-items:center;gap:.5rem;padding:.4rem 0;font-size:.9rem;border-bottom:1px solid var(--border)}
+.prop-checks li:last-child{border-bottom:none}
+.prop-check{font-size:1.1rem}
+.prop-val{font-family:var(--font-m);font-size:.85rem;color:var(--accent)}
+
+/* Prediction */
+.predict-row{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-top:.75rem;padding:.75rem;background:var(--bg-alt);border-radius:6px}
+.predict-row label{font-size:.9rem;font-weight:500}
+.predict-row input{font-family:var(--font-m);font-size:.9rem;width:80px;padding:.35rem .5rem;border:1px solid var(--border);border-radius:4px;background:var(--bg-canvas);color:var(--text);text-align:center;outline:none}
+.predict-row input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-light)}
+.predict-result{font-family:var(--font-d);font-size:1.05rem;color:var(--green);font-weight:600}
+
+/* Example data buttons */
+.example-btns{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1rem}
+.example-btns .btn{font-size:.78rem}
+
+/* Assumptions */
+.assumptions-grid{display:grid;gap:.75rem;margin-top:1rem}
+.assumption-card{background:var(--bg-alt);border-radius:6px;padding:.85rem 1rem;border-left:3px solid var(--accent)}
+.assumption-id{font-family:var(--font-m);font-size:.75rem;color:var(--accent);font-weight:700;margin-bottom:.2rem}
+.assumption-name{font-family:var(--font-d);font-weight:700;color:var(--heading);font-size:.95rem;margin-bottom:.2rem}
+.assumption-desc{font-size:.88rem;color:var(--text-sec);line-height:1.5}
+
+/* Hidden by default */
+.results-section{display:none}
+.results-section.visible{display:block}
+
+/* Responsive */
+@media(max-width:600px){
+  .lab{margin:1rem -.5rem;padding:1rem}
+  .data-entry input[type="number"]{max-width:70px;font-size:.8rem}
+  .lab-stats{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+  .stat-value{font-size:1.1rem}
+}
+</style>
+</head>
+<body>
+<article>
+
+<p class="eyebrow">Econometria I — Clase 3</p>
+<h1>Regresión Lineal Simple</h1>
+<p class="subtitle">Estimación por OLS, propiedades algebraicas, varianza de los estimadores y bondad de ajuste</p>
+
+<p class="lead">En esta página podés cargar tus propios datos, estimar la regresión por Mínimos Cuadrados Ordinarios (OLS) y explorar en detalle cada paso del cálculo: desde los coeficientes estimados hasta el R², pasando por los residuos y los errores estándar.</p>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>El modelo</h2>
+
+<p>El <strong>modelo de regresión lineal simple</strong> (o modelo poblacional) relaciona una variable dependiente <span class="math">y</span> con una variable independiente <span class="math">x</span>:</p>
+
+<div class="formula-block">
+  <span class="math">y<sub>i</sub> = &beta;<sub>0</sub> + &beta;<sub>1</sub> x<sub>i</sub> + u<sub>i</sub></span>
+</div>
+
+<p>donde <span class="math">&beta;<sub>0</sub></span> es el intercepto, <span class="math">&beta;<sub>1</sub></span> es la pendiente (el efecto marginal de <span class="math">x</span> sobre <span class="math">y</span>) y <span class="math">u<sub>i</sub></span> es el término de error.</p>
+
+<p>Con una muestra de <span class="math">n</span> observaciones, OLS estima los parámetros minimizando la suma de residuos al cuadrado. Los estimadores resultantes son:</p>
+
+<div class="formula-block">
+  <span class="math">&beta;&#770;<sub>1</sub> = <span class="frac"><span class="num">&sum;(x<sub>i</sub> &minus; x&#772;)(y<sub>i</sub> &minus; y&#772;)</span><span class="den">&sum;(x<sub>i</sub> &minus; x&#772;)&sup2;</span></span></span>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <span class="math">&beta;&#770;<sub>0</sub> = y&#772; &minus; &beta;&#770;<sub>1</sub> x&#772;</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>Calculadora OLS interactiva</h2>
+
+<p>Ingresá los valores de <strong>X</strong> e <strong>Y</strong> en la tabla y presioná <strong>Calcular</strong> para obtener todos los resultados de la regresión. Necesitás al menos 3 observaciones con variación en X.</p>
+
+<div class="lab">
+  <div class="lab-header">
+    <span class="lab-title">Datos</span>
+    <div class="example-btns">
+      <button class="btn btn-sm" onclick="loadExample('small')">Ejemplo básico</button>
+      <button class="btn btn-sm" onclick="loadExample('salary')">Salario y educación</button>
+      <button class="btn btn-sm" onclick="loadExample('consumption')">Consumo e ingreso</button>
+    </div>
+  </div>
+
+  <div style="overflow-x:auto">
+    <table class="data-entry" id="dataTable">
+      <thead>
+        <tr><th style="width:2rem">#</th><th>X</th><th>Y</th><th style="width:2rem"></th></tr>
+      </thead>
+      <tbody id="dataBody"></tbody>
+    </table>
+  </div>
+
+  <div class="data-btns">
+    <button class="btn btn-sm" onclick="addRow()">+ Agregar fila</button>
+    <button class="btn btn-sm" onclick="addMultipleRows()">+ 5 filas</button>
+    <button class="btn btn-sm btn-danger" onclick="clearData()">Limpiar todo</button>
+    <div style="flex:1"></div>
+    <button class="btn btn-primary" onclick="calculate()">Calcular</button>
+  </div>
+
+  <div id="errorMsg" style="display:none;color:var(--red);font-size:.9rem;margin-bottom:.75rem;font-weight:500"></div>
+
+  <!-- Results -->
+  <div id="resultsSection" class="results-section">
+
+    <!-- Equation -->
+    <div class="lab-equation" id="eqDisplay"></div>
+
+    <!-- Stats grid -->
+    <div class="lab-stats" id="statsGrid"></div>
+
+    <!-- Scatter plot -->
+    <div style="margin-top:1rem">
+      <div class="lab-header">
+        <span class="lab-title">Diagrama de dispersión</span>
+        <div class="lab-btns">
+          <button class="btn btn-sm active" id="btnResid" onclick="toggleOverlay('resid')">Residuos</button>
+          <button class="btn btn-sm" id="btnMeans" onclick="toggleOverlay('means')">Medias</button>
+          <button class="btn btn-sm" id="btnLabels" onclick="toggleOverlay('labels')">Etiquetas</button>
+        </div>
+      </div>
+      <div class="lab-canvas-wrap">
+        <canvas id="scatterCanvas" width="760" height="420"></canvas>
+      </div>
+    </div>
+
+    <!-- Prediction -->
+    <div class="predict-row">
+      <label>Predecir ŷ para X₀ =</label>
+      <input type="number" id="predX" step="any" oninput="predict()">
+      <span class="predict-result" id="predResult"></span>
+    </div>
+
+    <!-- Detailed calculations -->
+    <h3 style="margin-top:1.5rem">Tabla de cálculos intermedios</h3>
+    <p style="font-size:.88rem;color:var(--text-sec)">Cada columna muestra un paso del cálculo de OLS. La última fila contiene las sumas necesarias para los estimadores.</p>
+    <div class="results-wrap" id="calcTableWrap"></div>
+
+    <!-- Variance decomposition -->
+    <h3 style="margin-top:1.5rem">Descomposición de la varianza</h3>
+    <p style="font-size:.88rem;color:var(--text-sec)">La variabilidad total de <span class="math">y</span> se descompone en la parte explicada por el modelo y la parte no explicada (residuos).</p>
+    <div class="formula-block">
+      <span class="math"><span class="n">SST</span> = <span class="n">SSE</span> + <span class="n">SSR</span></span>
+      &nbsp;&nbsp;&rarr;&nbsp;&nbsp;
+      <span class="math">&sum;(y<sub>i</sub>&minus;y&#772;)&sup2; = &sum;(y&#770;<sub>i</sub>&minus;y&#772;)&sup2; + &sum;u&#770;<sub>i</sub>&sup2;</span>
+    </div>
+    <div class="var-decomp" id="varDecomp"></div>
+
+    <!-- Algebraic properties -->
+    <h3 style="margin-top:1.5rem">Propiedades algebraicas (verificación)</h3>
+    <p style="font-size:.88rem;color:var(--text-sec)">Estas propiedades se cumplen <em>siempre</em> en OLS, sin necesidad de supuestos adicionales.</p>
+    <ul class="prop-checks" id="propChecks"></ul>
+
+    <!-- Standard errors -->
+    <h3 style="margin-top:1.5rem">Error estándar de la regresión y de los estimadores</h3>
+    <div id="seSection"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>¿Qué mide el R²?</h2>
+
+<p>El <strong>coeficiente de determinación</strong> R² indica qué proporción de la variabilidad de <span class="math">y</span> es explicada por el modelo:</p>
+
+<div class="formula-block">
+  <span class="math">R&sup2; = 1 &minus; <span class="frac"><span class="num"><span class="n">SSR</span></span><span class="den"><span class="n">SST</span></span></span> = <span class="frac"><span class="num"><span class="n">SSE</span></span><span class="den"><span class="n">SST</span></span></span></span>
+</div>
+
+<p>Siempre se cumple que <span class="math">0 &le; R&sup2; &le; 1</span>. Un valor cercano a 1 indica que el modelo explica gran parte de la variación de <span class="math">y</span>; un valor cercano a 0 indica que <span class="math">x</span> tiene poco poder explicativo.</p>
+
+<div class="tip">
+  <strong>Atención:</strong> un R² alto no implica causalidad, ni un R² bajo significa que el modelo sea inútil. En ciencias sociales, valores de 0.20 a 0.40 son comunes y pueden ser informativos.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>El desvío estándar de la regresión</h2>
+
+<p>El <strong>desvío estándar de la regresión</strong> (SER, o <span class="math">&sigma;&#770;</span>) mide la dispersión típica de los residuos alrededor de la recta estimada. Cuanto menor sea, mejor se ajusta el modelo a los datos:</p>
+
+<div class="formula-block">
+  <span class="math">&sigma;&#770;&sup2; = <span class="frac"><span class="num"><span class="n">SSR</span></span><span class="den">n &minus; 2</span></span> = <span class="frac"><span class="num">&sum;u&#770;<sub>i</sub>&sup2;</span><span class="den">n &minus; 2</span></span></span>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <span class="math"><span class="n">SER</span> = &sigma;&#770; = &radic;<span style="text-decoration:overline">&sigma;&#770;&sup2;</span></span>
+</div>
+
+<p>Dividimos por <span class="math">n &minus; 2</span> (y no por <span class="math">n</span>) porque estimamos dos parámetros (<span class="math">&beta;&#770;<sub>0</sub></span> y <span class="math">&beta;&#770;<sub>1</sub></span>), lo que consume dos grados de libertad. Esto hace que <span class="math">&sigma;&#770;&sup2;</span> sea un estimador <strong>insesgado</strong> de <span class="math">&sigma;&sup2;</span>.</p>
+
+<p>Con este estimador, podemos calcular los <strong>errores estándar</strong> de los coeficientes:</p>
+
+<div class="formula-block">
+  <span class="math"><span class="n">se</span>(&beta;&#770;<sub>1</sub>) = <span class="frac"><span class="num">&sigma;&#770;</span><span class="den">&radic;<span style="text-decoration:overline"><span class="n">SST</span><sub>x</sub></span></span></span></span>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <span class="math"><span class="n">se</span>(&beta;&#770;<sub>0</sub>) = &sigma;&#770; &sdot; &radic;<span style="text-decoration:overline"><span class="frac"><span class="num">&sum;x<sub>i</sub>&sup2;</span><span class="den">n &sdot; <span class="n">SST</span><sub>x</sub></span></span></span></span>
+</div>
+
+<p>Los errores estándar miden la <strong>precisión</strong> de los estimadores: cuanto menores sean, más confiable es la estimación. Son fundamentales para construir intervalos de confianza y realizar tests de hipótesis.</p>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>Supuestos del modelo (SLR.1–SLR.5)</h2>
+
+<p>Para que los estimadores OLS tengan las propiedades deseables (insesgadez, eficiencia), el modelo debe cumplir ciertos supuestos:</p>
+
+<div class="assumptions-grid" id="assumptionsGrid">
+  <div class="assumption-card">
+    <div class="assumption-id">SLR.1</div>
+    <div class="assumption-name">Linealidad en los parámetros</div>
+    <div class="assumption-desc">El modelo poblacional es <span class="math">y = &beta;<sub>0</sub> + &beta;<sub>1</sub>x + u</span>. La relación entre los parámetros y la variable dependiente es lineal.</div>
+  </div>
+  <div class="assumption-card">
+    <div class="assumption-id">SLR.2</div>
+    <div class="assumption-name">Muestreo aleatorio</div>
+    <div class="assumption-desc">La muestra de <span class="math">n</span> observaciones {(x<sub>i</sub>, y<sub>i</sub>)} se obtiene mediante un muestreo aleatorio de la población.</div>
+  </div>
+  <div class="assumption-card">
+    <div class="assumption-id">SLR.3</div>
+    <div class="assumption-name">Variación en X</div>
+    <div class="assumption-desc">Los valores de <span class="math">x</span> en la muestra no son todos iguales: <span class="math"><span class="n">SST</span><sub>x</sub> = &sum;(x<sub>i</sub> &minus; x&#772;)&sup2; &gt; 0</span>.</div>
+  </div>
+  <div class="assumption-card">
+    <div class="assumption-id">SLR.4</div>
+    <div class="assumption-name">Media condicional cero</div>
+    <div class="assumption-desc">El valor esperado del error dado cualquier valor de <span class="math">x</span> es cero: <span class="math">E(u | x) = 0</span>. Esto implica que <span class="math">x</span> es exógena.</div>
+  </div>
+  <div class="assumption-card">
+    <div class="assumption-id">SLR.5</div>
+    <div class="assumption-name">Homocedasticidad</div>
+    <div class="assumption-desc">La varianza del error es constante para cualquier valor de <span class="math">x</span>: <span class="math"><span class="n">Var</span>(u | x) = &sigma;&sup2;</span>.</div>
+  </div>
+</div>
+
+<div class="callout" style="margin-top:1rem">
+  <div class="callout-title">Importante</div>
+  Los supuestos SLR.1–SLR.4 son suficientes para garantizar la <strong>insesgadez</strong> de los estimadores OLS. El supuesto SLR.5 (homocedasticidad) se agrega para derivar las fórmulas de varianza y para que OLS sea el estimador lineal insesgado más eficiente (teorema de Gauss-Markov).
+</div>
+
+</article>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+// ── State ──
+let data = [];
+let result = null;
+let overlays = { resid: true, means: false, labels: false };
+
+// ── Data entry ──
+function addRow(x, y) {
+  const tbody = $('#dataBody');
+  const idx = tbody.children.length + 1;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${idx}</td><td><input type="number" step="any" value="${x??''}" class="inp-x"></td><td><input type="number" step="any" value="${y??''}" class="inp-y"></td><td><button class="btn-del" onclick="removeRow(this)" title="Eliminar">&times;</button></td>`;
+  tbody.appendChild(tr);
+  renumber();
+}
+
+function addMultipleRows() { for (let i = 0; i < 5; i++) addRow(); }
+
+function removeRow(btn) {
+  btn.closest('tr').remove();
+  renumber();
+}
+
+function renumber() {
+  $$('#dataBody tr').forEach((tr, i) => { tr.children[0].textContent = i + 1; });
+}
+
+function clearData() {
+  $('#dataBody').innerHTML = '';
+  $('#resultsSection').classList.remove('visible');
+  $('#errorMsg').style.display = 'none';
+}
+
+function loadExample(name) {
+  clearData();
+  const examples = {
+    small: { x: [1,2,3,4,5,6,7,8], y: [2,4,5,4,6,8,7,9] },
+    salary: { x: [0,4,8,12,16,6,2,10,14,11,5,9,3,7,13], y: [12,18,28,36,44,22,14,32,40,34,20,30,16,25,38] },
+    consumption: { x: [20,25,30,35,40,45,50,55,60,65,70,75], y: [16,22,24,29,33,35,40,41,47,50,54,58] }
+  };
+  const d = examples[name];
+  for (let i = 0; i < d.x.length; i++) addRow(d.x[i], d.y[i]);
+}
+
+// ── Parse data from inputs ──
+function parseData() {
+  const xs = [], ys = [];
+  $$('#dataBody tr').forEach(tr => {
+    const xv = tr.querySelector('.inp-x').value.trim();
+    const yv = tr.querySelector('.inp-y').value.trim();
+    if (xv !== '' && yv !== '') {
+      xs.push(parseFloat(xv));
+      ys.push(parseFloat(yv));
+    }
+  });
+  return { x: xs, y: ys };
+}
+
+// ── OLS calculation ──
+function olsCalc(x, y) {
+  const n = x.length;
+  const xbar = x.reduce((a, b) => a + b, 0) / n;
+  const ybar = y.reduce((a, b) => a + b, 0) / n;
+
+  let sxy = 0, sxx = 0;
+  for (let i = 0; i < n; i++) {
+    sxy += (x[i] - xbar) * (y[i] - ybar);
+    sxx += (x[i] - xbar) ** 2;
+  }
+
+  const b1 = sxy / sxx;
+  const b0 = ybar - b1 * xbar;
+
+  const yhat = x.map(xi => b0 + b1 * xi);
+  const uhat = y.map((yi, i) => yi - yhat[i]);
+
+  const SSR = uhat.reduce((a, u) => a + u * u, 0);
+  const SST = y.reduce((a, yi) => a + (yi - ybar) ** 2, 0);
+  const SSE = yhat.reduce((a, yh) => a + (yh - ybar) ** 2, 0);
+  const R2 = 1 - SSR / SST;
+
+  const sigma2 = SSR / (n - 2);
+  const sigma = Math.sqrt(sigma2);
+  const se_b1 = sigma / Math.sqrt(sxx);
+
+  const sumx2 = x.reduce((a, xi) => a + xi * xi, 0);
+  const se_b0 = sigma * Math.sqrt(sumx2 / (n * sxx));
+
+  const sumU = uhat.reduce((a, u) => a + u, 0);
+  const sumXU = x.reduce((a, xi, i) => a + xi * uhat[i], 0);
+
+  const details = [];
+  for (let i = 0; i < n; i++) {
+    details.push({
+      i: i + 1,
+      xi: x[i], yi: y[i],
+      dxi: x[i] - xbar, dyi: y[i] - ybar,
+      dxdy: (x[i] - xbar) * (y[i] - ybar),
+      dx2: (x[i] - xbar) ** 2,
+      yhati: yhat[i], uhati: uhat[i],
+      u2i: uhat[i] ** 2
+    });
+  }
+
+  return {
+    n, xbar, ybar, b0, b1, sxy, sxx,
+    yhat, uhat, SSR, SST, SSE, R2,
+    sigma2, sigma, se_b1, se_b0, sumx2,
+    sumU, sumXU, details,
+    x, y
+  };
+}
+
+// ── Main calculation ──
+function calculate() {
+  const { x, y } = parseData();
+  const errEl = $('#errorMsg');
+
+  if (x.length < 3) {
+    errEl.textContent = 'Se necesitan al menos 3 observaciones completas (X e Y).';
+    errEl.style.display = 'block';
+    $('#resultsSection').classList.remove('visible');
+    return;
+  }
+  if (x.some(isNaN) || y.some(isNaN)) {
+    errEl.textContent = 'Todos los valores deben ser numéricos.';
+    errEl.style.display = 'block';
+    return;
+  }
+  const allSame = x.every(v => v === x[0]);
+  if (allSame) {
+    errEl.textContent = 'Los valores de X deben tener variación (no pueden ser todos iguales).';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  errEl.style.display = 'none';
+  result = olsCalc(x, y);
+  renderResults();
+  $('#resultsSection').classList.add('visible');
+  $('#resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── Render everything ──
+function renderResults() {
+  const r = result;
+  const fmt = (v, d = 4) => Number(v.toFixed(d)).toString();
+
+  // Equation
+  const sign = r.b1 >= 0 ? '+' : '−';
+  $('#eqDisplay').innerHTML = `ŷ = ${fmt(r.b0)} ${sign} ${fmt(Math.abs(r.b1))} · x`;
+
+  // Stats grid
+  $('#statsGrid').innerHTML = [
+    { l: 'Observaciones', v: r.n, c: '' },
+    { l: 'Media de X (x̄)', v: fmt(r.xbar), c: '' },
+    { l: 'Media de Y (ȳ)', v: fmt(r.ybar), c: '' },
+    { l: 'β̂₁ (pendiente)', v: fmt(r.b1), c: 'accent' },
+    { l: 'β̂₀ (intercepto)', v: fmt(r.b0), c: 'accent' },
+    { l: 'R²', v: fmt(r.R2), c: 'green' },
+    { l: 'SER (σ̂)', v: fmt(r.sigma), c: 'orange' },
+    { l: 'se(β̂₁)', v: fmt(r.se_b1), c: '' },
+    { l: 'se(β̂₀)', v: fmt(r.se_b0), c: '' },
+  ].map(s => `<div class="stat-card"><div class="stat-label">${s.l}</div><div class="stat-value ${s.c}">${s.v}</div></div>`).join('');
+
+  // Scatter plot
+  drawScatter();
+
+  // Prediction
+  $('#predResult').textContent = '';
+  $('#predX').value = '';
+
+  // Calculation table
+  renderCalcTable();
+
+  // Variance decomposition
+  renderVarDecomp();
+
+  // Algebraic properties
+  renderPropChecks();
+
+  // Standard errors section
+  renderSESection();
+}
+
+// ── Scatter plot (canvas) ──
+function drawScatter() {
+  const r = result;
+  const canvas = $('#scatterCanvas');
+  const dpr = window.devicePixelRatio || 1;
+  const cw = canvas.parentElement.clientWidth;
+  const ch = Math.min(420, cw * 0.55);
+  canvas.width = cw * dpr;
+  canvas.height = ch * dpr;
+  canvas.style.width = cw + 'px';
+  canvas.style.height = ch + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const pad = { t: 20, r: 25, b: 45, l: 55 };
+  const pw = cw - pad.l - pad.r;
+  const ph = ch - pad.t - pad.b;
+
+  const cs = getComputedStyle(document.documentElement);
+  const col = {
+    bg: cs.getPropertyValue('--bg-canvas').trim(),
+    text: cs.getPropertyValue('--text-sec').trim(),
+    heading: cs.getPropertyValue('--heading').trim(),
+    accent: cs.getPropertyValue('--accent').trim(),
+    green: cs.getPropertyValue('--green').trim(),
+    red: cs.getPropertyValue('--red').trim(),
+    blue: cs.getPropertyValue('--blue').trim(),
+    border: cs.getPropertyValue('--border').trim(),
+    point: cs.getPropertyValue('--accent').trim(),
+  };
+
+  // Ranges
+  const xmin = Math.min(...r.x), xmax = Math.max(...r.x);
+  const ymin = Math.min(...r.y, ...r.yhat), ymax = Math.max(...r.y, ...r.yhat);
+  const xpad = (xmax - xmin) * 0.08 || 1;
+  const ypad = (ymax - ymin) * 0.08 || 1;
+  const x0 = xmin - xpad, x1 = xmax + xpad;
+  const y0 = ymin - ypad, y1 = ymax + ypad;
+
+  const sx = v => pad.l + (v - x0) / (x1 - x0) * pw;
+  const sy = v => pad.t + ph - (v - y0) / (y1 - y0) * ph;
+
+  // Background
+  ctx.fillStyle = col.bg;
+  ctx.fillRect(0, 0, cw, ch);
+
+  // Grid
+  ctx.strokeStyle = col.border;
+  ctx.lineWidth = 0.5;
+  const nTicksX = 6, nTicksY = 5;
+  for (let i = 0; i <= nTicksX; i++) {
+    const v = x0 + (x1 - x0) * i / nTicksX;
+    const px = sx(v);
+    ctx.beginPath(); ctx.moveTo(px, pad.t); ctx.lineTo(px, pad.t + ph); ctx.stroke();
+    ctx.fillStyle = col.text; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(v.toFixed(1), px, pad.t + ph + 16);
+  }
+  for (let i = 0; i <= nTicksY; i++) {
+    const v = y0 + (y1 - y0) * i / nTicksY;
+    const py = sy(v);
+    ctx.beginPath(); ctx.moveTo(pad.l, py); ctx.lineTo(pad.l + pw, py); ctx.stroke();
+    ctx.fillStyle = col.text; ctx.font = '11px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText(v.toFixed(1), pad.l - 8, py + 4);
+  }
+
+  // Axes
+  ctx.strokeStyle = col.text;
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t + ph); ctx.lineTo(pad.l + pw, pad.t + ph); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t + ph); ctx.stroke();
+
+  // Axis labels
+  ctx.fillStyle = col.heading; ctx.font = 'bold 12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('X', pad.l + pw / 2, ch - 4);
+  ctx.save(); ctx.translate(14, pad.t + ph / 2); ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Y', 0, 0); ctx.restore();
+
+  // Mean lines
+  if (overlays.means) {
+    ctx.save();
+    ctx.setLineDash([6, 4]);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = col.text;
+    ctx.globalAlpha = 0.5;
+    ctx.beginPath(); ctx.moveTo(sx(r.xbar), pad.t); ctx.lineTo(sx(r.xbar), pad.t + ph); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pad.l, sy(r.ybar)); ctx.lineTo(pad.l + pw, sy(r.ybar)); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+    ctx.font = '10px sans-serif'; ctx.fillStyle = col.text;
+    ctx.textAlign = 'left';
+    ctx.fillText('x̄=' + r.xbar.toFixed(2), sx(r.xbar) + 4, pad.t + 12);
+    ctx.fillText('ȳ=' + r.ybar.toFixed(2), pad.l + 4, sy(r.ybar) - 5);
+    ctx.restore();
+  }
+
+  // Residuals
+  if (overlays.resid) {
+    ctx.strokeStyle = col.red;
+    ctx.lineWidth = 1.5;
+    ctx.globalAlpha = 0.6;
+    for (let i = 0; i < r.n; i++) {
+      ctx.beginPath();
+      ctx.moveTo(sx(r.x[i]), sy(r.y[i]));
+      ctx.lineTo(sx(r.x[i]), sy(r.yhat[i]));
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // Regression line
+  const lx0 = x0, lx1 = x1;
+  const ly0 = r.b0 + r.b1 * lx0, ly1 = r.b0 + r.b1 * lx1;
+  ctx.strokeStyle = col.green;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(sx(lx0), sy(ly0)); ctx.lineTo(sx(lx1), sy(ly1)); ctx.stroke();
+
+  // Points
+  for (let i = 0; i < r.n; i++) {
+    ctx.fillStyle = col.accent;
+    ctx.beginPath();
+    ctx.arc(sx(r.x[i]), sy(r.y[i]), 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = col.bg;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  // Labels
+  if (overlays.labels) {
+    ctx.font = '10px monospace';
+    ctx.fillStyle = col.heading;
+    ctx.textAlign = 'left';
+    for (let i = 0; i < r.n; i++) {
+      ctx.fillText(`(${r.x[i]}, ${r.y[i]})`, sx(r.x[i]) + 7, sy(r.y[i]) - 5);
+    }
+  }
+}
+
+// ── Toggle overlays ──
+function toggleOverlay(key) {
+  overlays[key] = !overlays[key];
+  const btnId = '#btn' + key.charAt(0).toUpperCase() + key.slice(1);
+  $(btnId).classList.toggle('active', overlays[key]);
+  if (result) drawScatter();
+}
+
+// ── Prediction ──
+function predict() {
+  if (!result) return;
+  const x0 = parseFloat($('#predX').value);
+  if (isNaN(x0)) { $('#predResult').textContent = ''; return; }
+  const yhat = result.b0 + result.b1 * x0;
+  $('#predResult').textContent = `ŷ = ${yhat.toFixed(4)}`;
+}
+
+// ── Detailed calculation table ──
+function renderCalcTable() {
+  const r = result;
+  const fmt = v => v.toFixed(4);
+  let html = '<table class="results-table"><thead><tr>';
+  html += '<th>i</th><th>x<sub>i</sub></th><th>y<sub>i</sub></th>';
+  html += '<th>x<sub>i</sub>−x̄</th><th>y<sub>i</sub>−ȳ</th>';
+  html += '<th>(x<sub>i</sub>−x̄)(y<sub>i</sub>−ȳ)</th><th>(x<sub>i</sub>−x̄)²</th>';
+  html += '<th>ŷ<sub>i</sub></th><th>û<sub>i</sub></th><th>û<sub>i</sub>²</th>';
+  html += '</tr></thead><tbody>';
+
+  let sumDxDy = 0, sumDx2 = 0, sumU2 = 0;
+  r.details.forEach(d => {
+    sumDxDy += d.dxdy;
+    sumDx2 += d.dx2;
+    sumU2 += d.u2i;
+    html += `<tr><td>${d.i}</td><td>${fmt(d.xi)}</td><td>${fmt(d.yi)}</td>`;
+    html += `<td>${fmt(d.dxi)}</td><td>${fmt(d.dyi)}</td>`;
+    html += `<td>${fmt(d.dxdy)}</td><td>${fmt(d.dx2)}</td>`;
+    html += `<td>${fmt(d.yhati)}</td><td>${fmt(d.uhati)}</td><td>${fmt(d.u2i)}</td></tr>`;
+  });
+
+  html += `<tr><td>Σ</td><td></td><td></td><td></td><td></td>`;
+  html += `<td>${fmt(sumDxDy)}</td><td>${fmt(sumDx2)}</td>`;
+  html += `<td></td><td>${fmt(r.sumU)}</td><td>${fmt(sumU2)}</td></tr>`;
+  html += '</tbody></table>';
+  $('#calcTableWrap').innerHTML = html;
+}
+
+// ── Variance decomposition ──
+function renderVarDecomp() {
+  const r = result;
+  const fmt = v => v.toFixed(4);
+  const pSSE = r.SST > 0 ? (r.SSE / r.SST * 100) : 0;
+  const pSSR = r.SST > 0 ? (r.SSR / r.SST * 100) : 0;
+
+  let html = `<div class="var-bar-wrap">`;
+  html += `<div class="var-bar-seg var-bar-sse" style="width:${pSSE}%">${pSSE > 10 ? 'SSE' : ''}</div>`;
+  html += `<div class="var-bar-seg var-bar-ssr" style="width:${pSSR}%">${pSSR > 10 ? 'SSR' : ''}</div>`;
+  html += `</div>`;
+  html += `<div class="var-legend">`;
+  html += `<div class="var-legend-item"><div class="var-legend-dot" style="background:var(--accent)"></div>SSE (explicada) = ${fmt(r.SSE)} (${pSSE.toFixed(1)}%)</div>`;
+  html += `<div class="var-legend-item"><div class="var-legend-dot" style="background:var(--red)"></div>SSR (residual) = ${fmt(r.SSR)} (${pSSR.toFixed(1)}%)</div>`;
+  html += `<div class="var-legend-item" style="margin-left:auto;font-weight:600">SST = ${fmt(r.SST)}</div>`;
+  html += `</div>`;
+  $('#varDecomp').innerHTML = html;
+}
+
+// ── Algebraic property checks ──
+function renderPropChecks() {
+  const r = result;
+  const fmt = v => v.toFixed(8);
+  const near = v => Math.abs(v) < 1e-6;
+
+  const checks = [
+    { label: 'Σûᵢ = 0', val: r.sumU, ok: near(r.sumU) },
+    { label: 'Σxᵢûᵢ = 0', val: r.sumXU, ok: near(r.sumXU) },
+    { label: 'La recta pasa por (x̄, ȳ)', val: r.b0 + r.b1 * r.xbar, expected: r.ybar, ok: near(r.b0 + r.b1 * r.xbar - r.ybar) },
+    { label: 'ȳ = ŷ̄ (media de ŷ = media de y)', val: r.yhat.reduce((a, b) => a + b, 0) / r.n, expected: r.ybar, ok: near(r.yhat.reduce((a, b) => a + b, 0) / r.n - r.ybar) },
+  ];
+
+  let html = '';
+  checks.forEach(c => {
+    const icon = c.ok ? '<span class="prop-check" style="color:var(--green)">✓</span>' : '<span class="prop-check" style="color:var(--red)">✗</span>';
+    const detail = c.expected !== undefined
+      ? `${fmt(c.val)} ≈ ${fmt(c.expected)}`
+      : `${fmt(c.val)} ≈ 0`;
+    html += `<li>${icon} <span>${c.label}</span> <span class="prop-val">${detail}</span></li>`;
+  });
+  $('#propChecks').innerHTML = html;
+}
+
+// ── SE section ──
+function renderSESection() {
+  const r = result;
+  const fmt = v => v.toFixed(4);
+  let html = `<div style="margin-top:.5rem">`;
+  html += `<div class="formula-block"><span class="math">&sigma;&#770;&sup2; = <span class="frac"><span class="num"><span class="n">SSR</span></span><span class="den">n &minus; 2</span></span> = <span class="frac"><span class="num">${fmt(r.SSR)}</span><span class="den">${r.n} &minus; 2</span></span> = ${fmt(r.sigma2)}</span></div>`;
+  html += `<div class="formula-block"><span class="math"><span class="n">SER</span> = &sigma;&#770; = &radic;<span style="text-decoration:overline">${fmt(r.sigma2)}</span> = ${fmt(r.sigma)}</span></div>`;
+  html += `<div class="formula-block"><span class="math"><span class="n">se</span>(&beta;&#770;<sub>1</sub>) = <span class="frac"><span class="num">${fmt(r.sigma)}</span><span class="den">&radic;<span style="text-decoration:overline">${fmt(r.sxx)}</span></span></span> = ${fmt(r.se_b1)}</span></div>`;
+  html += `<div class="formula-block"><span class="math"><span class="n">se</span>(&beta;&#770;<sub>0</sub>) = ${fmt(r.sigma)} &sdot; &radic;<span style="text-decoration:overline"><span class="frac"><span class="num">${fmt(r.sumx2)}</span><span class="den">${r.n} &sdot; ${fmt(r.sxx)}</span></span></span> = ${fmt(r.se_b0)}</span></div>`;
+  html += `</div>`;
+  $('#seSection').innerHTML = html;
+}
+
+// ── Resize handler ──
+window.addEventListener('resize', () => { if (result) drawScatter(); });
+
+// ── Theme detection for canvas redraw ──
+const mqDark = window.matchMedia('(prefers-color-scheme:dark)');
+mqDark.addEventListener('change', () => { if (result) drawScatter(); });
+
+// ── Init: start with 5 empty rows ──
+for (let i = 0; i < 5; i++) addRow();
+</script>
+</body>
+</html>
