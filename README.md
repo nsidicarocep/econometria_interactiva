@@ -20,7 +20,7 @@ La siguiente tabla se ira actualizando a lo largo del cuatrimestre con los links
 | 3 | 18/08 | Regresion simple: supuestos SLR.1-SLR.5. Insesgadez. Varianza de los estimadores. Error estandar. | Nº 1 | [Regresión lineal simple](regresion_simple/tablero_regresion_simple.html) | [Link Colab](https://colab.research.google.com/github/nsidicarocep/econometria_interactiva/blob/main/codigos/1_regresion_simple_R.ipynb)|
 | 4 | 25/08 | Regresion multiple. Interpretacion ceteris paribus. Sesgo de variable omitida. Supuestos MLR.1-MLR.5. R² y R² ajustado. Gauss-Markov. | Nº 2 | | |
 | 5 | 29/08 | Inferencia estadistica I. Normalidad (MLR.6). Distribucion de estimadores OLS. Test t. Intervalos de confianza. P-valores. *(Sabado - Virtual sincronica)* | Nº 3 | | |
-| 6 | 01/09 | Formas funcionales: log-log, log-lin, lin-log. Modelos cuadraticos. Elasticidades y semi-elasticidades. Prediccion. | Nº 4 | | |
+| 6 | 01/09 | Formas funcionales: log-log, log-lin, lin-log. Modelos cuadraticos. Elasticidades y semi-elasticidades. Prediccion. | Nº 4 | [Formas funcionales y prediccion](formas_funcionales/tablero_formas_funcionales.html) | |
 | 7 | 08/09 | Variables dummy e interacciones. Categoria base. Trampa de dummies. Test de Chow. | Nº 5 | | |
 | 8 | 15/09 | Inferencia estadistica II. Test F. Significatividad conjunta. Modelos restringidos vs. no restringidos. Repaso pre-parcial. | Nº 3 | | |
 | 9 | 22/09 | **Primer examen parcial** | | | |

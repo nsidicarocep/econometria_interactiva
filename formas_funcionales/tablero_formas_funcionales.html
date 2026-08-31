@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formas Funcionales y Predicción — Laboratorio Interactivo</title>
+<style>
+:root {
+  --bg: #F7F5F0;
+  --bg-alt: #EDEAE3;
+  --bg-canvas: #FFFFFF;
+  --text: #2C2C2E;
+  --text-sec: #636366;
+  --heading: #1A2744;
+  --accent: #3170A2;
+  --accent-light: #E3EEF6;
+  --green: #2D8659;
+  --green-light: #D4EDDF;
+  --red: #D45A3A;
+  --red-light: #FBEAE5;
+  --orange: #C87A1A;
+  --orange-light: #FDF0DB;
+  --purple: #7B5EA7;
+  --purple-light: #EDE7F6;
+  --blue: #5B9BD5;
+  --border: #DCDAD4;
+  --shadow: rgba(28,28,30,.07);
+  --font-d: Georgia,"Palatino Linotype","Book Antiqua",Palatino,serif;
+  --font-b: "Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-m: "Cascadia Code","Fira Code",Consolas,monospace;
+  --cw: 780px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --green:#4DBB7F;--green-light:#1A3329;
+  --red:#F07A5A;--red-light:#3D2219;
+  --orange:#E8A84C;--orange-light:#3D2E14;
+  --purple:#A78BDB;--purple-light:#2A2040;
+  --blue:#7FC4F5;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --green:#4DBB7F;--green-light:#1A3329;
+  --red:#F07A5A;--red-light:#3D2219;
+  --orange:#E8A84C;--orange-light:#3D2E14;
+  --purple:#A78BDB;--purple-light:#2A2040;
+  --blue:#7FC4F5;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}
+:root[data-theme="light"]{
+  --bg:#F7F5F0;--bg-alt:#EDEAE3;--bg-canvas:#FFFFFF;
+  --text:#2C2C2E;--text-sec:#636366;--heading:#1A2744;
+  --accent:#3170A2;--accent-light:#E3EEF6;
+  --green:#2D8659;--green-light:#D4EDDF;
+  --red:#D45A3A;--red-light:#FBEAE5;
+  --orange:#C87A1A;--orange-light:#FDF0DB;
+  --purple:#7B5EA7;--purple-light:#EDE7F6;
+  --blue:#5B9BD5;
+  --border:#DCDAD4;--shadow:rgba(28,28,30,.07);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:17px;line-height:1.72;-webkit-font-smoothing:antialiased}
+article{max-width:var(--cw);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+
+h1{font-family:var(--font-d);font-size:clamp(2rem,5vw,2.8rem);color:var(--heading);line-height:1.12;text-wrap:balance;letter-spacing:-.025em;margin-bottom:.4rem}
+h2{font-family:var(--font-d);font-size:1.55rem;color:var(--heading);line-height:1.3;text-wrap:balance;margin-top:3.5rem;margin-bottom:.75rem;padding-bottom:.45rem;border-bottom:2px solid var(--accent)}
+h3{font-family:var(--font-d);font-size:1.15rem;color:var(--heading);margin-top:1.5rem;margin-bottom:.5rem}
+p{margin-bottom:1.15rem;max-width:65ch}
+strong{color:var(--heading);font-weight:600}
+ul,ol{margin:0 0 1.15rem 1.3rem;max-width:65ch}
+li{margin-bottom:.3rem}
+
+.eyebrow{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:600;margin-bottom:.5rem}
+.subtitle{font-family:var(--font-d);font-size:1.15rem;color:var(--text-sec);font-style:italic;margin-bottom:2rem;max-width:55ch}
+.lead{font-size:1.05rem;color:var(--text-sec);max-width:60ch}
+
+.formula-block{background:var(--bg-alt);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.25rem 0;border-radius:0 6px 6px 0;overflow-x:auto}
+.math{font-family:var(--font-d);font-style:italic;font-size:1.05em}
+.math .n{font-style:normal}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 2px}
+.frac .num{border-bottom:1.5px solid currentColor;padding:0 5px 3px;line-height:1.3;text-align:center}
+.frac .den{padding:3px 5px 0;line-height:1.3;text-align:center}
+
+.callout{background:var(--red-light);border-left:3px solid var(--red);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.callout-title{font-weight:700;color:var(--red);margin-bottom:.25rem}
+.tip{background:var(--green-light);border-left:3px solid var(--green);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.note{background:var(--orange-light);border-left:3px solid var(--orange);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.note-title{font-weight:700;color:var(--orange);margin-bottom:.25rem}
+
+/* Lab */
+.lab{background:var(--bg-canvas);border:1px solid var(--border);border-radius:8px;padding:1.25rem;margin:1.5rem -1rem;box-shadow:0 2px 12px var(--shadow)}
+@media(min-width:800px){.lab{margin:1.5rem -3rem;padding:1.5rem}}
+.lab-title{font-family:var(--font-d);font-size:1.1rem;color:var(--heading);font-weight:700;margin-bottom:.75rem}
+.lab-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:1rem}
+.lab-sub{font-size:.85rem;color:var(--text-sec);margin:-.4rem 0 .9rem;max-width:70ch}
+
+.lab-canvas-wrap{position:relative;width:100%;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--bg-canvas)}
+.lab-canvas-wrap canvas{display:block;width:100%}
+.lab-canvas-wrap.clickable canvas{cursor:crosshair}
+
+.lab-btns{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem}
+.btn{font-family:var(--font-b);font-size:.82rem;padding:.4rem .85rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);cursor:pointer;transition:all .15s;font-weight:500}
+.btn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.btn:active{transform:scale(.97)}
+.btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;font-size:.88rem;padding:.5rem 1.2rem}
+.btn-primary:hover{background:var(--heading);border-color:var(--heading);color:#fff}
+.btn-sm{font-size:.78rem;padding:.3rem .6rem}
+
+.lab-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.6rem;margin-top:1rem}
+.stat-card{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.6rem .8rem}
+.stat-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-sec);margin-bottom:.15rem}
+.stat-value{font-family:var(--font-d);font-size:1.3rem;color:var(--heading);font-variant-numeric:tabular-nums}
+.stat-value.accent{color:var(--accent)}
+.stat-value.green{color:var(--green)}
+.stat-value.orange{color:var(--red)}
+.stat-value.purple{color:var(--purple)}
+.stat-value.sm{font-size:1.05rem}
+.stat-note{font-size:.7rem;color:var(--text-sec);margin-top:.15rem;line-height:1.35}
+
+.lab-equation{background:var(--accent-light);border-radius:6px;padding:.75rem 1rem;margin-top:.75rem;text-align:center;font-family:var(--font-d);font-size:1.15rem;color:var(--heading);font-style:italic}
+
+/* Simulation controls */
+.sim-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem;margin-bottom:1rem}
+.sim-control{display:flex;flex-direction:column;gap:.2rem}
+.sim-control label{font-size:.78rem;font-weight:600;color:var(--text-sec);text-transform:uppercase;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:baseline;gap:.4rem}
+.sim-control input[type="range"]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:var(--border);outline:none;transition:background .15s}
+.sim-control input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg-canvas);box-shadow:0 1px 4px var(--shadow)}
+.sim-control input[type="range"]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg-canvas);box-shadow:0 1px 4px var(--shadow)}
+.sim-control select,.sim-control input[type="number"]{font-family:var(--font-b);font-size:.88rem;padding:.35rem .5rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);outline:none}
+.sim-control select:focus,.sim-control input[type="number"]:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-light)}
+.sim-val{font-family:var(--font-m);font-size:.88rem;color:var(--accent);font-variant-numeric:tabular-nums}
+.sim-canvas-wrap{position:relative;width:100%;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--bg-canvas)}
+.sim-canvas-wrap canvas{display:block;width:100%}
+.sim-result-row{display:flex;flex-wrap:wrap;gap:1rem;margin-top:.75rem;padding:.75rem;background:var(--bg-alt);border-radius:6px;font-size:.9rem;align-items:center}
+
+/* Segmented toggles */
+.seg{display:flex;flex-wrap:wrap;gap:.35rem;margin:.25rem 0 .75rem}
+.legend{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:.5rem;font-size:.8rem;color:var(--text-sec)}
+.legend-item{display:flex;align-items:center;gap:.35rem}
+.legend-dot{width:14px;height:3px;border-radius:2px;display:inline-block}
+.legend-box{width:13px;height:11px;border-radius:2px;display:inline-block;opacity:.35}
+
+/* Tables */
+.results-wrap{overflow-x:auto;margin-top:1rem;border:1px solid var(--border);border-radius:6px}
+.results-table{width:100%;border-collapse:collapse;font-size:.82rem;white-space:nowrap}
+.results-table th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-sec);font-weight:600;padding:.5rem .6rem;text-align:center;border-bottom:2px solid var(--border);background:var(--bg-alt);position:sticky;top:0}
+.results-table td{padding:.4rem .6rem;text-align:center;border-bottom:1px solid var(--border);font-family:var(--font-m);font-size:.8rem}
+.results-table td.lbl{font-family:var(--font-b);text-align:left;font-weight:600;color:var(--heading)}
+.results-table tr:hover td{background:var(--bg-alt)}
+.results-table tr.hi td{background:var(--accent-light)}
+.results-table td.txt{font-family:var(--font-b);text-align:left;white-space:normal;font-size:.82rem;color:var(--text-sec);line-height:1.5}
+
+/* Regression output table (Bloque 4) */
+.reg-out{border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-top:1rem;background:var(--bg)}
+.reg-out-head{background:var(--bg-alt);padding:.6rem 1rem;font-family:var(--font-d);font-weight:700;color:var(--heading);font-size:.95rem;border-bottom:1px solid var(--border);text-align:center}
+.reg-row{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:.55rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.reg-row:hover{background:var(--accent-light)}
+.reg-row.open{background:var(--accent-light)}
+.reg-var{font-family:var(--font-m);font-size:.85rem;color:var(--heading)}
+.reg-coef{font-family:var(--font-m);font-size:.85rem;text-align:right;white-space:nowrap}
+.reg-se{display:block;color:var(--text-sec);font-size:.78rem}
+.reg-foot{padding:.5rem 1rem;font-size:.78rem;color:var(--text-sec);display:flex;flex-wrap:wrap;gap:1.2rem}
+.reg-explain{display:none;padding:.75rem 1rem;background:var(--bg-alt);border-bottom:1px solid var(--border);font-size:.88rem;line-height:1.6}
+.reg-explain.open{display:block}
+.reg-hint{font-size:.78rem;color:var(--text-sec);font-style:italic;margin-top:.4rem}
+
+/* Quiz */
+.quiz-item{border:1px solid var(--border);border-radius:6px;margin-bottom:.6rem;background:var(--bg);overflow:hidden}
+.quiz-q{padding:.75rem 1rem;font-size:.92rem;line-height:1.6}
+.quiz-q .qid{font-family:var(--font-m);font-weight:700;color:var(--accent);margin-right:.4rem}
+.quiz-btns{display:flex;gap:.4rem;padding:0 1rem .75rem}
+.quiz-fb{display:none;padding:.75rem 1rem;font-size:.88rem;line-height:1.6;border-top:1px solid var(--border)}
+.quiz-fb.show{display:block}
+.quiz-fb.ok{background:var(--green-light)}
+.quiz-fb.no{background:var(--red-light)}
+.quiz-verdict{font-weight:700;display:block;margin-bottom:.2rem}
+.quiz-score{font-size:.88rem;color:var(--text-sec);margin-top:.5rem}
+
+/* Bars */
+.bar-cmp{margin-top:.75rem}
+.bar-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.45rem;font-size:.85rem}
+.bar-name{width:130px;flex-shrink:0;color:var(--text-sec);font-size:.8rem}
+.bar-track{flex:1;height:22px;background:var(--bg-alt);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .35s ease}
+.bar-val{width:90px;text-align:right;font-family:var(--font-m);font-size:.82rem;color:var(--heading)}
+
+@media(max-width:600px){
+  .lab{margin:1rem -.5rem;padding:1rem}
+  .lab-stats{grid-template-columns:repeat(auto-fit,minmax(115px,1fr))}
+  .stat-value{font-size:1.1rem}
+  .bar-name{width:90px}
+  .bar-val{width:70px}
+}
+</style>
+</head>
+<body>
+<article>
+
+<p class="eyebrow">Econometría I — Clase 6</p>
+<h1>Formas funcionales y predicción</h1>
+<p class="subtitle">Escalas, logaritmos, modelos cuadráticos, efectos marginales e intervalos de predicción</p>
+
+<p class="lead">Hasta ahora el modelo de regresión fue siempre <span class="math">y = &beta;<sub>0</sub> + &beta;<sub>1</sub>x + u</span>, con un efecto marginal constante. Pero "lineal en los parámetros" no obliga a que la relación entre <span class="math">x</span> e <span class="math">y</span> sea una recta: podemos transformar las variables. En esta página vas a ver, moviendo controles, cómo cambian los coeficientes y su interpretación según la especificación que elijas, cómo se comporta el efecto marginal a lo largo de una curva cuadrática, y por qué la banda de incertidumbre alrededor de la recta de regresión se abre a medida que nos alejamos del centro de los datos.</p>
+
+<div class="tip">
+  <strong>Cómo usar esta página.</strong> Cada laboratorio es independiente: movés los controles y todo se recalcula al instante. Los ejemplos numéricos vienen de la <strong>Práctica de la Clase 8</strong>, así que podés usar la página para verificar tus respuestas de los ejercicios 1, 2, 3, 5, 6, 7 y 8.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>1. Cambios de escala: qué cambia y qué no</h2>
+
+<p>Antes de transformar variables con logaritmos, conviene entender un caso más simple: <strong>reexpresar una variable en otra unidad de medida</strong>. Si multiplicamos la variable dependiente por una constante <span class="math">c</span>, o dividimos un regresor por una constante <span class="math">d</span>, los coeficientes cambian de forma completamente mecánica:</p>
+
+<div class="formula-block">
+  <span class="math">y* = c &sdot; y &nbsp;&rArr;&nbsp; &beta;&#770;<sub>j</sub>* = c &sdot; &beta;&#770;<sub>j</sub></span>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <span class="math">x<sub>j</sub>* = d &sdot; x<sub>j</sub> &nbsp;&rArr;&nbsp; &beta;&#770;<sub>j</sub>* = &beta;&#770;<sub>j</sub> / d</span>
+</div>
+
+<p>Lo importante es lo que <em>no</em> cambia: los errores estándar se reescalan exactamente igual que los coeficientes, así que el <strong>estadístico t es invariante</strong>. Y como el ajuste del modelo es el mismo (solo cambiamos las unidades del eje), el <strong>R² también es invariante</strong>. Un cambio de escala no genera ni destruye información.</p>
+
+<div class="lab">
+  <div class="lab-header">
+    <span class="lab-title">Laboratorio 1 · Reexpresión de unidades</span>
+    <button class="btn btn-sm" onclick="resetScale()">Volver al original</button>
+  </div>
+  <p class="lab-sub">Modelo base (Ejercicio 1 de la práctica, n = 526): <span class="math">salario = &minus;1.50 + 0.52&sdot;educ + 0.03&sdot;exper</span>, con salario en <strong>miles de pesos</strong>, educ y exper en <strong>años</strong>.</p>
+
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label for="scY">Unidad del salario</label>
+      <select id="scY" onchange="renderScale()">
+        <option value="1">Miles de pesos (original)</option>
+        <option value="1000">Pesos</option>
+        <option value="0.001">Millones de pesos</option>
+        <option value="1" data-usd="1">Dólares (1 USD = 1.000 pesos)</option>
+      </select>
+    </div>
+    <div class="sim-control">
+      <label for="scEduc">Unidad de educación</label>
+      <select id="scEduc" onchange="renderScale()">
+        <option value="1">Años (original)</option>
+        <option value="12">Meses</option>
+        <option value="0.1">Décadas</option>
+      </select>
+    </div>
+    <div class="sim-control">
+      <label for="scExper">Unidad de experiencia</label>
+      <select id="scExper" onchange="renderScale()">
+        <option value="1">Años (original)</option>
+        <option value="12">Meses</option>
+        <option value="0.1">Décadas</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="results-wrap">
+    <table class="results-table" id="scaleTable"></table>
+  </div>
+
+  <div id="scaleNotes"></div>
+</div>
+
+<div class="callout">
+  <div class="callout-title">Error frecuente</div>
+  Si alguien reporta que estimó "el mismo modelo" con la variable dependiente en otra unidad y obtuvo un <strong>R² distinto</strong>, algo está mal: o no es el mismo modelo, o cambió la muestra, o hay un error de cálculo. Un simple cambio de escala <em>no puede</em> alterar el R² (Ejercicio 1.d). Lo que sí cambia el R² es transformar la variable dependiente con un logaritmo, porque ahí ya no estamos explicando la misma variable.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>2. Las cuatro formas funcionales</h2>
+
+<p>Con logaritmos podemos construir cuatro especificaciones básicas. Todas se estiman por OLS igual que siempre; lo único que cambia es <strong>cómo se lee el coeficiente de pendiente</strong>:</p>
+
+<div class="results-wrap">
+<table class="results-table">
+  <thead><tr><th>Modelo</th><th>Dependiente</th><th>Independiente</th><th>Interpretación de β₁</th></tr></thead>
+  <tbody>
+    <tr><td class="lbl">Nivel-nivel</td><td>y</td><td>x</td><td class="txt">Δx = 1 unidad ⟹ Δy = β₁ unidades</td></tr>
+    <tr><td class="lbl">Log-nivel</td><td>ln(y)</td><td>x</td><td class="txt">Δx = 1 unidad ⟹ %Δy ≈ 100·β₁ &nbsp;(<em>semi-elasticidad</em>)</td></tr>
+    <tr><td class="lbl">Nivel-log</td><td>y</td><td>ln(x)</td><td class="txt">%Δx = 1% ⟹ Δy ≈ β₁/100 unidades</td></tr>
+    <tr><td class="lbl">Log-log</td><td>ln(y)</td><td>ln(x)</td><td class="txt">%Δx = 1% ⟹ %Δy = β₁% &nbsp;(<em>elasticidad constante</em>)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>En el laboratorio siguiente elegís cuál es la <strong>verdadera</strong> relación entre <span class="math">x</span> e <span class="math">y</span> en la población, y la página estima las cuatro especificaciones sobre los mismos datos. Fijate qué pasa con la curva ajustada cuando la forma funcional no coincide con la verdadera.</p>
+
+<div class="lab">
+  <div class="lab-header">
+    <span class="lab-title">Laboratorio 2 · Comparador de especificaciones</span>
+    <button class="btn btn-sm" onclick="newFormSample()">Nueva muestra</button>
+  </div>
+
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label for="ffDgp">Relación verdadera</label>
+      <select id="ffDgp" onchange="runForms()">
+        <option value="lin">Lineal: y = 10 + 1.2·x</option>
+        <option value="log" selected>Logarítmica: y = 4 + 9·ln(x)</option>
+        <option value="exp">Exponencial: ln(y) = 1.6 + 0.09·x</option>
+        <option value="pow">Potencial: ln(y) = 2.0 + 0.70·ln(x)</option>
+      </select>
+    </div>
+    <div class="sim-control">
+      <label>n (tamaño muestral) <span class="sim-val" id="ffNVal">120</span></label>
+      <input type="range" id="ffN" min="25" max="400" step="5" value="120" oninput="runForms()">
+    </div>
+    <div class="sim-control">
+      <label>Ruido <span class="sim-val" id="ffSigVal">0.60</span></label>
+      <input type="range" id="ffSig" min="0.05" max="2" step="0.05" value="0.6" oninput="runForms()">
+    </div>
+  </div>
+
+  <div class="seg" id="ffToggles">
+    <button class="btn btn-sm active" data-spec="0" onclick="toggleSpec(0)">Nivel-nivel</button>
+    <button class="btn btn-sm active" data-spec="1" onclick="toggleSpec(1)">Log-nivel</button>
+    <button class="btn btn-sm active" data-spec="2" onclick="toggleSpec(2)">Nivel-log</button>
+    <button class="btn btn-sm active" data-spec="3" onclick="toggleSpec(3)">Log-log</button>
+    <button class="btn btn-sm" id="ffTransBtn" onclick="toggleTransformed()">Ver en escala transformada</button>
+  </div>
+
+  <div class="sim-canvas-wrap">
+    <canvas id="ffCanvas" width="760" height="420"></canvas>
+  </div>
+  <div class="legend" id="ffLegend"></div>
+
+  <div class="results-wrap">
+    <table class="results-table" id="ffTable"></table>
+  </div>
+
+  <h3>Interpretación de cada especificación</h3>
+  <div id="ffInterp"></div>
+</div>
+
+<div class="note">
+  <div class="note-title">El R² no es comparable entre modelos con distinta variable dependiente</div>
+  En la tabla, los dos modelos con <span class="math">y</span> en niveles comparten variable dependiente y sus R² <em>sí</em> se pueden comparar entre sí; lo mismo ocurre entre los dos modelos con <span class="math">ln(y)</span>. Pero comparar el R² de un modelo en niveles contra uno en logaritmos <strong>no tiene sentido</strong>: cada uno explica una variable distinta, y por lo tanto un SST distinto (Ejercicios 4.f y 5.e).
+</div>
+
+<div class="tip">
+  <strong>Aproximación vs. cálculo exacto.</strong> En un modelo log-nivel, decir "un año más de educación aumenta el salario 100·β₁ %" es una <em>aproximación</em> válida solo para valores chicos de β₁. El cambio porcentual exacto es <span class="math">100 &sdot; (e<sup>&beta;&#770;<sub>1</sub></sup> &minus; 1)</span>. Con β₁ = 0.085 la aproximación dice 8.5% y el valor exacto es 8.87%: la diferencia es menor. Con β₁ = 0.12 (Ejercicio 2.d) la aproximación dice 12% y el exacto es 12.75%. A partir de β₁ ≈ 0.20 la brecha se vuelve grande y conviene usar siempre la fórmula exacta.
+</div>
+
+<div class="lab">
+  <div class="lab-title">Calculadora: aproximado vs. exacto</div>
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label>&beta;&#770;<sub>1</sub> (modelo log-nivel) <span class="sim-val" id="apxBVal">0.120</span></label>
+      <input type="range" id="apxB" min="-0.5" max="0.8" step="0.005" value="0.12" oninput="renderApprox()">
+    </div>
+    <div class="sim-control">
+      <label>&Delta;x (unidades) <span class="sim-val" id="apxDVal">1</span></label>
+      <input type="range" id="apxD" min="1" max="10" step="1" value="1" oninput="renderApprox()">
+    </div>
+  </div>
+  <div class="lab-stats" id="apxStats"></div>
+  <div class="sim-canvas-wrap" style="margin-top:.75rem">
+    <canvas id="apxCanvas" width="760" height="260"></canvas>
+  </div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--accent)"></span>Aproximación 100·β₁·Δx</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>Exacto 100·(e<sup>β₁·Δx</sup>−1)</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>3. El modelo cuadrático</h2>
+
+<p>Cuando el efecto de <span class="math">x</span> sobre <span class="math">y</span> no es constante —rendimientos decrecientes, curvas de aprendizaje, ciclos de vida— agregamos el término al cuadrado:</p>
+
+<div class="formula-block">
+  <span class="math">y = &beta;<sub>0</sub> + &beta;<sub>1</sub>x + &beta;<sub>2</sub>x&sup2; + u</span>
+</div>
+
+<p>El modelo sigue siendo <strong>lineal en los parámetros</strong>, así que se estima por OLS sin ningún cambio: simplemente construimos una nueva columna con <span class="math">x&sup2;</span>. Lo que cambia radicalmente es la interpretación. El efecto marginal ya no es <span class="math">&beta;<sub>1</sub></span>, sino la derivada:</p>
+
+<div class="formula-block">
+  <span class="math"><span class="frac"><span class="num">&part;y</span><span class="den">&part;x</span></span> = &beta;<sub>1</sub> + 2&beta;<sub>2</sub>x</span>
+  &nbsp;&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;&nbsp;
+  <span class="math">x* = <span class="frac"><span class="num">&minus;&beta;<sub>1</sub></span><span class="den">2&beta;<sub>2</sub></span></span></span>
+</div>
+
+<p>El efecto marginal <strong>depende del punto en el que se lo evalúe</strong>. El coeficiente <span class="math">&beta;<sub>1</sub></span> es apenas el efecto marginal en <span class="math">x = 0</span>, un punto que muchas veces ni siquiera pertenece al rango de los datos. Y <span class="math">x*</span> es el punto de quiebre: un <strong>máximo</strong> si <span class="math">&beta;<sub>2</sub> &lt; 0</span> (curva cóncava, forma de U invertida) o un <strong>mínimo</strong> si <span class="math">&beta;<sub>2</sub> &gt; 0</span> (curva convexa, forma de U).</p>
+
+<div class="lab">
+  <div class="lab-header">
+    <span class="lab-title">Laboratorio 3 · La curva y su efecto marginal</span>
+    <div class="lab-btns" style="margin-top:0">
+      <button class="btn btn-sm" onclick="quadPreset('exper')">Experiencia y ln(salario)</button>
+      <button class="btn btn-sm" onclick="quadPreset('u')">U (convexa)</button>
+      <button class="btn btn-sm" onclick="quadPreset('lin')">Casi lineal</button>
+    </div>
+  </div>
+  <p class="lab-sub">Preset inicial: el Ejercicio 3 de la práctica, <span class="math">ln(salario) = 0.50 + 0.042&sdot;exper &minus; 0.00075&sdot;exper&sup2;</span>. Hacé clic sobre el gráfico (o usá el control <span class="math">x<sub>0</sub></span>) para mover el punto de evaluación.</p>
+
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label>&beta;<sub>0</sub> <span class="sim-val" id="qB0Val">0.500</span></label>
+      <input type="range" id="qB0" min="-5" max="10" step="0.05" value="0.5" oninput="drawQuad()">
+    </div>
+    <div class="sim-control">
+      <label>&beta;<sub>1</sub> <span class="sim-val" id="qB1Val">0.0420</span></label>
+      <input type="range" id="qB1" min="-0.5" max="0.5" step="0.001" value="0.042" oninput="drawQuad()">
+    </div>
+    <div class="sim-control">
+      <label>&beta;<sub>2</sub> <span class="sim-val" id="qB2Val">-0.00075</span></label>
+      <input type="range" id="qB2" min="-0.01" max="0.01" step="0.00005" value="-0.00075" oninput="drawQuad()">
+    </div>
+    <div class="sim-control">
+      <label>Rango de x (0 a …) <span class="sim-val" id="qXmaxVal">45</span></label>
+      <input type="range" id="qXmax" min="10" max="100" step="1" value="45" oninput="drawQuad()">
+    </div>
+    <div class="sim-control">
+      <label>x<sub>0</sub> (punto de evaluación) <span class="sim-val" id="qX0Val">10.0</span></label>
+      <input type="range" id="qX0" min="0" max="45" step="0.5" value="10" oninput="drawQuad()">
+    </div>
+    <div class="sim-control">
+      <label for="qPct">Escala de la dependiente</label>
+      <select id="qPct" onchange="drawQuad()">
+        <option value="1" selected>y = ln(algo) → efectos en %</option>
+        <option value="0">y en niveles → efectos en unidades</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="lab-canvas-wrap clickable" id="quadWrap">
+    <canvas id="quadCanvas" width="760" height="380"></canvas>
+  </div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>Curva ajustada</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>Recta tangente en x₀ (pendiente = efecto marginal)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--purple)"></span>Punto de quiebre x*</span>
+  </div>
+
+  <div class="lab-equation" id="quadEq"></div>
+  <div class="lab-stats" id="quadStats"></div>
+
+  <h3>El efecto marginal como función de x</h3>
+  <p style="font-size:.88rem;color:var(--text-sec);max-width:70ch">La derivada <span class="math">&beta;<sub>1</sub> + 2&beta;<sub>2</sub>x</span> es una <strong>recta</strong>. Donde esa recta cruza el cero está el punto de quiebre de la curva de arriba: ahí el efecto marginal cambia de signo.</p>
+  <div class="sim-canvas-wrap">
+    <canvas id="meCanvas" width="760" height="260"></canvas>
+  </div>
+
+  <h3>Tabla de efectos marginales</h3>
+  <div class="results-wrap">
+    <table class="results-table" id="quadTable"></table>
+  </div>
+
+  <div id="quadShapeNote"></div>
+</div>
+
+<div class="callout">
+  <div class="callout-title">Ejercicio 3.d — la interpretación incorrecta</div>
+  Reportar solo <span class="math">&beta;&#770;<sub>1</sub> = 0.042</span> y decir "cada año adicional de experiencia sube el salario 4,2%" es <strong>incorrecto</strong>. Ese número es el efecto marginal únicamente en <span class="math">exper = 0</span>. Con <span class="math">&beta;&#770;<sub>2</sub> = &minus;0.00075</span>, el efecto en <span class="math">exper = 10</span> ya cae a 2.7% y en <span class="math">exper = 28</span> se anula. Movelo en el laboratorio y mirá cómo la tangente se va aplanando.
+</div>
+
+<div class="tip">
+  <strong>Testear si la relación es realmente cuadrática.</strong> La hipótesis "la relación es lineal" es <span class="math">H<sub>0</sub>: &beta;<sub>2</sub> = 0</span>, y se testea con un t común: <span class="math">t = &beta;&#770;<sub>2</sub> / se(&beta;&#770;<sub>2</sub>)</span>. En el Ejercicio 3.e, <span class="math">t = &minus;0.00075 / 0.00015 = &minus;5.0</span>, muy por encima de 1.96 en valor absoluto: se rechaza la linealidad al 5%. Ojo con el otro extremo: si <span class="math">&beta;&#770;<sub>2</sub></span> no es significativo, el término cuadrático agrega ruido y colinealidad sin aportar nada.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>4. Leer una salida de regresión</h2>
+
+<p>Las dos tablas siguientes son las de los Ejercicios 5 y 6 de la práctica. <strong>Hacé clic en cualquier fila</strong> para ver la interpretación del coeficiente, su estadístico t y su intervalo de confianza al 95%. Intentá responder primero y después verificá.</p>
+
+<div class="lab">
+  <div class="lab-title">Ejercicio 5 · Precio de la vivienda (log-nivel)</div>
+  <p class="lab-sub">Variable dependiente: <span class="math">ln(precio)</span>, con el precio en miles de dólares. Errores estándar entre paréntesis.</p>
+  <div class="reg-out" id="regHouse"></div>
+  <p class="reg-hint">Variables: habitaciones (cantidad), superficie (m²), antigüedad (años desde la construcción), garage (=1 si tiene).</p>
+</div>
+
+<div class="lab">
+  <div class="lab-title">Ejercicio 6 · Demanda residencial de electricidad (log-log)</div>
+  <p class="lab-sub">Variable dependiente: <span class="math">ln(consumo en kWh)</span>. Atención: <em>personas</em> entra en niveles, no en logaritmo.</p>
+  <div class="reg-out" id="regElec"></div>
+  <p class="reg-hint">Variables: tarifa ($/kWh), ingreso (mensual del hogar en $), personas (integrantes del hogar).</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>5. Predicción: dos intervalos distintos</h2>
+
+<p>Estimado el modelo, queremos predecir <span class="math">y</span> para un valor concreto <span class="math">x<sub>0</sub></span>. La predicción puntual es una sola, pero hay <strong>dos preguntas diferentes</strong>, y por lo tanto dos intervalos de ancho muy distinto:</p>
+
+<ul>
+  <li><strong>Intervalo de confianza para la media condicional</strong> <span class="math">E(y | x<sub>0</sub>)</span>: ¿cuánto gana <em>en promedio</em> la gente con estas características? La única incertidumbre viene de que estimamos los <span class="math">&beta;</span> con una muestra.</li>
+  <li><strong>Intervalo de predicción para un individuo</strong> <span class="math">y<sub>0</sub></span>: ¿cuánto gana <em>esta persona</em>? A la incertidumbre anterior se le suma la del error individual <span class="math">u<sub>0</sub></span>, que ninguna muestra puede eliminar.</li>
+</ul>
+
+<div class="formula-block">
+  <span class="math"><span class="n">se</span>(y&#770;<sub>0</sub>) = &sigma;&#770; &sdot; &radic;<span style="text-decoration:overline">x<sub>0</sub>&prime;(X&prime;X)<sup>&minus;1</sup>x<sub>0</sub></span></span>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <span class="math"><span class="n">se</span>(e&#770;<sub>0</sub>) = &sigma;&#770; &sdot; &radic;<span style="text-decoration:overline">1 + x<sub>0</sub>&prime;(X&prime;X)<sup>&minus;1</sup>x<sub>0</sub></span></span>
+</div>
+
+<p>En el caso de regresión simple esa forma cuadrática tiene una expresión transparente, que explica todo lo que se ve en el gráfico:</p>
+
+<div class="formula-block">
+  <span class="math"><span class="n">se</span>(y&#770;<sub>0</sub>) = &sigma;&#770; &sdot; &radic;<span style="text-decoration:overline"><span class="frac"><span class="num">1</span><span class="den">n</span></span> + <span class="frac"><span class="num">(x<sub>0</sub> &minus; x&#772;)&sup2;</span><span class="den"><span class="n">SST</span><sub>x</sub></span></span></span></span>
+</div>
+
+<p>El segundo término es cero cuando <span class="math">x<sub>0</sub> = x&#772;</span> y crece con el cuadrado de la distancia al centro de los datos: <strong>por eso la banda tiene forma de reloj de arena</strong>, angosta en el medio y cada vez más ancha hacia los extremos. Predecir lejos del rango observado es caro en términos de precisión.</p>
+
+<div class="lab">
+  <div class="lab-header">
+    <span class="lab-title">Laboratorio 4 · Bandas de confianza y de predicción</span>
+    <button class="btn btn-sm" onclick="newPredSample()">Nueva muestra</button>
+  </div>
+  <p class="lab-sub">Hacé clic sobre el gráfico para mover <span class="math">x<sub>0</sub></span>. Probá llevarlo a los bordes y observá cómo se abre la banda verde.</p>
+
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label>n (tamaño muestral) <span class="sim-val" id="pdNVal">40</span></label>
+      <input type="range" id="pdN" min="12" max="500" step="1" value="40" oninput="runPred()">
+    </div>
+    <div class="sim-control">
+      <label>&sigma; (desvío del error) <span class="sim-val" id="pdSigVal">3.0</span></label>
+      <input type="range" id="pdSig" min="0.5" max="10" step="0.25" value="3" oninput="runPred()">
+    </div>
+    <div class="sim-control">
+      <label>Curvatura verdadera (&beta;<sub>2</sub>) <span class="sim-val" id="pdCurvVal">0.00</span></label>
+      <input type="range" id="pdCurv" min="-0.3" max="0.3" step="0.01" value="0" oninput="runPred()">
+    </div>
+    <div class="sim-control">
+      <label for="pdSpec">Especificación estimada</label>
+      <select id="pdSpec" onchange="runPred()">
+        <option value="1">Lineal: ŷ = b₀ + b₁x</option>
+        <option value="2">Cuadrática: ŷ = b₀ + b₁x + b₂x²</option>
+      </select>
+    </div>
+    <div class="sim-control">
+      <label for="pdLev">Nivel de confianza</label>
+      <select id="pdLev" onchange="runPred()">
+        <option value="0.90">90%</option>
+        <option value="0.95" selected>95%</option>
+        <option value="0.99">99%</option>
+      </select>
+    </div>
+    <div class="sim-control">
+      <label>x<sub>0</sub> <span class="sim-val" id="pdX0Val">5.0</span></label>
+      <input type="range" id="pdX0" min="-2" max="14" step="0.1" value="5" oninput="drawPred()">
+    </div>
+  </div>
+
+  <div class="lab-canvas-wrap clickable" id="predWrap">
+    <canvas id="predCanvas" width="760" height="430"></canvas>
+  </div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>Recta / curva estimada</span>
+    <span class="legend-item"><span class="legend-box" style="background:var(--green)"></span>IC de la media E(y|x₀)</span>
+    <span class="legend-item"><span class="legend-box" style="background:var(--purple)"></span>Intervalo de predicción de y₀</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--text-sec);height:2px"></span>x̄ (centro de los datos)</span>
+  </div>
+
+  <div class="lab-stats" id="pdStats"></div>
+  <div class="sim-result-row" id="pdIntervals"></div>
+
+  <h3>¿Qué pasa cuando crece la muestra?</h3>
+  <p style="font-size:.88rem;color:var(--text-sec);max-width:70ch">El gráfico muestra el ancho de cada intervalo en <span class="math">x<sub>0</sub></span> como función de <span class="math">n</span>, manteniendo fijos <span class="math">&sigma;&#770;</span> y la dispersión de X. El punto marca tu <span class="math">n</span> actual.</p>
+  <div class="sim-canvas-wrap">
+    <canvas id="pdNCanvas" width="760" height="250"></canvas>
+  </div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>Ancho del IC de la media → tiende a 0</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--purple)"></span>Ancho del intervalo de predicción → tiende a 2·c·σ</span>
+  </div>
+</div>
+
+<div class="lab">
+  <div class="lab-title">Calculadora de intervalos (Ejercicio 7)</div>
+  <p class="lab-sub">Cuando el enunciado ya te da <span class="math">se(y&#770;<sub>0</sub>)</span> y <span class="math">&sigma;&#770;</span>, no hace falta ninguna matriz: los dos intervalos salen directo. Los valores cargados son los del Ejercicio 7 (<span class="math">salario = 2.50 + 0.45&sdot;educ + 0.08&sdot;exper</span>, educ = 16, exper = 10).</p>
+  <div class="sim-controls">
+    <div class="sim-control"><label for="e7yhat">Predicción puntual ŷ₀</label><input type="number" id="e7yhat" step="any" value="10.50" oninput="renderE7()"></div>
+    <div class="sim-control"><label for="e7se">se(ŷ₀) — media condicional</label><input type="number" id="e7se" step="any" value="0.35" oninput="renderE7()"></div>
+    <div class="sim-control"><label for="e7sig">σ̂ (error estándar de la regresión)</label><input type="number" id="e7sig" step="any" value="2.80" oninput="renderE7()"></div>
+    <div class="sim-control"><label for="e7c">Valor crítico c</label><input type="number" id="e7c" step="any" value="1.96" oninput="renderE7()"></div>
+  </div>
+  <div class="lab-stats" id="e7Stats"></div>
+  <div class="sim-result-row" id="e7Out"></div>
+</div>
+
+<div class="tip">
+  <strong>Ejercicio 7.e.</strong> Con <span class="math">n &rarr; &infin;</span> el intervalo de confianza para la media <em>colapsa a un punto</em>: conocemos los <span class="math">&beta;</span> con precisión arbitraria. El intervalo de predicción, en cambio, converge a <span class="math">y&#770;<sub>0</sub> &plusmn; c &sdot; &sigma;</span> y ahí se queda. La variabilidad individual <span class="math">u<sub>0</sub></span> es parte del mundo, no de nuestra ignorancia estadística: por más datos que juntemos, dos personas con la misma educación y experiencia no ganan lo mismo.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>6. Predecir en niveles cuando el modelo está en logaritmos</h2>
+
+<p>Si estimamos <span class="math">ln(y) = &beta;<sub>0</sub> + &beta;<sub>1</sub>x + u</span> y queremos predecir <span class="math">y</span> —no <span class="math">ln(y)</span>— la tentación es exponenciar la predicción. <strong>Eso subestima sistemáticamente</strong> el valor esperado, por la desigualdad de Jensen: como la exponencial es convexa, <span class="math">E(e<sup>u</sup>) &gt; e<sup>E(u)</sup> = 1</span>.</p>
+
+<div class="formula-block">
+  <span class="math">E(y | x) = e<sup>&sigma;&sup2;/2</sup> &sdot; e<sup>&beta;<sub>0</sub> + &beta;<sub>1</sub>x</sup></span>
+  &nbsp;&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;&nbsp;
+  <span class="math">y&#770;<sub>0</sub><sup>corr</sup> = e<sup>&sigma;&#770;&sup2;/2</sup> &sdot; e<sup>ln(y)&#770;<sub>0</sub></sup></span>
+</div>
+
+<p>El factor <span class="math">e<sup>&sigma;&#770;&sup2;/2</sup></span> es siempre mayor que 1 y crece rápido con la varianza del error: si el modelo ajusta bien, la corrección es casi irrelevante; si el modelo es ruidoso, ignorarla puede errar por decenas de puntos porcentuales.</p>
+
+<div class="lab">
+  <div class="lab-title">Laboratorio 5 · Corrección por desigualdad de Jensen</div>
+  <p class="lab-sub">Preset del Ejercicio 8: <span class="math">ln(salario) = 0.80 + 0.075&sdot;educ</span>, con <span class="math">&sigma;&#770;&sup2; = 0.25</span>.</p>
+
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label>&beta;&#770;<sub>0</sub> <span class="sim-val" id="jB0Val">0.800</span></label>
+      <input type="range" id="jB0" min="-1" max="3" step="0.01" value="0.8" oninput="renderJensen()">
+    </div>
+    <div class="sim-control">
+      <label>&beta;&#770;<sub>1</sub> <span class="sim-val" id="jB1Val">0.075</span></label>
+      <input type="range" id="jB1" min="0" max="0.3" step="0.001" value="0.075" oninput="renderJensen()">
+    </div>
+    <div class="sim-control">
+      <label>educ<sub>0</sub> <span class="sim-val" id="jXVal">16</span></label>
+      <input type="range" id="jX" min="0" max="25" step="1" value="16" oninput="renderJensen()">
+    </div>
+    <div class="sim-control">
+      <label>&sigma;&#770;&sup2; (varianza del error) <span class="sim-val" id="jS2Val">0.250</span></label>
+      <input type="range" id="jS2" min="0" max="1.5" step="0.005" value="0.25" oninput="renderJensen()">
+    </div>
+  </div>
+
+  <div class="lab-stats" id="jStats"></div>
+  <div class="bar-cmp" id="jBars"></div>
+
+  <div class="sim-canvas-wrap" style="margin-top:1rem">
+    <canvas id="jCanvas" width="760" height="260"></canvas>
+  </div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--accent)"></span>Factor de corrección e<sup>σ̂²/2</sup> según σ̂²</span>
+  </div>
+</div>
+
+<div class="note">
+  <div class="note-title">Una alternativa que no necesita normalidad</div>
+  La fórmula <span class="math">e<sup>&sigma;&#770;&sup2;/2</sup></span> supone que el error es normal. Sin ese supuesto se usa el <strong>estimador smearing de Duan</strong>: se reemplaza el factor por el promedio muestral <span class="math">(1/n)&sum;e<sup>u&#770;<sub>i</sub></sup></span>, calculado con los residuos del modelo estimado. Ambos apuntan a lo mismo: corregir hacia arriba la predicción ingenua.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>7. Autoevaluación: verdadero o falso</h2>
+
+<p>Las diez afirmaciones del Ejercicio 4 de la práctica. Elegí una respuesta y la página te devuelve la justificación.</p>
+
+<div id="quizWrap"></div>
+<div class="quiz-score" id="quizScore"></div>
+<div class="lab-btns"><button class="btn btn-sm" onclick="resetQuiz()">Reiniciar</button></div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>Para llevarse</h2>
+
+<ul>
+  <li><strong>Escalas.</strong> Reexpresar unidades cambia coeficientes y errores estándar en la misma proporción: los <span class="math">t</span> y el R² quedan intactos.</li>
+  <li><strong>Logaritmos.</strong> El logaritmo en <span class="math">y</span> convierte efectos en porcentajes; en <span class="math">x</span>, hace que lo que importe sean los cambios relativos de <span class="math">x</span>. Log-log da elasticidades constantes y adimensionales.</li>
+  <li><strong>Cuadráticos.</strong> El efecto marginal es <span class="math">&beta;<sub>1</sub> + 2&beta;<sub>2</sub>x</span>: hay que reportarlo evaluado en valores relevantes (la media, algunos percentiles), nunca solo <span class="math">&beta;<sub>1</sub></span>. El punto de quiebre <span class="math">&minus;&beta;<sub>1</sub>/(2&beta;<sub>2</sub>)</span> puede caer fuera del rango de los datos, y en ese caso no se interpreta.</li>
+  <li><strong>R².</strong> Comparable solo entre modelos con la misma variable dependiente.</li>
+  <li><strong>Predicción.</strong> El intervalo para la media se angosta con <span class="math">n</span>; el intervalo para un individuo no. Ambos se abren a medida que <span class="math">x<sub>0</sub></span> se aleja de <span class="math">x&#772;</span>.</li>
+  <li><strong>Modelos en log.</strong> Exponenciar la predicción sin corregir por <span class="math">e<sup>&sigma;&#770;&sup2;/2</sup></span> subestima <span class="math">E(y|x<sub>0</sub>)</span>.</li>
+</ul>
+
+</article>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const CS = () => getComputedStyle(document.documentElement);
+const col = v => CS().getPropertyValue(v).trim();
+
+/* ══════════ Utilidades numéricas ══════════ */
+function matInv(A){
+  const n = A.length;
+  const M = A.map((r,i) => [...r, ...Array.from({length:n}, (_,j) => i===j?1:0)]);
+  for(let c=0;c<n;c++){
+    let p=c;
+    for(let r=c+1;r<n;r++) if(Math.abs(M[r][c])>Math.abs(M[p][c])) p=r;
+    if(Math.abs(M[p][c])<1e-12) return null;
+    const tmp=M[c]; M[c]=M[p]; M[p]=tmp;
+    const pv=M[c][c];
+    for(let j=0;j<2*n;j++) M[c][j]/=pv;
+    for(let r=0;r<n;r++){
+      if(r===c) continue;
+      const f=M[r][c];
+      if(f===0) continue;
+      for(let j=0;j<2*n;j++) M[r][j]-=f*M[c][j];
+    }
+  }
+  return M.map(r=>r.slice(n));
+}
+
+function ols(X,y){
+  const n=X.length, k=X[0].length;
+  const XtX=Array.from({length:k},()=>Array(k).fill(0));
+  const Xty=Array(k).fill(0);
+  for(let i=0;i<n;i++){
+    for(let a=0;a<k;a++){
+      Xty[a]+=X[i][a]*y[i];
+      for(let b=0;b<k;b++) XtX[a][b]+=X[i][a]*X[i][b];
+    }
+  }
+  const inv=matInv(XtX);
+  if(!inv) return null;
+  const b=Array(k).fill(0);
+  for(let a=0;a<k;a++) for(let j=0;j<k;j++) b[a]+=inv[a][j]*Xty[j];
+  const yhat=X.map(r=>r.reduce((s,v,j)=>s+v*b[j],0));
+  const res=y.map((v,i)=>v-yhat[i]);
+  const SSR=res.reduce((s,v)=>s+v*v,0);
+  const ybar=y.reduce((s,v)=>s+v,0)/n;
+  const SST=y.reduce((s,v)=>s+(v-ybar)**2,0);
+  const df=n-k;
+  const sigma2=df>0?SSR/df:NaN;
+  const se=b.map((_,i)=>Math.sqrt(sigma2*inv[i][i]));
+  return {b, se, inv, n, k, df, SSR, SST, sigma2, sigma:Math.sqrt(sigma2),
+          R2: SST>0 ? 1-SSR/SST : NaN, yhat, res, ybar};
+}
+
+function quadForm(inv, v){
+  let s=0;
+  for(let a=0;a<v.length;a++) for(let b=0;b<v.length;b++) s+=v[a]*inv[a][b]*v[b];
+  return s;
+}
+
+function normInv(p){
+  const a=[-3.969683028665376e+01,2.209460984245205e+02,-2.759285104469687e+02,1.383577518672690e+02,-3.066479806614716e+01,2.506628277459239e+00];
+  const b=[-5.447609879822406e+01,1.615858368580409e+02,-1.556989798598866e+02,6.680131188771972e+01,-1.328068155288572e+01];
+  const c=[-7.784894002430293e-03,-3.223964580411365e-01,-2.400758277161838e+00,-2.549732539343734e+00,4.374664141464968e+00,2.938163982698783e+00];
+  const d=[7.784695709041462e-03,3.224671290700398e-01,2.445134137142996e+00,3.754408661907416e+00];
+  const pl=0.02425;
+  let q,r;
+  if(p<pl){
+    q=Math.sqrt(-2*Math.log(p));
+    return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  }
+  if(p<=1-pl){
+    q=p-0.5; r=q*q;
+    return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+  }
+  q=Math.sqrt(-2*Math.log(1-p));
+  return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+}
+
+/* Cuantil t por expansión de Cornish-Fisher (buena para df >= 8) */
+function tInv(p, df){
+  const z=normInv(p);
+  if(!isFinite(df) || df>2000) return z;
+  const z2=z*z, z3=z2*z, z5=z3*z2, z7=z5*z2, z9=z7*z2;
+  const g1=(z3+z)/4;
+  const g2=(5*z5+16*z3+3*z)/96;
+  const g3=(3*z7+19*z5+17*z3-15*z)/384;
+  const g4=(79*z9+776*z7+1482*z5-1920*z3-945*z)/92160;
+  return z + g1/df + g2/(df*df) + g3/(df**3) + g4/(df**4);
+}
+
+function mulberry32(a){
+  return function(){
+    a|=0; a=a+0x6D2B79F5|0;
+    let t=Math.imul(a^a>>>15, 1|a);
+    t=t+Math.imul(t^t>>>7, 61|t)^t;
+    return ((t^t>>>14)>>>0)/4294967296;
+  };
+}
+function normGen(rng){
+  let spare=null;
+  return ()=>{
+    if(spare!==null){const v=spare; spare=null; return v;}
+    let u=0,v=0;
+    while(u===0) u=rng();
+    while(v===0) v=rng();
+    const m=Math.sqrt(-2*Math.log(u));
+    spare=m*Math.sin(2*Math.PI*v);
+    return m*Math.cos(2*Math.PI*v);
+  };
+}
+
+const mean = a => a.reduce((s,v)=>s+v,0)/a.length;
+const fmt = (v,d=3) => (isFinite(v)? v.toFixed(d) : '—');
+function fmtSmart(v){
+  if(!isFinite(v)) return '—';
+  const a=Math.abs(v);
+  if(a===0) return '0';
+  if(a<0.001) return Number(v.toFixed(7)).toString();
+  if(a<1) return v.toFixed(4);
+  if(a<100) return v.toFixed(3);
+  return v.toFixed(1);
+}
+function statCards(items){
+  return items.map(s=>`<div class="stat-card"><div class="stat-label">${s.l}</div><div class="stat-value ${s.c||''} ${s.sm?'sm':''}">${s.v}</div>${s.note?`<div class="stat-note">${s.note}</div>`:''}</div>`).join('');
+}
+
+/* ══════════ Canvas helpers ══════════ */
+function setupCanvas(id, ratio, maxH){
+  const canvas=document.getElementById(id);
+  const dpr=window.devicePixelRatio||1;
+  const cw=canvas.parentElement.clientWidth||760;
+  // En pantallas angostas la altura proporcional queda demasiado chata para
+  // leer los gráficos, así que imponemos un piso más alto.
+  const ch=Math.min(maxH||420, Math.max(cw<520?240:190, cw*ratio));
+  canvas.width=Math.round(cw*dpr);
+  canvas.height=Math.round(ch*dpr);
+  canvas.style.width=cw+'px';
+  canvas.style.height=ch+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {canvas, ctx, cw, ch};
+}
+
+/* Formatea las marcas de un eje con la cantidad de decimales que hace falta
+   para distinguir dos marcas consecutivas, y no más. */
+function tickFmt(lo, hi, n){
+  const step=(hi-lo)/n;
+  if(!isFinite(step) || step<=0) return v=>String(v);
+  const d=Math.min(6, Math.max(0, Math.ceil(-Math.log10(step))+1));
+  return v=>{
+    const s=(Math.abs(v)<step/1e6 ? 0 : v).toFixed(d);
+    return s==='-0'?'0':s;
+  };
+}
+
+function frame(ctx, cw, ch, pad, xr, yr, opts){
+  opts=opts||{};
+  const pw=cw-pad.l-pad.r, ph=ch-pad.t-pad.b;
+  const [x0,x1]=xr, [y0,y1]=yr;
+  const sx=v=>pad.l+(v-x0)/(x1-x0)*pw;
+  const sy=v=>pad.t+ph-(v-y0)/(y1-y0)*ph;
+  const ix=px=>x0+(px-pad.l)/pw*(x1-x0);
+
+  ctx.fillStyle=col('--bg-canvas');
+  ctx.fillRect(0,0,cw,ch);
+
+  const nx=opts.nx||6, ny=opts.ny||5;
+  const fx=opts.fx||tickFmt(x0,x1,nx);
+  const fy=opts.fy||tickFmt(y0,y1,ny);
+  ctx.strokeStyle=col('--border');
+  ctx.lineWidth=0.5;
+  ctx.font='11px sans-serif';
+  for(let i=0;i<=nx;i++){
+    const v=x0+(x1-x0)*i/nx, px=sx(v);
+    ctx.beginPath(); ctx.moveTo(px,pad.t); ctx.lineTo(px,pad.t+ph); ctx.stroke();
+    ctx.fillStyle=col('--text-sec'); ctx.textAlign='center';
+    ctx.fillText(fx(v), px, pad.t+ph+16);
+  }
+  for(let i=0;i<=ny;i++){
+    const v=y0+(y1-y0)*i/ny, py=sy(v);
+    ctx.beginPath(); ctx.moveTo(pad.l,py); ctx.lineTo(pad.l+pw,py); ctx.stroke();
+    ctx.fillStyle=col('--text-sec'); ctx.textAlign='right';
+    ctx.fillText(fy(v), pad.l-8, py+4);
+  }
+  ctx.strokeStyle=col('--text-sec'); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t+ph); ctx.lineTo(pad.l+pw,pad.t+ph); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+ph); ctx.stroke();
+
+  ctx.fillStyle=col('--heading'); ctx.font='bold 12px sans-serif'; ctx.textAlign='center';
+  if(opts.xlab) ctx.fillText(opts.xlab, pad.l+pw/2, ch-4);
+  if(opts.ylab){
+    ctx.save(); ctx.translate(13, pad.t+ph/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText(opts.ylab, 0, 0); ctx.restore();
+  }
+  return {sx, sy, ix, pw, ph, x0, x1, y0, y1};
+}
+
+function nicePad(lo, hi, frac){
+  frac=frac||0.08;
+  if(!isFinite(lo)||!isFinite(hi)) return [0,1];
+  if(hi-lo<1e-9){ const d=Math.abs(hi)*0.1||1; return [lo-d, hi+d]; }
+  const p=(hi-lo)*frac;
+  return [lo-p, hi+p];
+}
+
+function polyline(ctx, sc, f, x0, x1, steps){
+  ctx.beginPath();
+  let started=false;
+  for(let i=0;i<=steps;i++){
+    const x=x0+(x1-x0)*i/steps;
+    const y=f(x);
+    if(!isFinite(y)) { started=false; continue; }
+    const px=sc.sx(x), py=sc.sy(y);
+    if(!started){ ctx.moveTo(px,py); started=true; } else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 1 — Cambios de escala
+   ══════════════════════════════════════════════════════ */
+const BASE = {
+  n: 526, R2: 0.305,
+  rows: [
+    {name:'Constante', b:-1.50, se:1.10, kind:'const'},
+    {name:'educ',      b: 0.52, se:0.06, kind:'x', sel:'#scEduc', unit:'año'},
+    {name:'exper',     b: 0.03, se:0.012, kind:'x', sel:'#scExper', unit:'año'}
+  ]
+};
+
+function unitLabel(sel){
+  const el=$(sel);
+  return el.options[el.selectedIndex].textContent.replace(' (original)','').toLowerCase();
+}
+
+function renderScale(){
+  const yEl=$('#scY');
+  const c=parseFloat(yEl.value);
+  const yLabel=yEl.options[yEl.selectedIndex].textContent.replace(' (original)','');
+  const dEduc=parseFloat($('#scEduc').value);
+  const dExper=parseFloat($('#scExper').value);
+  const dFor={'educ':dEduc,'exper':dExper};
+
+  let html='<thead><tr><th>Variable</th><th>β̂ original</th><th>se original</th><th>t</th>'
+         + '<th>β̂ nuevo</th><th>se nuevo</th><th>t nuevo</th></tr></thead><tbody>';
+  BASE.rows.forEach(r=>{
+    const d = r.kind==='const' ? 1 : dFor[r.name];
+    const nb = c*r.b/d, nse = c*r.se/d;
+    const t0 = r.b/r.se, t1 = nb/nse;
+    const changed = Math.abs(nb-r.b)>1e-12;
+    html+=`<tr class="${changed?'hi':''}"><td class="lbl">${r.name}</td>`
+        + `<td>${fmtSmart(r.b)}</td><td>${fmtSmart(r.se)}</td><td>${t0.toFixed(3)}</td>`
+        + `<td><strong>${fmtSmart(nb)}</strong></td><td>${fmtSmart(nse)}</td><td>${t1.toFixed(3)}</td></tr>`;
+  });
+  html+=`<tr><td class="lbl">R²</td><td colspan="3">${BASE.R2.toFixed(3)}</td><td colspan="3">${BASE.R2.toFixed(3)} &nbsp;(idéntico)</td></tr>`;
+  html+=`<tr><td class="lbl">n</td><td colspan="3">${BASE.n}</td><td colspan="3">${BASE.n}</td></tr>`;
+  html+='</tbody>';
+  $('#scaleTable').innerHTML=html;
+
+  const nbEduc = c*0.52/dEduc;
+  const notes=[];
+  notes.push(`<div class="tip" style="margin-top:1rem"><strong>Lectura del nuevo β̂ de educ:</strong> un ${unitLabel('#scEduc').replace(/s$/,'')} adicional de educación se asocia con un cambio de <strong>${fmtSmart(nbEduc)}</strong> en el salario medido en ${yLabel.toLowerCase()}, manteniendo la experiencia constante.</div>`);
+
+  if(yEl.selectedIndex===3){
+    notes.push('<div class="note"><div class="note-title">El caso del colega (Ejercicio 1.d)</div>Con un tipo de cambio de 1 USD = 1.000 pesos, medir el salario en dólares es exactamente lo mismo que medirlo en miles de pesos: c = 1. Los coeficientes ni siquiera cambian. Y aunque el tipo de cambio fuera otro, el R² seguiría siendo 0.305: <strong>ningún cambio de escala puede modificarlo</strong>.</div>');
+  }
+  const anyChange = Math.abs(c-1)>1e-12 || Math.abs(dEduc-1)>1e-12 || Math.abs(dExper-1)>1e-12;
+  if(anyChange){
+    notes.push('<div class="callout" style="margin-top:1rem"><div class="callout-title">Lo que no se movió</div>Los estadísticos t son idénticos columna a columna, y el R² tampoco cambió. Las conclusiones de significatividad y de bondad de ajuste son exactamente las mismas: cambiar de unidades es cambiar el idioma en el que reportamos el resultado, no el resultado.</div>');
+  }
+  $('#scaleNotes').innerHTML=notes.join('');
+}
+function resetScale(){
+  $('#scY').selectedIndex=0; $('#scEduc').selectedIndex=0; $('#scExper').selectedIndex=0;
+  renderScale();
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 2 — Cuatro formas funcionales
+   ══════════════════════════════════════════════════════ */
+const SPECS=[
+  {id:0, name:'Nivel-nivel', short:'y ~ x',        depLog:false, indLog:false, color:'--accent'},
+  {id:1, name:'Log-nivel',   short:'ln(y) ~ x',    depLog:true,  indLog:false, color:'--red'},
+  {id:2, name:'Nivel-log',   short:'y ~ ln(x)',    depLog:false, indLog:true,  color:'--orange'},
+  {id:3, name:'Log-log',     short:'ln(y) ~ ln(x)',depLog:true,  indLog:true,  color:'--purple'}
+];
+let ffSeed=12345;
+let ffShow=[true,true,true,true];
+let ffTransformed=false;
+let ffState=null;
+
+function newFormSample(){ ffSeed=Math.floor(Math.random()*1e9); runForms(); }
+function toggleSpec(i){
+  ffShow[i]=!ffShow[i];
+  document.querySelector(`#ffToggles [data-spec="${i}"]`).classList.toggle('active', ffShow[i]);
+  drawForms();
+}
+function toggleTransformed(){
+  ffTransformed=!ffTransformed;
+  $('#ffTransBtn').classList.toggle('active', ffTransformed);
+  $('#ffTransBtn').textContent = ffTransformed ? 'Ver en escala original' : 'Ver en escala transformada';
+  drawForms();
+}
+
+function runForms(){
+  const n=parseInt($('#ffN').value);
+  const sig=parseFloat($('#ffSig').value);
+  const dgp=$('#ffDgp').value;
+  $('#ffNVal').textContent=n;
+  $('#ffSigVal').textContent=sig.toFixed(2);
+
+  const rng=mulberry32(ffSeed);
+  const rn=normGen(rng);
+  const x=[], y=[];
+  for(let i=0;i<n;i++){
+    const xi=1+19*rng();
+    let yi;
+    if(dgp==='lin')      yi = 10 + 1.2*xi + sig*5*rn();
+    else if(dgp==='log') yi = 4 + 9*Math.log(xi) + sig*4*rn();
+    else if(dgp==='exp') yi = Math.exp(1.6 + 0.09*xi + sig*0.35*rn());
+    else                 yi = Math.exp(2.0 + 0.70*Math.log(xi) + sig*0.35*rn());
+    x.push(xi);
+    y.push(Math.max(yi, 0.5));
+  }
+
+  const fits=SPECS.map(sp=>{
+    const yy = sp.depLog ? y.map(Math.log) : y;
+    const xx = sp.indLog ? x.map(Math.log) : x;
+    const X = xx.map(v=>[1,v]);
+    const r = ols(X, yy);
+    return {sp, r, xx, yy};
+  });
+
+  ffState={x, y, fits, xbar:mean(x), ybar:mean(y)};
+  drawForms();
+  renderFormsTable();
+}
+
+function ffCurve(fit, xv){
+  const b=fit.r.b;
+  const z = fit.sp.indLog ? Math.log(xv) : xv;
+  const v = b[0]+b[1]*z;
+  return fit.sp.depLog ? Math.exp(v) : v;
+}
+
+function drawForms(){
+  if(!ffState) return;
+  const {ctx, cw, ch}=setupCanvas('ffCanvas', 0.55, 430);
+  const {x, y, fits}=ffState;
+  const pad={t:18,r:20,b:44,l:60};
+
+  if(!ffTransformed){
+    const xr=nicePad(Math.min(...x), Math.max(...x));
+    let lo=Math.min(...y), hi=Math.max(...y);
+    fits.forEach((f,i)=>{ if(!ffShow[i]) return;
+      for(let k=0;k<=40;k++){
+        const xv=xr[0]+(xr[1]-xr[0])*k/40;
+        if(xv<=0 && f.sp.indLog) continue;
+        const yv=ffCurve(f,xv);
+        if(isFinite(yv)){ lo=Math.min(lo,yv); hi=Math.max(hi,yv); }
+      }
+    });
+    const spanY=Math.max(...y)-Math.min(...y);
+    lo=Math.max(lo, Math.min(...y)-spanY*0.8);
+    hi=Math.min(hi, Math.max(...y)+spanY*0.8);
+    const yr=nicePad(lo,hi);
+    const sc=frame(ctx,cw,ch,pad,xr,yr,{xlab:'x', ylab:'y'});
+
+    ctx.fillStyle=col('--text-sec'); ctx.globalAlpha=0.55;
+    for(let i=0;i<x.length;i++){
+      ctx.beginPath(); ctx.arc(sc.sx(x[i]), sc.sy(y[i]), 3, 0, 2*Math.PI); ctx.fill();
+    }
+    ctx.globalAlpha=1;
+
+    fits.forEach((f,i)=>{
+      if(!ffShow[i]) return;
+      ctx.strokeStyle=col(f.sp.color); ctx.lineWidth=2.4;
+      const lo2 = f.sp.indLog ? Math.max(xr[0], 0.01) : xr[0];
+      polyline(ctx, sc, xv=>ffCurve(f,xv), lo2, xr[1], 220);
+    });
+    $('#ffLegend').innerHTML = SPECS.map((sp,i)=>
+      `<span class="legend-item" style="opacity:${ffShow[i]?1:0.35}"><span class="legend-dot" style="background:var(${sp.color})"></span>${sp.name}</span>`).join('')
+      + '<span class="legend-item"><span class="legend-dot" style="background:var(--text-sec);border-radius:50%;width:8px;height:8px"></span>Datos</span>';
+  } else {
+    const idx = ffShow.findIndex(v=>v);
+    const f = fits[idx<0?0:idx];
+    const xx=f.xx, yy=f.yy;
+    const xr=nicePad(Math.min(...xx), Math.max(...xx));
+    const yr=nicePad(Math.min(...yy), Math.max(...yy));
+    const sc=frame(ctx,cw,ch,pad,xr,yr,{
+      xlab: f.sp.indLog?'ln(x)':'x',
+      ylab: f.sp.depLog?'ln(y)':'y'
+    });
+    ctx.fillStyle=col('--text-sec'); ctx.globalAlpha=0.55;
+    for(let i=0;i<xx.length;i++){
+      ctx.beginPath(); ctx.arc(sc.sx(xx[i]), sc.sy(yy[i]), 3, 0, 2*Math.PI); ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    ctx.strokeStyle=col(f.sp.color); ctx.lineWidth=2.6;
+    polyline(ctx, sc, z=>f.r.b[0]+f.r.b[1]*z, xr[0], xr[1], 2);
+    ctx.fillStyle=col('--heading'); ctx.font='bold 12px sans-serif'; ctx.textAlign='left';
+    ctx.fillText(f.sp.name+': en estos ejes el ajuste es una recta', pad.l+10, pad.t+16);
+    $('#ffLegend').innerHTML=`<span class="legend-item">Mostrando <strong style="color:var(${f.sp.color})">${f.sp.name}</strong> en sus ejes transformados. Activá otra especificación en los botones para verla acá.</span>`;
+  }
+}
+
+function renderFormsTable(){
+  const {fits, xbar, ybar}=ffState;
+  let html='<thead><tr><th>Especificación</th><th>β̂₀</th><th>β̂₁</th><th>se(β̂₁)</th><th>t</th><th>R²</th><th>Elasticidad en x̄</th></tr></thead><tbody>';
+  fits.forEach(f=>{
+    const b=f.r.b, se=f.r.se;
+    let el;
+    if(!f.sp.depLog && !f.sp.indLog) el=b[1]*xbar/ybar;
+    else if(f.sp.depLog && !f.sp.indLog) el=b[1]*xbar;
+    else if(!f.sp.depLog && f.sp.indLog) el=b[1]/ybar;
+    else el=b[1];
+    const dep = f.sp.depLog?'ln(y)':'y';
+    html+=`<tr><td class="lbl">${f.sp.name}<br><span style="font-family:var(--font-m);font-size:.72rem;color:var(--text-sec);font-weight:400">${f.sp.short}</span></td>`
+        + `<td>${fmtSmart(b[0])}</td><td><strong style="color:var(${f.sp.color})">${fmtSmart(b[1])}</strong></td>`
+        + `<td>${fmtSmart(se[1])}</td><td>${(b[1]/se[1]).toFixed(2)}</td>`
+        + `<td>${f.r.R2.toFixed(4)}<br><span style="font-size:.68rem;color:var(--text-sec)">dep: ${dep}</span></td>`
+        + `<td>${fmtSmart(el)}</td></tr>`;
+  });
+  html+='</tbody>';
+  $('#ffTable').innerHTML=html;
+
+  const interp=fits.map(f=>{
+    const b1=f.r.b[1];
+    let txt;
+    if(!f.sp.depLog && !f.sp.indLog){
+      txt=`Un aumento de <strong>una unidad</strong> en x se asocia con un cambio de <strong>${fmtSmart(b1)} unidades</strong> en y.`;
+    } else if(f.sp.depLog && !f.sp.indLog){
+      const exact=100*(Math.exp(b1)-1);
+      txt=`Un aumento de <strong>una unidad</strong> en x se asocia con un cambio de <strong>${fmtSmart(100*b1)}%</strong> en y (aproximado). El valor exacto es 100·(e<sup>${fmtSmart(b1)}</sup>−1) = <strong>${fmtSmart(exact)}%</strong>. Es una <em>semi-elasticidad</em>.`;
+    } else if(!f.sp.depLog && f.sp.indLog){
+      txt=`Un aumento de <strong>1%</strong> en x se asocia con un cambio de <strong>${fmtSmart(b1/100)} unidades</strong> en y. Duplicar x (subir 100%) cambia y en β̂₁·ln(2) = <strong>${fmtSmart(b1*Math.log(2))} unidades</strong>.`;
+    } else {
+      const tipo = Math.abs(b1)>1 ? 'elástica' : 'inelástica';
+      txt=`Un aumento de <strong>1%</strong> en x se asocia con un cambio de <strong>${fmtSmart(b1)}%</strong> en y. Este coeficiente <em>es</em> la elasticidad, es constante en todo el rango y no tiene unidades: la relación es <strong>${tipo}</strong> (|β̂₁| ${Math.abs(b1)>1?'>':'<'} 1).`;
+    }
+    return `<div class="reg-explain open" style="border-left:3px solid var(${f.sp.color});border-radius:0 6px 6px 0;margin-bottom:.5rem;border-bottom:none">
+      <strong style="color:var(${f.sp.color})">${f.sp.name}</strong> — β̂₁ = ${fmtSmart(b1)}<br>${txt}</div>`;
+  }).join('');
+  $('#ffInterp').innerHTML=interp;
+}
+
+/* ══════════ Aproximado vs exacto ══════════ */
+function renderApprox(){
+  const b=parseFloat($('#apxB').value);
+  const d=parseFloat($('#apxD').value);
+  $('#apxBVal').textContent=b.toFixed(3);
+  $('#apxDVal').textContent=d;
+  const apr=100*b*d;
+  const exa=100*(Math.exp(b*d)-1);
+  const err=exa-apr;
+  $('#apxStats').innerHTML=statCards([
+    {l:'Aproximación 100·β₁·Δx', v:fmt(apr,2)+'%', c:'accent'},
+    {l:'Exacto 100·(e^(β₁Δx)−1)', v:fmt(exa,2)+'%', c:'orange'},
+    {l:'Diferencia', v:(err>=0?'+':'')+fmt(err,2)+' p.p.', c: Math.abs(err)>1?'orange':'green'},
+    {l:'Error relativo', v: apr!==0 ? fmt(100*Math.abs(err/exa),1)+'%' : '—', c:''}
+  ]);
+
+  const {ctx, cw, ch}=setupCanvas('apxCanvas', 0.34, 280);
+  const pad={t:16,r:20,b:42,l:58};
+  const xr=[-0.5,0.8];
+  const yr=[-60,140];
+  const sc=frame(ctx,cw,ch,pad,xr,yr,{xlab:'β₁ (con Δx = 1)', ylab:'% de cambio en y',
+    fx:v=>v.toFixed(2), fy:v=>v.toFixed(0)+'%'});
+  ctx.strokeStyle=col('--border'); ctx.lineWidth=1; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(pad.l, sc.sy(0)); ctx.lineTo(cw-pad.r, sc.sy(0)); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeStyle=col('--accent'); ctx.lineWidth=2.2;
+  polyline(ctx, sc, v=>100*v, xr[0], xr[1], 2);
+  ctx.strokeStyle=col('--red'); ctx.lineWidth=2.2;
+  polyline(ctx, sc, v=>100*(Math.exp(v)-1), xr[0], xr[1], 200);
+  const bm=Math.max(xr[0], Math.min(xr[1], b));
+  ctx.strokeStyle=col('--text-sec'); ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(sc.sx(bm), pad.t); ctx.lineTo(sc.sx(bm), ch-pad.b); ctx.stroke();
+  ctx.setLineDash([]);
+  [[100*bm,'--accent'],[100*(Math.exp(bm)-1),'--red']].forEach(([yv,c])=>{
+    if(yv<yr[0]||yv>yr[1]) return;
+    ctx.fillStyle=col(c);
+    ctx.beginPath(); ctx.arc(sc.sx(bm), sc.sy(yv), 4.5, 0, 2*Math.PI); ctx.fill();
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 3 — Cuadrático
+   ══════════════════════════════════════════════════════ */
+let quadScale=null;
+
+function quadPreset(k){
+  if(k==='exper'){ setVals({qB0:0.5,qB1:0.042,qB2:-0.00075,qXmax:45,qX0:10}); $('#qPct').value='1'; }
+  if(k==='u'){ setVals({qB0:8,qB1:-0.6,qB2:0.02,qXmax:45,qX0:10}); $('#qPct').value='0'; }
+  if(k==='lin'){ setVals({qB0:2,qB1:0.25,qB2:0.0002,qXmax:45,qX0:20}); $('#qPct').value='0'; }
+  drawQuad();
+}
+function setVals(o){ for(const k in o) $('#'+k).value=o[k]; }
+
+function drawQuad(){
+  const b0=parseFloat($('#qB0').value);
+  const b1=parseFloat($('#qB1').value);
+  const b2=parseFloat($('#qB2').value);
+  const xmax=parseFloat($('#qXmax').value);
+  const pct=$('#qPct').value==='1';
+  const x0s=$('#qX0');
+  x0s.max=xmax;
+  let x0=Math.min(parseFloat(x0s.value), xmax);
+  x0s.value=x0;
+
+  $('#qB0Val').textContent=b0.toFixed(3);
+  $('#qB1Val').textContent=b1.toFixed(4);
+  $('#qB2Val').textContent=b2.toFixed(5);
+  $('#qXmaxVal').textContent=xmax;
+  $('#qX0Val').textContent=x0.toFixed(1);
+
+  const f=x=>b0+b1*x+b2*x*x;
+  const me=x=>b1+2*b2*x;
+  const star = Math.abs(b2)>1e-9 ? -b1/(2*b2) : NaN;
+
+  /* ── Curva ── */
+  const c1=setupCanvas('quadCanvas', 0.5, 400);
+  const pad={t:20,r:22,b:44,l:62};
+  const xs=[]; for(let i=0;i<=100;i++) xs.push(xmax*i/100);
+  const vals=xs.map(f);
+  const yr=nicePad(Math.min(...vals), Math.max(...vals), 0.14);
+  const sc=frame(c1.ctx, c1.cw, c1.ch, pad, [0,xmax], yr, {
+    xlab:'x', ylab: pct?'y = ln(algo)':'y', fx:v=>v.toFixed(0), fy:v=>fmtSmart(v), nx:6, ny:5
+  });
+  quadScale={sc, pad, cw:c1.cw, ch:c1.ch, xmax};
+  const ctx=c1.ctx;
+
+  if(isFinite(star) && star>0 && star<xmax){
+    ctx.strokeStyle=col('--purple'); ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(sc.sx(star), pad.t); ctx.lineTo(sc.sx(star), c1.ch-pad.b); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=col('--purple'); ctx.font='bold 11px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('x* = '+star.toFixed(1), sc.sx(star), pad.t+12);
+  }
+
+  ctx.strokeStyle=col('--green'); ctx.lineWidth=2.8;
+  polyline(ctx, sc, f, 0, xmax, 260);
+
+  const m=me(x0), fy0=f(x0);
+  const tanHalf=xmax*0.22;
+  ctx.strokeStyle=col('--red'); ctx.lineWidth=2; ctx.setLineDash([]);
+  const tx0=Math.max(0,x0-tanHalf), tx1=Math.min(xmax,x0+tanHalf);
+  ctx.beginPath();
+  ctx.moveTo(sc.sx(tx0), sc.sy(fy0+m*(tx0-x0)));
+  ctx.lineTo(sc.sx(tx1), sc.sy(fy0+m*(tx1-x0)));
+  ctx.stroke();
+
+  ctx.strokeStyle=col('--text-sec'); ctx.lineWidth=1; ctx.globalAlpha=.6; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(sc.sx(x0), c1.ch-pad.b); ctx.lineTo(sc.sx(x0), sc.sy(fy0)); ctx.stroke();
+  ctx.setLineDash([]); ctx.globalAlpha=1;
+
+  ctx.fillStyle=col('--red');
+  ctx.beginPath(); ctx.arc(sc.sx(x0), sc.sy(fy0), 6, 0, 2*Math.PI); ctx.fill();
+  ctx.strokeStyle=col('--bg-canvas'); ctx.lineWidth=2; ctx.stroke();
+
+  ctx.fillStyle=col('--heading'); ctx.font='bold 11px sans-serif'; ctx.textAlign='left';
+  const lx=sc.sx(x0)+10 > c1.cw-160 ? sc.sx(x0)-150 : sc.sx(x0)+10;
+  ctx.fillText(`x₀ = ${x0.toFixed(1)}`, lx, sc.sy(fy0)-16);
+  ctx.fillStyle=col('--red');
+  ctx.fillText(`pendiente = ${fmtSmart(m)}`, lx, sc.sy(fy0)-3);
+
+  /* ── Efecto marginal ── */
+  const c2=setupCanvas('meCanvas', 0.34, 280);
+  const meVals=xs.map(me);
+  const mr=nicePad(Math.min(0,...meVals), Math.max(0,...meVals), 0.15);
+  const pad2={t:16,r:22,b:42,l:62};
+  const sc2=frame(c2.ctx, c2.cw, c2.ch, pad2, [0,xmax], mr, {
+    xlab:'x', ylab: pct?'∂y/∂x (×100 = %)':'∂y/∂x', fx:v=>v.toFixed(0), fy:v=>fmtSmart(v), ny:4
+  });
+  const ctx2=c2.ctx;
+  const zeroY=sc2.sy(0);
+  ctx2.save();
+  ctx2.beginPath();
+  ctx2.moveTo(sc2.sx(0), zeroY);
+  for(let i=0;i<=120;i++){ const xv=xmax*i/120; ctx2.lineTo(sc2.sx(xv), sc2.sy(me(xv))); }
+  ctx2.lineTo(sc2.sx(xmax), zeroY);
+  ctx2.closePath();
+  ctx2.clip();
+  ctx2.globalAlpha=0.18;
+  ctx2.fillStyle=col('--green');
+  ctx2.fillRect(pad2.l, pad2.t, c2.cw-pad2.l-pad2.r, zeroY-pad2.t);
+  ctx2.fillStyle=col('--red');
+  ctx2.fillRect(pad2.l, zeroY, c2.cw-pad2.l-pad2.r, (c2.ch-pad2.b)-zeroY);
+  ctx2.restore();
+
+  ctx2.strokeStyle=col('--text-sec'); ctx2.lineWidth=1.2; ctx2.setLineDash([4,3]);
+  ctx2.beginPath(); ctx2.moveTo(pad2.l, zeroY); ctx2.lineTo(c2.cw-pad2.r, zeroY); ctx2.stroke();
+  ctx2.setLineDash([]);
+  ctx2.strokeStyle=col('--red'); ctx2.lineWidth=2.6;
+  polyline(ctx2, sc2, me, 0, xmax, 2);
+  if(isFinite(star) && star>0 && star<xmax){
+    ctx2.strokeStyle=col('--purple'); ctx2.lineWidth=1.5; ctx2.setLineDash([5,4]);
+    ctx2.beginPath(); ctx2.moveTo(sc2.sx(star), pad2.t); ctx2.lineTo(sc2.sx(star), c2.ch-pad2.b); ctx2.stroke();
+    ctx2.setLineDash([]);
+  }
+  ctx2.fillStyle=col('--accent');
+  ctx2.beginPath(); ctx2.arc(sc2.sx(x0), sc2.sy(m), 5.5, 0, 2*Math.PI); ctx2.fill();
+  ctx2.strokeStyle=col('--bg-canvas'); ctx2.lineWidth=2; ctx2.stroke();
+  ctx2.fillStyle=col('--text-sec'); ctx2.font='10px sans-serif'; ctx2.textAlign='left';
+  ctx2.fillText('efecto positivo', pad2.l+8, zeroY-8);
+  ctx2.fillText('efecto negativo', pad2.l+8, zeroY+16);
+
+  /* ── Stats ── */
+  const shape = Math.abs(b2)<1e-9 ? 'Lineal (β₂ = 0)' : (b2<0 ? 'Cóncava — U invertida' : 'Convexa — forma de U');
+  const kind  = b2<0 ? 'máximo' : 'mínimo';
+  const emTxt = pct ? fmt(100*m,2)+'%' : fmtSmart(m);
+  const fe = v => {
+    const a=Math.abs(v);
+    if(a===0) return '0';
+    const d = a<0.0001 ? 6 : (a<0.01 ? 5 : (a<1 ? 4 : 3));
+    return Number(v.toFixed(d)).toString();
+  };
+  $('#quadEq').innerHTML = `ŷ = ${fe(b0)} ${b1>=0?'+':'−'} ${fe(Math.abs(b1))}·x ${b2>=0?'+':'−'} ${fe(Math.abs(b2))}·x² &nbsp;&nbsp;⟹&nbsp;&nbsp; ∂ŷ/∂x = ${fe(b1)} ${2*b2>=0?'+':'−'} ${fe(Math.abs(2*b2))}·x`;
+
+  $('#quadStats').innerHTML=statCards([
+    {l:'Forma de la curva', v:shape, c: b2<0?'orange':'accent', sm:true},
+    {l:`Efecto marginal en x₀=${x0.toFixed(1)}`, v:emTxt, c: m>=0?'green':'orange',
+     note: pct?'cambio % aproximado en y por unidad de x':'unidades de y por unidad de x'},
+    {l:'β₁ = efecto marginal en x = 0', v: pct? fmt(100*b1,2)+'%' : fmtSmart(b1), c:'', note:'no es el efecto “promedio”'},
+    {l:`Punto de quiebre x* (${kind})`, v: isFinite(star)? star.toFixed(2) : '—', c:'purple',
+     note: !isFinite(star) ? 'sin término cuadrático' : (star>0 && star<xmax ? 'dentro del rango de x' : 'FUERA del rango de x')},
+    {l:'ŷ en x₀', v:fmtSmart(fy0), c:''},
+    {l:'ŷ en x*', v: isFinite(star)? fmtSmart(f(star)) : '—', c:''}
+  ]);
+
+  /* ── Tabla de EM ── */
+  const grid=[];
+  const step=xmax/6;
+  for(let i=0;i<=6;i++) grid.push(Math.round(step*i*10)/10);
+  if(isFinite(star) && star>0 && star<xmax) grid.push(Math.round(star*10)/10);
+  grid.push(Math.round(x0*10)/10);
+  const uniq=[...new Set(grid)].sort((a,b)=>a-b);
+  let html='<thead><tr><th>x</th><th>ŷ = β̂₀+β̂₁x+β̂₂x²</th><th>∂ŷ/∂x = β̂₁+2β̂₂x</th>'
+         + (pct?'<th>%Δy por unidad (aprox.)</th>':'')+'<th>Signo</th></tr></thead><tbody>';
+  uniq.forEach(xv=>{
+    const mv=me(xv);
+    const isX0=Math.abs(xv-x0)<1e-6;
+    const isStar=isFinite(star)&&Math.abs(xv-Math.round(star*10)/10)<1e-6;
+    html+=`<tr class="${isX0?'hi':''}"><td class="lbl">${xv.toFixed(1)}${isX0?' ←x₀':''}${isStar?' ←x*':''}</td>`
+        + `<td>${fmtSmart(f(xv))}</td><td>${fmtSmart(mv)}</td>`
+        + (pct?`<td>${fmt(100*mv,2)}%</td>`:'')
+        + `<td style="color:var(${mv>0?'--green':(mv<0?'--red':'--text-sec')})">${mv>0?'creciente ↑':(mv<0?'decreciente ↓':'plano →')}</td></tr>`;
+  });
+  html+='</tbody>';
+  $('#quadTable').innerHTML=html;
+
+  /* ── Nota de forma ── */
+  let note='';
+  if(Math.abs(b2)<1e-9){
+    note='<div class="note" style="margin-top:1rem"><div class="note-title">β₂ = 0</div>Sin término cuadrático el efecto marginal es constante e igual a β₁: volvimos al modelo lineal de siempre. Si al estimar el modelo el t de β̂₂ no rechaza H₀: β₂ = 0, esta es la especificación preferible.</div>';
+  } else if(!isFinite(star) || star<=0 || star>=xmax){
+    note=`<div class="note" style="margin-top:1rem"><div class="note-title">El punto de quiebre cae fuera del rango</div>x* = ${star.toFixed(2)} no pertenece al intervalo [0, ${xmax}] en el que observamos x. Dentro del rango relevante la relación es <strong>monótona</strong> (${me(xmax/2)>0?'creciente':'decreciente'}) y lo único que hace el término cuadrático es acelerarla o frenarla. Interpretar x* como "el óptimo" sería <strong>extrapolar</strong>.</div>`;
+  } else {
+    const frac=star/xmax;
+    note=`<div class="tip" style="margin-top:1rem"><strong>Punto de quiebre en x* = ${star.toFixed(2)}</strong> (${(100*frac).toFixed(0)}% del rango de x). Antes de x* el efecto marginal es ${b2<0?'positivo y decreciente':'negativo y creciente'}; después de x* cambia de signo. Recordá que esto es una propiedad de la <em>forma funcional impuesta</em>: la parábola obliga a que haya exactamente un punto de quiebre, exista o no en la realidad. Y si muy pocas observaciones caen más allá de x*, el "máximo" está identificado con poquísimos datos.</div>`;
+  }
+  $('#quadShapeNote').innerHTML=note;
+}
+
+function quadClick(ev){
+  if(!quadScale) return;
+  const rect=ev.currentTarget.getBoundingClientRect();
+  const px=ev.clientX-rect.left;
+  const xv=quadScale.sc.ix(px);
+  const clamped=Math.max(0, Math.min(quadScale.xmax, xv));
+  $('#qX0').value=Math.round(clamped*2)/2;
+  drawQuad();
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 4 — Predicción e intervalos
+   ══════════════════════════════════════════════════════ */
+let pdSeed=777;
+let pdState=null;
+let pdScale=null;
+
+function newPredSample(){ pdSeed=Math.floor(Math.random()*1e9); runPred(); }
+
+function runPred(){
+  const n=parseInt($('#pdN').value);
+  const sig=parseFloat($('#pdSig').value);
+  const curv=parseFloat($('#pdCurv').value);
+  const k=parseInt($('#pdSpec').value);
+  $('#pdNVal').textContent=n;
+  $('#pdSigVal').textContent=sig.toFixed(2);
+  $('#pdCurvVal').textContent=curv.toFixed(2);
+
+  const rng=mulberry32(pdSeed);
+  const rn=normGen(rng);
+  const x=[], y=[];
+  for(let i=0;i<n;i++){
+    const xi=10*rng();
+    y.push(2 + 1.5*xi + curv*xi*xi + sig*rn());
+    x.push(xi);
+  }
+  const X = x.map(v => k===1 ? [1,v] : [1,v,v*v]);
+  const r = ols(X,y);
+  pdState={x,y,r,k,n};
+  drawPred();
+}
+
+function predVec(xv,k){ return k===1?[1,xv]:[1,xv,xv*xv]; }
+
+function drawPred(){
+  if(!pdState) return;
+  const {x,y,r,k,n}=pdState;
+  const lev=parseFloat($('#pdLev').value);
+  const tc=tInv(0.5+lev/2, r.df);
+  const x0s=$('#pdX0');
+  const x0=parseFloat(x0s.value);
+  $('#pdX0Val').textContent=x0.toFixed(1);
+
+  const c1=setupCanvas('predCanvas',0.56,440);
+  const pad={t:18,r:22,b:44,l:60};
+  const xr=[-2,14];
+  const fit=xv=>predVec(xv,k).reduce((s,v,j)=>s+v*r.b[j],0);
+  const q=xv=>quadForm(r.inv, predVec(xv,k));
+  const seMean=xv=>r.sigma*Math.sqrt(Math.max(0,q(xv)));
+  const sePred=xv=>r.sigma*Math.sqrt(Math.max(0,1+q(xv)));
+
+  let lo=Math.min(...y), hi=Math.max(...y);
+  for(let i=0;i<=60;i++){
+    const xv=xr[0]+(xr[1]-xr[0])*i/60;
+    const f=fit(xv), w=tc*sePred(xv);
+    lo=Math.min(lo,f-w); hi=Math.max(hi,f+w);
+  }
+  const yr=nicePad(lo,hi,0.05);
+  const sc=frame(c1.ctx,c1.cw,c1.ch,pad,xr,yr,{xlab:'x', ylab:'y', fx:v=>v.toFixed(0), fy:v=>v.toFixed(0)});
+  pdScale={sc, xr};
+  const ctx=c1.ctx;
+  const N=180;
+
+  function band(halfW, color, alpha){
+    ctx.save();
+    ctx.globalAlpha=alpha;
+    ctx.fillStyle=col(color);
+    ctx.beginPath();
+    for(let i=0;i<=N;i++){
+      const xv=xr[0]+(xr[1]-xr[0])*i/N;
+      const py=sc.sy(fit(xv)+halfW(xv));
+      if(i===0) ctx.moveTo(sc.sx(xv),py); else ctx.lineTo(sc.sx(xv),py);
+    }
+    for(let i=N;i>=0;i--){
+      const xv=xr[0]+(xr[1]-xr[0])*i/N;
+      ctx.lineTo(sc.sx(xv), sc.sy(fit(xv)-halfW(xv)));
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+  band(xv=>tc*sePred(xv), '--purple', 0.16);
+  band(xv=>tc*seMean(xv), '--green', 0.30);
+
+  ctx.save(); ctx.globalAlpha=0.75;
+  ctx.strokeStyle=col('--purple'); ctx.lineWidth=1.3; ctx.setLineDash([6,4]);
+  polyline(ctx, sc, xv=>fit(xv)+tc*sePred(xv), xr[0], xr[1], N);
+  polyline(ctx, sc, xv=>fit(xv)-tc*sePred(xv), xr[0], xr[1], N);
+  ctx.setLineDash([]); ctx.restore();
+
+  ctx.fillStyle=col('--accent');
+  ctx.save(); ctx.globalAlpha=Math.max(0.25, Math.min(0.7, 30/n));
+  for(let i=0;i<x.length;i++){
+    ctx.beginPath(); ctx.arc(sc.sx(x[i]), sc.sy(y[i]), 3, 0, 2*Math.PI); ctx.fill();
+  }
+  ctx.restore();
+
+  ctx.strokeStyle=col('--green'); ctx.lineWidth=2.6;
+  polyline(ctx, sc, fit, xr[0], xr[1], N);
+
+  const xbar=mean(x);
+  ctx.strokeStyle=col('--text-sec'); ctx.lineWidth=1; ctx.setLineDash([4,4]); ctx.globalAlpha=.6;
+  ctx.beginPath(); ctx.moveTo(sc.sx(xbar), pad.t); ctx.lineTo(sc.sx(xbar), c1.ch-pad.b); ctx.stroke();
+  ctx.setLineDash([]); ctx.globalAlpha=1;
+  ctx.fillStyle=col('--text-sec'); ctx.font='10px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('x̄', sc.sx(xbar), pad.t+11);
+
+  const f0=fit(x0), sm=seMean(x0), sp=sePred(x0);
+  const px=sc.sx(x0);
+  ctx.strokeStyle=col('--purple'); ctx.lineWidth=2.4;
+  ctx.beginPath(); ctx.moveTo(px, sc.sy(f0-tc*sp)); ctx.lineTo(px, sc.sy(f0+tc*sp)); ctx.stroke();
+  [f0-tc*sp, f0+tc*sp].forEach(v=>{
+    ctx.beginPath(); ctx.moveTo(px-7, sc.sy(v)); ctx.lineTo(px+7, sc.sy(v)); ctx.stroke();
+  });
+  ctx.strokeStyle=col('--green'); ctx.lineWidth=4;
+  ctx.beginPath(); ctx.moveTo(px, sc.sy(f0-tc*sm)); ctx.lineTo(px, sc.sy(f0+tc*sm)); ctx.stroke();
+  ctx.fillStyle=col('--heading');
+  ctx.beginPath(); ctx.arc(px, sc.sy(f0), 5, 0, 2*Math.PI); ctx.fill();
+  ctx.strokeStyle=col('--bg-canvas'); ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle=col('--heading'); ctx.font='bold 11px sans-serif';
+  ctx.textAlign = px > c1.cw-90 ? 'right' : 'left';
+  const off = px > c1.cw-90 ? -10 : 10;
+  ctx.fillText(`x₀ = ${x0.toFixed(1)}`, px+off, sc.sy(f0)-8);
+
+  const dist=Math.abs(x0-xbar);
+  const sx2=x.reduce((s,v)=>s+(v-xbar)**2,0);
+  $('#pdStats').innerHTML=statCards([
+    {l:'ŷ₀ (predicción puntual)', v:fmt(f0,3), c:'accent'},
+    {l:'σ̂ (SER)', v:fmt(r.sigma,3), c:''},
+    {l:'se(ŷ₀) — media', v:fmt(sm,3), c:'green', note:'σ̂·√(x₀′(X′X)⁻¹x₀)'},
+    {l:'se(ê₀) — individuo', v:fmt(sp,3), c:'purple', note:'σ̂·√(1+x₀′(X′X)⁻¹x₀)'},
+    {l:'t crítico', v:fmt(tc,3), c:'', note:`${(lev*100).toFixed(0)}%, ${r.df} g.l.`},
+    {l:'|x₀ − x̄|', v:fmt(dist,2), c:'', note:'distancia al centro de los datos'},
+    {l:'R²', v:fmt(r.R2,4), c:''},
+    {l:'SSTx', v:fmt(sx2,1), c:''}
+  ]);
+
+  const wMean=2*tc*sm, wPred=2*tc*sp;
+  $('#pdIntervals').innerHTML=
+    `<div style="width:100%">
+      <div style="margin-bottom:.5rem"><strong style="color:var(--green)">IC ${(lev*100).toFixed(0)}% para E(y | x₀)</strong>:
+        <span style="font-family:var(--font-m)">[${fmt(f0-tc*sm,3)} ; ${fmt(f0+tc*sm,3)}]</span>
+        &nbsp;— ancho ${fmt(wMean,3)}</div>
+      <div style="margin-bottom:.5rem"><strong style="color:var(--purple)">Intervalo de predicción ${(lev*100).toFixed(0)}% para y₀</strong>:
+        <span style="font-family:var(--font-m)">[${fmt(f0-tc*sp,3)} ; ${fmt(f0+tc*sp,3)}]</span>
+        &nbsp;— ancho ${fmt(wPred,3)}</div>
+      <div style="font-size:.85rem;color:var(--text-sec)">El intervalo de predicción es <strong>${fmt(wPred/wMean,1)} veces más ancho</strong> que el de la media.
+      ${x0<Math.min(...x)||x0>Math.max(...x) ? '<span style="color:var(--red);font-weight:600"> Atención: x₀ está fuera del rango de los datos observados — esto es extrapolación.</span>' : ''}</div>
+    </div>`;
+
+  drawPredN(f0, sm, sp, tc, lev);
+}
+
+function drawPredN(f0, sm, sp, tc, lev){
+  const {r,n,k}=pdState;
+  const qcur=(sm/r.sigma)**2;
+  const c=setupCanvas('pdNCanvas',0.32,270);
+  const pad={t:16,r:22,b:42,l:62};
+  const nmin=10, nmax=1000;
+  const wMean=nn=>2*tInv(0.5+lev/2, Math.max(1,nn-k))*r.sigma*Math.sqrt(qcur*n/nn);
+  const wPred=nn=>2*tInv(0.5+lev/2, Math.max(1,nn-k))*r.sigma*Math.sqrt(1+qcur*n/nn);
+  const hi=Math.max(wPred(nmin), wMean(nmin));
+  const sc=frame(c.ctx,c.cw,c.ch,pad,[nmin,nmax],[0,hi*1.05],{
+    xlab:'n (tamaño muestral)', ylab:'ancho del intervalo', fx:v=>v.toFixed(0), fy:v=>v.toFixed(1), nx:5, ny:4
+  });
+  const ctx=c.ctx;
+  const asym=2*tInv(0.5+lev/2, 1e6)*r.sigma;
+  ctx.strokeStyle=col('--text-sec'); ctx.lineWidth=1; ctx.setLineDash([4,4]); ctx.globalAlpha=.6;
+  ctx.beginPath(); ctx.moveTo(pad.l, sc.sy(asym)); ctx.lineTo(c.cw-pad.r, sc.sy(asym)); ctx.stroke();
+  ctx.setLineDash([]); ctx.globalAlpha=1;
+  ctx.fillStyle=col('--text-sec'); ctx.font='10px sans-serif'; ctx.textAlign='right';
+  ctx.fillText('2·c·σ̂ = '+asym.toFixed(2), c.cw-pad.r-4, sc.sy(asym)-5);
+
+  ctx.strokeStyle=col('--purple'); ctx.lineWidth=2.4;
+  polyline(ctx, sc, wPred, nmin, nmax, 300);
+  ctx.strokeStyle=col('--green'); ctx.lineWidth=2.4;
+  polyline(ctx, sc, wMean, nmin, nmax, 300);
+
+  if(n>=nmin && n<=nmax){
+    ctx.strokeStyle=col('--text-sec'); ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(sc.sx(n), pad.t); ctx.lineTo(sc.sx(n), c.ch-pad.b); ctx.stroke();
+    ctx.setLineDash([]);
+    [[wMean(n),'--green'],[wPred(n),'--purple']].forEach(([v,cc])=>{
+      ctx.fillStyle=col(cc);
+      ctx.beginPath(); ctx.arc(sc.sx(n), sc.sy(v), 4.5, 0, 2*Math.PI); ctx.fill();
+    });
+    ctx.fillStyle=col('--heading'); ctx.font='bold 10px sans-serif'; ctx.textAlign='left';
+    ctx.fillText('n actual', sc.sx(n)+6, pad.t+12);
+  }
+}
+
+function predClick(ev){
+  if(!pdScale) return;
+  const rect=ev.currentTarget.getBoundingClientRect();
+  const xv=pdScale.sc.ix(ev.clientX-rect.left);
+  const cl=Math.max(-2, Math.min(14, xv));
+  $('#pdX0').value=Math.round(cl*10)/10;
+  drawPred();
+}
+
+/* ══════════ Calculadora del Ejercicio 7 ══════════ */
+function renderE7(){
+  const yh=parseFloat($('#e7yhat').value);
+  const se=parseFloat($('#e7se').value);
+  const sg=parseFloat($('#e7sig').value);
+  const c =parseFloat($('#e7c').value);
+  if([yh,se,sg,c].some(v=>!isFinite(v))){ $('#e7Out').innerHTML='<span style="color:var(--red)">Completá los cuatro valores.</span>'; return; }
+  const sePred=Math.sqrt(sg*sg+se*se);
+  const wM=c*se, wP=c*sePred;
+  $('#e7Stats').innerHTML=statCards([
+    {l:'ŷ₀', v:fmt(yh,3), c:'accent'},
+    {l:'se(ŷ₀)', v:fmt(se,3), c:'green', note:'solo incertidumbre de los β̂'},
+    {l:'se(ê₀) = √(σ̂² + se(ŷ₀)²)', v:fmt(sePred,3), c:'purple', note:'suma la varianza del error individual'},
+    {l:'Semi-amplitud IC', v:'±'+fmt(wM,3), c:''},
+    {l:'Semi-amplitud IP', v:'±'+fmt(wP,3), c:''},
+    {l:'Cuántas veces más ancho', v:fmt(sePred/se,1)+'×', c:'orange'}
+  ]);
+  $('#e7Out').innerHTML=
+    `<div style="width:100%">
+      <div style="margin-bottom:.5rem"><strong style="color:var(--green)">IC para E(y | x₀)</strong>:
+        <span style="font-family:var(--font-m)">${fmt(yh,3)} ± ${fmt(c,2)}·${fmt(se,3)} = [${fmt(yh-wM,3)} ; ${fmt(yh+wM,3)}]</span></div>
+      <div style="margin-bottom:.5rem"><strong style="color:var(--purple)">Intervalo de predicción para y₀</strong>:
+        <span style="font-family:var(--font-m)">${fmt(yh,3)} ± ${fmt(c,2)}·${fmt(sePred,3)} = [${fmt(yh-wP,3)} ; ${fmt(yh+wP,3)}]</span></div>
+      <div style="font-size:.85rem;color:var(--text-sec)">Casi toda la amplitud del segundo intervalo viene de σ̂, no de la imprecisión en los β̂:
+      acá σ̂ = ${fmt(sg,2)} contra se(ŷ₀) = ${fmt(se,2)}. Ese es el punto del inciso (d): son <strong>dos fuentes de incertidumbre distintas</strong>,
+      y la del error individual domina.</div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 5 — Jensen
+   ══════════════════════════════════════════════════════ */
+function renderJensen(){
+  const b0=parseFloat($('#jB0').value);
+  const b1=parseFloat($('#jB1').value);
+  const xv=parseFloat($('#jX').value);
+  const s2=parseFloat($('#jS2').value);
+  $('#jB0Val').textContent=b0.toFixed(3);
+  $('#jB1Val').textContent=b1.toFixed(3);
+  $('#jXVal').textContent=xv;
+  $('#jS2Val').textContent=s2.toFixed(3);
+
+  const lnhat=b0+b1*xv;
+  const naive=Math.exp(lnhat);
+  const factor=Math.exp(s2/2);
+  const corr=factor*naive;
+  const gap=100*(corr/naive-1);
+
+  $('#jStats').innerHTML=statCards([
+    {l:'ln(y)₀ estimado', v:fmt(lnhat,4), c:'', note:`${fmt(b0,3)} + ${fmt(b1,3)}·${xv}`},
+    {l:'Predicción ingenua e^ln(y)₀', v:fmt(naive,3), c:'orange', note:'subestima E(y|x₀)'},
+    {l:'Factor e^(σ̂²/2)', v:fmt(factor,4), c:'accent'},
+    {l:'Predicción corregida', v:fmt(corr,3), c:'green'},
+    {l:'Subestimación de la ingenua', v:'+'+fmt(gap,2)+'%', c: gap>10?'orange':'', note:'cuánto le falta a la predicción sin corregir'}
+  ]);
+
+  const maxv=Math.max(naive,corr);
+  $('#jBars').innerHTML=
+    `<div class="bar-row"><span class="bar-name">Ingenua</span><span class="bar-track"><span class="bar-fill" style="width:${100*naive/maxv}%;background:var(--red)"></span></span><span class="bar-val">${fmt(naive,2)}</span></div>
+     <div class="bar-row"><span class="bar-name">Corregida</span><span class="bar-track"><span class="bar-fill" style="width:${100*corr/maxv}%;background:var(--green)"></span></span><span class="bar-val">${fmt(corr,2)}</span></div>`;
+
+  const c=setupCanvas('jCanvas',0.32,270);
+  const pad={t:16,r:22,b:42,l:62};
+  const sc=frame(c.ctx,c.cw,c.ch,pad,[0,1.5],[1,Math.exp(1.5/2)*1.02],{
+    xlab:'σ̂² (varianza del error)', ylab:'factor e^(σ̂²/2)', fx:v=>v.toFixed(2), fy:v=>v.toFixed(2), ny:4
+  });
+  const ctx=c.ctx;
+  ctx.strokeStyle=col('--accent'); ctx.lineWidth=2.6;
+  polyline(ctx, sc, v=>Math.exp(v/2), 0, 1.5, 200);
+  ctx.strokeStyle=col('--text-sec'); ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(sc.sx(s2), c.ch-pad.b); ctx.lineTo(sc.sx(s2), sc.sy(factor)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l, sc.sy(factor)); ctx.lineTo(sc.sx(s2), sc.sy(factor)); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=col('--accent');
+  ctx.beginPath(); ctx.arc(sc.sx(s2), sc.sy(factor), 5, 0, 2*Math.PI); ctx.fill();
+  ctx.strokeStyle=col('--bg-canvas'); ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle=col('--heading'); ctx.font='bold 11px sans-serif'; ctx.textAlign='left';
+  ctx.fillText(`+${gap.toFixed(1)}%`, sc.sx(s2)+8, sc.sy(factor)-6);
+}
+
+/* ══════════════════════════════════════════════════════
+   Bloque 4 — salidas de regresión interactivas
+   ══════════════════════════════════════════════════════ */
+const REG_HOUSE={
+  title:'ln(precio)',
+  n:320, R2:0.612, R2a:0.607,
+  rows:[
+    {v:'habitaciones', b:0.092, se:0.021, exp:()=>{
+      const b=0.092, se=0.021, t=b/se, ex=100*(Math.exp(b)-1);
+      return `Modelo <strong>log-nivel</strong>: la dependiente está en logaritmo y el regresor en niveles, así que el coeficiente es una <strong>semi-elasticidad</strong>. Una habitación adicional, manteniendo constantes superficie, antigüedad y garage, se asocia con un precio aproximadamente <strong>${(100*b).toFixed(1)}% más alto</strong> (exacto: 100·(e^${b}−1) = ${ex.toFixed(2)}%).<br>
+      t = ${b}/${se} = <strong>${t.toFixed(2)}</strong> → significativo al 1%. IC 95%: [${(b-1.96*se).toFixed(4)} ; ${(b+1.96*se).toFixed(4)}], es decir entre ${(100*(b-1.96*se)).toFixed(1)}% y ${(100*(b+1.96*se)).toFixed(1)}%.`;
+    }},
+    {v:'superficie', b:0.00035, se:0.00008, exp:()=>{
+      const b=0.00035, se=0.00008, t=b/se;
+      return `Un metro cuadrado adicional se asocia con un precio <strong>${(100*b).toFixed(3)}% más alto</strong>. El número parece minúsculo porque la unidad es chica: <strong>10 m² adicionales</strong> implican ${(100*b*10).toFixed(2)}% (Ejercicio 5.b) y 100 m² implican ${(100*b*100).toFixed(1)}%.<br>
+      t = ${t.toFixed(2)} → significativo al 1%. <em>Un coeficiente chico no es lo mismo que un efecto irrelevante</em>: depende de la escala de la variable.`;
+    }},
+    {v:'antiguedad', b:-0.015, se:0.006, exp:()=>{
+      const b=-0.015, se=0.006, t=b/se, ex=100*(Math.exp(b)-1);
+      return `Un año más de antigüedad se asocia con un precio <strong>${(100*b).toFixed(1)}% más bajo</strong> (exacto: ${ex.toFixed(2)}%), ceteris paribus.<br>
+      t = ${t.toFixed(2)} → significativo al 5% (|t| > 1.96) pero no al 1%. IC 95%: [${(b-1.96*se).toFixed(4)} ; ${(b+1.96*se).toFixed(4)}] (Ejercicio 5.d). El intervalo <strong>no contiene el cero</strong>, lo que es exactamente equivalente a rechazar H₀: β = 0 al 5%: las dos herramientas dicen lo mismo.`;
+    }},
+    {v:'garage', b:0.038, se:0.045, exp:()=>{
+      const b=0.038, se=0.045, t=b/se;
+      return `t = ${b}/${se} = <strong>${t.toFixed(2)}</strong>, muy por debajo de 1.96: <strong>no es significativo</strong> (Ejercicio 5.c).<br>
+      Pero cuidado con la conclusión. "No significativo" significa que <em>estos datos no permiten distinguir el efecto de cero</em>, no que el efecto sea cero. El IC 95% es [${(b-1.96*se).toFixed(3)} ; ${(b+1.96*se).toFixed(3)}], es decir entre −5% y +12.6%: un rango que incluye efectos económicamente importantes. El problema es de <strong>precisión</strong>, no de evidencia a favor de la nula.`;
+    }},
+    {v:'Constante', b:4.20, se:0.15, exp:()=>{
+      return `Es el valor esperado de ln(precio) para una vivienda con 0 habitaciones, 0 m², 0 años de antigüedad y sin garage: una combinación que no existe. Como suele pasar, <strong>el intercepto no tiene interpretación económica directa</strong>, pero es imprescindible para que el modelo ajuste bien y para que los residuos tengan media cero.`;
+    }}
+  ]
+};
+
+const REG_ELEC={
+  title:'ln(consumo kWh)',
+  n:250, R2:0.520, R2a:0.514,
+  rows:[
+    {v:'ln(tarifa)', b:-0.45, se:0.09, exp:()=>{
+      return `Modelo <strong>log-log</strong>: el coeficiente <em>es</em> la elasticidad. La <strong>elasticidad-precio de la demanda de electricidad es −0.45</strong>: un aumento del 1% en la tarifa se asocia con una caída del 0.45% en el consumo.<br>
+      Como |−0.45| &lt; 1, la demanda es <strong>inelástica</strong>: tiene sentido económico, la electricidad es difícil de sustituir en el corto plazo. Si la tarifa sube <strong>10%</strong>, el consumo cae aproximadamente <strong>4.5%</strong> (Ejercicio 6.e), y la facturación total del regulado <em>sube</em>.<br>
+      t = ${(-0.45/0.09).toFixed(2)} → altamente significativo.`;
+    }},
+    {v:'ln(ingreso)', b:0.32, se:0.07, exp:()=>{
+      return `<strong>Elasticidad-ingreso = 0.32</strong>: un 1% más de ingreso se asocia con 0.32% más de consumo.<br>
+      Al ser <strong>positiva</strong>, la electricidad es un <strong>bien normal</strong>. Al ser <strong>menor que 1</strong>, es una <strong>necesidad</strong> y no un bien de lujo: el consumo crece proporcionalmente menos que el ingreso. Como corolario, el gasto en electricidad representa una fracción decreciente del ingreso a medida que el hogar es más rico, lo que hace que las tarifas planas sean regresivas.<br>
+      t = ${(0.32/0.07).toFixed(2)}.`;
+    }},
+    {v:'personas', b:0.15, se:0.04, exp:()=>{
+      const b=0.15, ex=100*(Math.exp(b)-1), ex2=100*(Math.exp(2*b)-1);
+      return `Ojo: esta variable entra <strong>en niveles</strong>, no en logaritmo. Entonces el modelo es <strong>log-nivel</strong> para esta variable y el coeficiente es una <strong>semi-elasticidad</strong>, no una elasticidad.<br>
+      Una persona más en el hogar se asocia con un consumo <strong>${(100*b).toFixed(0)}% mayor</strong> (aproximado; exacto ${ex.toFixed(1)}%).<br>
+      Pasar de <strong>3 a 5 integrantes</strong> (Ejercicio 6.d) son 2 unidades: aproximadamente <strong>${(100*2*b).toFixed(0)}%</strong> más de consumo. Como 0.30 ya no es un número chico, conviene el cálculo exacto: 100·(e^0.30−1) = <strong>${ex2.toFixed(1)}%</strong>.<br>
+      t = ${(b/0.04).toFixed(2)}.`;
+    }},
+    {v:'Constante', b:3.80, se:0.55, exp:()=>{
+      return `Valor esperado de ln(consumo) cuando ln(tarifa) = ln(ingreso) = 0 (es decir, tarifa e ingreso iguales a 1 peso) y el hogar tiene 0 personas. Sin contenido económico: es un ancla del ajuste.`;
+    }}
+  ]
+};
+
+function renderRegOut(id, R){
+  const el=$('#'+id);
+  let html=`<div class="reg-out-head">${R.title}</div>`;
+  R.rows.forEach((r,i)=>{
+    html+=`<div class="reg-row" data-t="${id}-${i}" onclick="toggleReg('${id}-${i}')">
+        <span class="reg-var">${r.v}</span>
+        <span class="reg-coef">${r.b}<span class="reg-se">(${r.se})</span></span>
+      </div>
+      <div class="reg-explain" id="ex-${id}-${i}">${r.exp()}</div>`;
+  });
+  html+=`<div class="reg-foot"><span>Observaciones: <strong>${R.n}</strong></span><span>R²: <strong>${R.R2}</strong></span><span>R² ajustado: <strong>${R.R2a}</strong></span></div>`;
+  el.innerHTML=html;
+}
+
+function toggleReg(t){
+  const ex=$('#ex-'+t);
+  const row=document.querySelector(`.reg-row[data-t="${t}"]`);
+  const open=ex.classList.toggle('open');
+  row.classList.toggle('open', open);
+}
+
+/* ══════════════════════════════════════════════════════
+   Quiz V/F
+   ══════════════════════════════════════════════════════ */
+const QUIZ=[
+  {id:'a', q:'En un modelo log-nivel, si β̂₁ = 0.03, entonces un aumento de una unidad en x se asocia con un aumento de 3 <em>unidades</em> en y.',
+   ans:false, why:'Es <strong>3 por ciento</strong>, no 3 unidades. Con ln(y) como dependiente, β₁ es una semi-elasticidad: %Δy ≈ 100·β₁. El valor exacto acá es 100·(e^0.03−1) = 3.05%.'},
+  {id:'b', q:'Si reescalamos la variable dependiente de dólares a miles de dólares, el R² del modelo no cambia.',
+   ans:true, why:'Correcto. Dividir y por 1.000 divide por 1.000² tanto el SST como el SSR, y el cociente SSR/SST queda intacto. Todos los coeficientes y errores estándar se dividen por 1.000, los t no se mueven. Probalo en el Laboratorio 1.'},
+  {id:'c', q:'En un modelo log-log, el coeficiente de pendiente tiene unidades que dependen de la escala de medición de x e y.',
+   ans:false, why:'Al revés: la elasticidad es un <strong>número puro, adimensional</strong>. Es el cociente de dos cambios porcentuales, y los porcentajes no dependen de la unidad en que se mida cada variable. Esa invarianza es justamente una de las razones por las que el log-log es tan usado.'},
+  {id:'d', q:'Si estimamos ln(y) = 2 + 0.5·ln(x), entonces cuando x sube 10%, y sube exactamente 5%.',
+   ans:false, why:'Sube <strong>aproximadamente</strong> 5%. El cálculo exacto es (1.10)^0.5 − 1 = 4.88%. La interpretación "β₁ % por cada 1%" es una aproximación de primer orden, buena para cambios chicos y cada vez peor para cambios grandes.'},
+  {id:'e', q:'En un modelo cuadrático y = β₀ + β₁x + β₂x² + u, el coeficiente β₁ mide el efecto marginal de x sobre y.',
+   ans:false, why:'El efecto marginal es <strong>β₁ + 2β₂x</strong> y depende del punto donde se evalúe. β₁ es apenas el efecto marginal en x = 0, un valor que muchas veces ni siquiera está en el rango de los datos. Es el error del Ejercicio 3.d.'},
+  {id:'f', q:'Si queremos comparar un modelo con dependiente salario contra otro con dependiente ln(salario), podemos elegir el que tenga mayor R².',
+   ans:false, why:'No son comparables: cada modelo explica una variable dependiente distinta y por lo tanto un SST distinto. El R² responde "qué fracción de la variabilidad <em>de esta variable</em> explico", y las dos variabilidades no son la misma. Para comparar hay criterios específicos, pero nunca el R² directo.'},
+  {id:'g', q:'El intervalo de predicción para un individuo específico siempre es más ancho que el intervalo de confianza para la media condicional, y esa diferencia no desaparece aunque la muestra crezca.',
+   ans:true, why:'Correcto, y es el punto central del Laboratorio 4. se(ê₀) = σ̂·√(1 + x₀′(X′X)⁻¹x₀) incluye ese "1" que representa la varianza del error individual u₀. Con n → ∞ el término x₀′(X′X)⁻¹x₀ tiende a cero y el IC de la media colapsa, pero el intervalo de predicción converge a ŷ₀ ± c·σ y ahí se queda.'},
+  {id:'h', q:'Si una variable como la edad toma valores entre 20 y 65 años, es recomendable transformarla con logaritmo para mejorar el modelo.',
+   ans:false, why:'No hay ninguna razón para hacerlo. El logaritmo se justifica cuando la variable es positiva y muy asimétrica (ingresos, precios, poblaciones), o cuando la teoría sugiere efectos proporcionales. Una variable acotada en un rango angosto como la edad no gana nada: ln(65) − ln(20) es apenas 1.19, y se pierde interpretabilidad. Si se sospecha no linealidad en la edad, lo natural es un término cuadrático.'},
+  {id:'i', q:'Al predecir y en niveles a partir de un modelo estimado en ln(y), basta con calcular e^(ln y)₀ para obtener una predicción insesgada de E(y | x₀).',
+   ans:false, why:'Es el problema de la <strong>desigualdad de Jensen</strong>: como la exponencial es convexa, E(e^u) > e^(E(u)) = 1, y exponenciar sin corregir <strong>subestima</strong> sistemáticamente. Bajo normalidad hay que multiplicar por e^(σ̂²/2); si no se quiere suponer normalidad, se usa el estimador smearing de Duan. Ver el Laboratorio 5.'},
+  {id:'j', q:'En un modelo log-nivel, un cambio de escala en y (por ejemplo, de pesos a miles de pesos) modifica el intercepto pero no las pendientes.',
+   ans:true, why:'Correcto, y es una propiedad muy elegante. Si y* = c·y, entonces ln(y*) = ln(c) + ln(y): la transformación agrega una <strong>constante</strong>, que es absorbida íntegramente por el intercepto (β₀* = β₀ + ln c). Las pendientes no se mueven, lo que es coherente con que midan cambios porcentuales, invariantes a la unidad.'}
+];
+
+function renderQuiz(){
+  $('#quizWrap').innerHTML=QUIZ.map((q,i)=>
+    `<div class="quiz-item">
+      <div class="quiz-q"><span class="qid">${q.id})</span>${q.q}</div>
+      <div class="quiz-btns">
+        <button class="btn btn-sm" onclick="answerQuiz(${i},true)">Verdadero</button>
+        <button class="btn btn-sm" onclick="answerQuiz(${i},false)">Falso</button>
+      </div>
+      <div class="quiz-fb" id="qfb-${i}"></div>
+    </div>`).join('');
+  updateQuizScore();
+}
+let quizAnswers={};
+function answerQuiz(i, val){
+  const q=QUIZ[i];
+  const ok = (val===q.ans);
+  quizAnswers[i]=ok;
+  const fb=$('#qfb-'+i);
+  fb.className='quiz-fb show '+(ok?'ok':'no');
+  fb.innerHTML=`<span class="quiz-verdict" style="color:var(${ok?'--green':'--red'})">${ok?'Correcto':'Incorrecto'} — la afirmación es ${q.ans?'VERDADERA':'FALSA'}</span>${q.why}`;
+  updateQuizScore();
+}
+function updateQuizScore(){
+  const done=Object.keys(quizAnswers).length;
+  const right=Object.values(quizAnswers).filter(Boolean).length;
+  $('#quizScore').textContent = done===0 ? '' : `Respondidas: ${done} de ${QUIZ.length} · Correctas: ${right}`;
+}
+function resetQuiz(){ quizAnswers={}; renderQuiz(); }
+
+/* ══════════════════════════════════════════════════════
+   Init y listeners
+   ══════════════════════════════════════════════════════ */
+function redrawAll(){
+  drawForms();
+  renderApprox();
+  drawQuad();
+  drawPred();
+  renderJensen();
+}
+
+$('#quadWrap').addEventListener('click', quadClick);
+$('#predWrap').addEventListener('click', predClick);
+
+let rzTimer=null;
+window.addEventListener('resize', ()=>{
+  clearTimeout(rzTimer);
+  rzTimer=setTimeout(redrawAll, 120);
+});
+const mqDark=window.matchMedia('(prefers-color-scheme:dark)');
+if(mqDark.addEventListener) mqDark.addEventListener('change', redrawAll);
+
+renderScale();
+runForms();
+renderApprox();
+drawQuad();
+runPred();
+renderE7();
+renderJensen();
+renderRegOut('regHouse', REG_HOUSE);
+renderRegOut('regElec', REG_ELEC);
+renderQuiz();
+</script>
+</body>
+</html>
