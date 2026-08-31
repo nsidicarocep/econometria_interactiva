@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inferencia Estadística — Laboratorio Interactivo</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+:root {
+  --bg: #F7F5F0;
+  --bg-alt: #EDEAE3;
+  --bg-canvas: #FFFFFF;
+  --text: #2C2C2E;
+  --text-sec: #636366;
+  --heading: #1A2744;
+  --accent: #3170A2;
+  --accent-light: #E3EEF6;
+  --green: #2D8659;
+  --green-light: #D4EDDF;
+  --red: #D45A3A;
+  --red-light: #FBEAE5;
+  --orange: #C87A1A;
+  --orange-light: #FDF0DB;
+  --purple: #7B5EA7;
+  --purple-light: #EDE7F6;
+  --blue: #5B9BD5;
+  --border: #DCDAD4;
+  --shadow: rgba(28,28,30,.07);
+  --font-d: Georgia,"Palatino Linotype","Book Antiqua",Palatino,serif;
+  --font-b: "Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-m: "Cascadia Code","Fira Code",Consolas,monospace;
+  --cw: 780px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --green:#4DBB7F;--green-light:#1A3329;
+  --red:#F07A5A;--red-light:#3D2219;
+  --orange:#E8A84C;--orange-light:#3D2E14;
+  --purple:#A78BDB;--purple-light:#2A2040;
+  --blue:#7FC4F5;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --green:#4DBB7F;--green-light:#1A3329;
+  --red:#F07A5A;--red-light:#3D2219;
+  --orange:#E8A84C;--orange-light:#3D2E14;
+  --purple:#A78BDB;--purple-light:#2A2040;
+  --blue:#7FC4F5;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}
+:root[data-theme="light"]{
+  --bg:#F7F5F0;--bg-alt:#EDEAE3;--bg-canvas:#FFFFFF;
+  --text:#2C2C2E;--text-sec:#636366;--heading:#1A2744;
+  --accent:#3170A2;--accent-light:#E3EEF6;
+  --green:#2D8659;--green-light:#D4EDDF;
+  --red:#D45A3A;--red-light:#FBEAE5;
+  --orange:#C87A1A;--orange-light:#FDF0DB;
+  --purple:#7B5EA7;--purple-light:#EDE7F6;
+  --blue:#5B9BD5;
+  --border:#DCDAD4;--shadow:rgba(28,28,30,.07);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:17px;line-height:1.72;-webkit-font-smoothing:antialiased}
+article{max-width:var(--cw);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+
+h1{font-family:var(--font-d);font-size:clamp(2rem,5vw,2.8rem);color:var(--heading);line-height:1.12;text-wrap:balance;letter-spacing:-.025em;margin-bottom:.4rem}
+h2{font-family:var(--font-d);font-size:1.55rem;color:var(--heading);line-height:1.3;text-wrap:balance;margin-top:3.5rem;margin-bottom:.75rem;padding-bottom:.45rem;border-bottom:2px solid var(--accent)}
+h3{font-family:var(--font-d);font-size:1.15rem;color:var(--heading);margin-top:1.5rem;margin-bottom:.5rem}
+p{margin-bottom:1.15rem;max-width:65ch}
+strong{color:var(--heading);font-weight:600}
+
+.eyebrow{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:600;margin-bottom:.5rem}
+.subtitle{font-family:var(--font-d);font-size:1.15rem;color:var(--text-sec);font-style:italic;margin-bottom:2rem;max-width:55ch}
+.lead{font-size:1.05rem;color:var(--text-sec);max-width:60ch}
+
+.formula-block{background:var(--bg-alt);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.25rem 0;border-radius:0 6px 6px 0;overflow-x:auto;text-align:center}
+.math{font-family:var(--font-d);font-style:italic;font-size:1.05em}
+.math .n{font-style:normal}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 2px}
+.frac .num{border-bottom:1.5px solid currentColor;padding:0 5px 3px;line-height:1.3;text-align:center}
+.frac .den{padding:3px 5px 0;line-height:1.3;text-align:center}
+
+.tip{background:var(--green-light);border-left:3px solid var(--green);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.callout{background:var(--red-light);border-left:3px solid var(--red);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.info{background:var(--accent-light);border-left:3px solid var(--accent);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+
+nav.side-nav{position:fixed;top:50%;right:1.2rem;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:.5rem}
+nav.side-nav a{display:block;width:10px;height:10px;border-radius:50%;background:var(--border);transition:all .2s;text-indent:-9999px}
+nav.side-nav a:hover,nav.side-nav a.active{background:var(--accent);transform:scale(1.3)}
+@media(max-width:900px){nav.side-nav{display:none}}
+
+.lab{background:var(--bg-canvas);border:1px solid var(--border);border-radius:8px;padding:1.25rem;margin:1.5rem -1rem;box-shadow:0 2px 12px var(--shadow)}
+@media(min-width:800px){.lab{margin:1.5rem -2rem;padding:1.5rem}}
+.lab-title{font-family:var(--font-d);font-size:1.1rem;color:var(--heading);font-weight:700;margin-bottom:.75rem}
+
+.lab-chart{width:100%;overflow:hidden}
+.lab-chart svg{width:100%;display:block}
+
+.lab-controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.75rem 0}
+.lab-controls label{font-size:.85rem;color:var(--text-sec);display:flex;align-items:center;gap:.4rem}
+.lab-controls input[type=range]{width:120px;accent-color:var(--accent)}
+.lab-controls .val{font-family:var(--font-m);font-size:.85rem;min-width:40px;color:var(--heading);font-weight:600}
+
+.btn{font-family:var(--font-b);font-size:.82rem;padding:.4rem .85rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);cursor:pointer;transition:all .15s;font-weight:500}
+.btn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.primary:hover{background:var(--heading);border-color:var(--heading)}
+
+.lab-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;margin-top:1rem}
+.stat-card{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.6rem .8rem}
+.stat-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-sec);margin-bottom:.15rem}
+.stat-value{font-family:var(--font-d);font-size:1.2rem;color:var(--heading);font-variant-numeric:tabular-nums}
+
+.chart-legend{display:flex;flex-wrap:wrap;gap:.75rem;margin:.5rem 0;font-size:.82rem}
+.chart-legend-item{display:flex;align-items:center;gap:.3rem}
+.chart-legend-line{width:18px;height:3px;border-radius:2px}
+.chart-legend-dash{width:18px;height:0;border-top:2px dashed}
+.color-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:.4rem;vertical-align:middle}
+
+.coef-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:1rem 0}
+.coef-table th{background:var(--bg-alt);padding:.5rem .6rem;text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-sec);border-bottom:2px solid var(--border)}
+.coef-table td{padding:.5rem .6rem;border-bottom:1px solid var(--border);vertical-align:middle;font-family:var(--font-m);font-size:.82rem}
+.coef-table tr:hover{background:var(--accent-light)}
+.badge{display:inline-block;padding:.1rem .4rem;border-radius:3px;font-size:.75rem;font-weight:600;font-family:var(--font-b)}
+.badge.yes{background:var(--green-light);color:var(--green)}
+.badge.no{background:var(--red-light);color:var(--red)}
+.badge.partial{background:var(--orange-light);color:var(--orange)}
+.stars{font-family:var(--font-b);font-weight:700}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+@media(max-width:600px){.two-col{grid-template-columns:1fr}}
+.two-col .col-panel{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.75rem;text-align:center}
+.two-col .col-panel h4{font-family:var(--font-d);font-size:.95rem;color:var(--heading);margin-bottom:.5rem}
+
+footer.page-footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:.8rem;color:var(--text-sec)}
+
+@media(max-width:600px){
+  article{padding:2rem 1rem 4rem}
+  .lab{margin:1.25rem -.5rem;padding:1rem}
+  .lab-stats{grid-template-columns:1fr 1fr}
+  h2{font-size:1.35rem}
+}
+</style>
+</head>
+<body>
+<nav class="side-nav">
+  <a href="#sec-varianza" title="Varianza de los estimadores">1</a>
+  <a href="#sec-test" title="Test t">2</a>
+  <a href="#sec-ic" title="Intervalos de confianza">3</a>
+  <a href="#sec-potencia" title="Potencia">4</a>
+  <a href="#sec-modelos" title="Comparación de modelos">5</a>
+</nav>
+
+<article>
+<header>
+  <p class="eyebrow">Econometría I &mdash; UADE</p>
+  <h1>Inferencia Estadística en Regresión</h1>
+  <p class="subtitle">Un laboratorio interactivo para explorar varianza de estimadores, tests t, intervalos de confianza y comparación de modelos</p>
+  <p class="lead">Bajo los supuestos del Modelo Lineal Clásico (MLR.1&ndash;MLR.6), los estimadores OLS tienen distribución normal. Esto permite construir <strong>tests de hipótesis</strong> e <strong>intervalos de confianza</strong>. En esta página vas a poder experimentar con cada pieza del proceso de inferencia.</p>
+</header>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 1: VARIANZA DE LOS ESTIMADORES      -->
+<!-- =========================================== -->
+<section id="sec-varianza">
+<h2>1. Varianza de los Estimadores MCO</h2>
+<p>Bajo los supuestos CLM, la varianza del estimador <span class="math">β&#770;<sub>j</sub></span> depende de tres factores:</p>
+
+<div class="formula-block">
+  <span class="math">Var(β&#770;<sub>j</sub>) = <span class="frac"><span class="num">σ²</span><span class="den">STC<sub>j</sub> · (1 − R²<sub>j</sub>)</span></span></span>
+</div>
+
+<p>Donde <span class="math">σ²</span> es la varianza del error, <span class="math">STC<sub>j</sub> = Σ(x<sub>ji</sub> − x̄<sub>j</sub>)²</span> es la variación total de <span class="math">x<sub>j</sub></span>, y <span class="math">R²<sub>j</sub></span> mide la colinealidad con los demás regresores. En regresión simple (<span class="math">R²<sub>j</sub> = 0</span>):</p>
+
+<div class="formula-block">
+  <span class="math">Var(β&#770;<sub>1</sub>) = <span class="frac"><span class="num">σ²</span><span class="den">Σ(x<sub>i</sub> − x̄)²</span></span> = <span class="frac"><span class="num">σ²</span><span class="den">n · Var(x)</span></span></span>
+</div>
+
+<p>Tres palancas determinan la precisión: <strong>más dispersión en <em>x</em></strong>, <strong>menor varianza del error</strong> y <strong>mayor tamaño de muestra</strong> producen estimaciones más precisas.</p>
+
+<div class="lab">
+  <div class="lab-title">Simulador: ¿qué determina la precisión de β&#770;<sub>1</sub>?</div>
+  <div class="info" style="margin-top:0;margin-bottom:.75rem;font-size:.88rem"><strong>Modelo:</strong> <span class="math">y = 2 + 1.5 · x + u</span>, con <span class="math">β<sub>1</sub> = 1.5</span> (verdadero). Cada simulación genera 2000 muestras y estima β&#770;<sub>1</sub> por MCO.</div>
+  <div class="lab-controls">
+    <label>σ (error): <input type="range" id="v-sigma" min="1" max="10" value="3" step="0.5"><span class="val" id="v-sigma-val">3.0</span></label>
+    <label>DE(x): <input type="range" id="v-sdx" min="0.5" max="8" value="2" step="0.5"><span class="val" id="v-sdx-val">2.0</span></label>
+    <label><em>n</em>: <input type="range" id="v-n" min="10" max="500" value="50" step="10"><span class="val" id="v-n-val">50</span></label>
+  </div>
+  <div class="lab-controls">
+    <button class="btn primary" id="v-btn-run">Simular 2000 muestras</button>
+  </div>
+  <div class="lab-chart" id="v-chart"></div>
+  <div class="chart-legend">
+    <span class="chart-legend-item"><span class="chart-legend-dash" style="border-color:var(--red)"></span> β<sub>1</sub> = 1.5 (real)</span>
+    <span class="chart-legend-item"><span class="chart-legend-line" style="background:var(--green)"></span> Media de las estimaciones</span>
+  </div>
+  <div class="lab-stats">
+    <div class="stat-card"><div class="stat-label">Var(β&#770;<sub>1</sub>) teórica</div><div class="stat-value" id="v-var-t">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Var(β&#770;<sub>1</sub>) simulada</div><div class="stat-value" id="v-var-s">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">SE(β&#770;<sub>1</sub>)</div><div class="stat-value" id="v-se">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Media de β&#770;<sub>1</sub></div><div class="stat-value" id="v-mean">&mdash;</div></div>
+  </div>
+</div>
+<div class="tip"><strong>Probá:</strong> aumentá σ y observá cómo el histograma se ensancha. Luego aumentá DE(x) o <em>n</em> y velo concentrarse. La varianza del estimador es <em>directamente</em> proporcional a σ² e <em>inversamente</em> proporcional a STC<sub>x</sub>.</div>
+</section>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 2: TEST t                            -->
+<!-- =========================================== -->
+<section id="sec-test">
+<h2>2. Error Estándar y Test t</h2>
+<p>Para testear <span class="math">H<sub>0</sub>: β<sub>j</sub> = 0</span> contra <span class="math">H<sub>1</sub>: β<sub>j</sub> ≠ 0</span>, construimos el <strong>estadístico t</strong>:</p>
+
+<div class="formula-block">
+  <span class="math">t<sub>β&#770;<sub>j</sub></sub> = <span class="frac"><span class="num">β&#770;<sub>j</sub></span><span class="den">se(β&#770;<sub>j</sub>)</span></span> &nbsp;∼&nbsp; t<sub>n−k−1</sub> &nbsp;&nbsp;<span class="n">bajo</span> H<sub>0</sub></span>
+</div>
+
+<p>El estadístico t mide cuántos errores estándar está <span class="math">β&#770;<sub>j</sub></span> alejado de cero. Si <span class="math">|t|</span> es grande, tenemos evidencia para rechazar <span class="math">H<sub>0</sub></span>. Generá muestras individuales y observá cómo varía el resultado entre una muestra y otra.</p>
+
+<div class="lab">
+  <div class="lab-title">Explorador de muestras individuales</div>
+  <div class="info" style="margin-top:0;margin-bottom:.75rem;font-size:.88rem"><strong>Modelo:</strong> <span class="math">salario = 3 + β<sub>1</sub> · educ + β<sub>2</sub> · exper + u</span></div>
+  <div class="lab-controls">
+    <label>β<sub>1</sub> (educ): <input type="range" id="t-b1" min="0" max="3" value="1.5" step="0.1"><span class="val" id="t-b1-val">1.5</span></label>
+    <label>β<sub>2</sub> (exper): <input type="range" id="t-b2" min="0" max="2" value="0.3" step="0.1"><span class="val" id="t-b2-val">0.3</span></label>
+    <label>σ: <input type="range" id="t-sigma" min="1" max="10" value="5" step="0.5"><span class="val" id="t-sigma-val">5.0</span></label>
+    <label><em>n</em>: <input type="range" id="t-n" min="20" max="200" value="80" step="10"><span class="val" id="t-n-val">80</span></label>
+  </div>
+  <div class="lab-controls">
+    <button class="btn primary" id="t-btn-gen">Generar nueva muestra</button>
+    <button class="btn" id="t-btn-reset">Reiniciar contador</button>
+    <span style="font-size:.82rem;color:var(--text-sec)" id="t-counter">Muestras: 0 | β₁ sig.: 0 | β₂ sig.: 0</span>
+  </div>
+  <div class="lab-chart" id="t-scatter" style="max-height:350px"></div>
+  <div style="overflow-x:auto">
+  <table class="coef-table" id="t-table">
+    <thead><tr><th>Coeficiente</th><th>Estimación</th><th>Error Estándar</th><th>Estadístico t</th><th>p-valor</th><th>Signif.</th></tr></thead>
+    <tbody id="t-tbody">
+      <tr><td colspan="6" style="text-align:center;color:var(--text-sec)">Generá una muestra para ver los resultados</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <h3 style="margin-top:1.25rem">Distribución t y zona de rechazo</h3>
+  <div class="lab-chart" id="t-dist-chart"></div>
+  <div class="chart-legend">
+    <span class="chart-legend-item"><span class="chart-legend-line" style="background:var(--accent)"></span> Distribución t</span>
+    <span class="chart-legend-item" style="background:var(--red-light);padding:.1rem .3rem;border-radius:3px"><span style="color:var(--red);font-weight:600">Zona de rechazo (α=5%)</span></span>
+    <span class="chart-legend-item"><span class="chart-legend-dash" style="border-color:var(--green);border-width:3px"></span> t observado (β&#770;<sub>1</sub>)</span>
+  </div>
+</div>
+<div class="callout"><strong>Clave:</strong> con los mismos parámetros, cada muestra da un resultado diferente. A veces rechazamos H<sub>0</sub>, a veces no. Observá el contador: con β<sub>1</sub> = 1.5, la mayoría de las muestras lo detectan como significativo. Pero con β<sub>2</sub> = 0.3 y σ alto, muchas muestras no logran rechazar H<sub>0</sub>.</div>
+</section>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 3: INTERVALOS DE CONFIANZA           -->
+<!-- =========================================== -->
+<section id="sec-ic">
+<h2>3. Intervalos de Confianza</h2>
+<p>Un <strong>intervalo de confianza</strong> al (1−α)×100% para β<sub>j</sub> es:</p>
+
+<div class="formula-block">
+  <span class="math">IC = [β&#770;<sub>j</sub> − c<sub>α/2</sub> · se(β&#770;<sub>j</sub>), &nbsp; β&#770;<sub>j</sub> + c<sub>α/2</sub> · se(β&#770;<sub>j</sub>)]</span>
+</div>
+
+<p>La interpretación correcta: si repitiéramos el muestreo muchas veces, <strong>el 95% de los intervalos</strong> construidos de esta forma contendrían al verdadero β<sub>j</sub>. El parámetro es fijo; lo que varía es el intervalo.</p>
+
+<div class="lab">
+  <div class="lab-title">Simulación: 100 intervalos de confianza</div>
+  <div class="lab-controls">
+    <label>β<sub>1</sub> verdadero: <input type="range" id="ic-b1" min="0.5" max="3" value="1.5" step="0.1"><span class="val" id="ic-b1-val">1.5</span></label>
+    <label>σ: <input type="range" id="ic-sigma" min="1" max="8" value="4" step="0.5"><span class="val" id="ic-sigma-val">4.0</span></label>
+    <label><em>n</em>: <input type="range" id="ic-n" min="20" max="200" value="50" step="10"><span class="val" id="ic-n-val">50</span></label>
+    <label>Nivel: <input type="range" id="ic-level" min="80" max="99" value="95" step="1"><span class="val" id="ic-level-val">95%</span></label>
+  </div>
+  <div class="lab-controls">
+    <button class="btn primary" id="ic-btn-run">Generar 100 intervalos</button>
+  </div>
+  <div class="lab-chart" id="ic-chart"></div>
+  <div class="chart-legend">
+    <span class="chart-legend-item"><span class="chart-legend-line" style="background:var(--green)"></span> IC que contiene a β<sub>1</sub></span>
+    <span class="chart-legend-item"><span class="chart-legend-line" style="background:var(--red)"></span> IC que NO contiene a β<sub>1</sub></span>
+    <span class="chart-legend-item"><span class="chart-legend-dash" style="border-color:var(--red)"></span> β<sub>1</sub> verdadero</span>
+  </div>
+  <div class="lab-stats">
+    <div class="stat-card"><div class="stat-label">ICs que contienen β<sub>1</sub></div><div class="stat-value" id="ic-cover">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Cobertura empírica</div><div class="stat-value" id="ic-pct">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Ancho medio del IC</div><div class="stat-value" id="ic-width">&mdash;</div></div>
+  </div>
+</div>
+<div class="tip"><strong>Observá:</strong> al nivel del 95%, aproximadamente 95 de 100 intervalos contienen el valor verdadero. Bajá el nivel a 80% y vas a ver más intervalos rojos (no cubren). Subí <em>n</em> y los intervalos se vuelven más angostos.</div>
+</section>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 4: POTENCIA Y SIGNIFICATIVIDAD       -->
+<!-- =========================================== -->
+<section id="sec-potencia">
+<h2>4. Potencia: ¿"no significativo" = efecto nulo?</h2>
+
+<div class="callout">
+  <strong>Error frecuente:</strong> "No rechazar H<sub>0</sub>" NO implica que β<sub>j</sub> = 0. Solo significa que no tenemos <em>suficiente evidencia</em> para descartarlo con los datos disponibles.
+</div>
+
+<p>La <strong>potencia</strong> del test es la probabilidad de rechazar H<sub>0</sub> cuando es falsa (es decir, cuando el efecto realmente existe). Depende de tres factores: el <strong>tamaño del efecto</strong> (β<sub>1</sub>), la <strong>varianza del error</strong> (σ²) y el <strong>tamaño de muestra</strong> (<em>n</em>).</p>
+
+<div class="lab">
+  <div class="lab-title">Comparación: H₀ verdadera vs. H₀ falsa</div>
+  <div class="info" style="margin-top:0;margin-bottom:.75rem;font-size:.88rem">
+    Modelo: <span class="math">y = 2 + β<sub>1</sub> · x + u</span>. Simulamos 2000 muestras para cada escenario y contamos cuántas veces el test t rechaza H<sub>0</sub>: β<sub>1</sub>=0 al 5%.
+  </div>
+  <div class="lab-controls">
+    <label>β<sub>1</sub> (panel derecho): <input type="range" id="p-b1" min="0.1" max="3" value="0.5" step="0.1"><span class="val" id="p-b1-val">0.5</span></label>
+    <label>σ: <input type="range" id="p-sigma" min="1" max="10" value="4" step="0.5"><span class="val" id="p-sigma-val">4.0</span></label>
+    <label><em>n</em>: <input type="range" id="p-n" min="10" max="300" value="30" step="10"><span class="val" id="p-n-val">30</span></label>
+  </div>
+  <div class="lab-controls">
+    <button class="btn primary" id="p-btn-run">Simular 2000 muestras × 2</button>
+  </div>
+  <div class="two-col">
+    <div class="col-panel">
+      <h4>β<sub>1</sub> = 0 (H₀ verdadera)</h4>
+      <div class="lab-chart" id="p-chart-left"></div>
+      <div style="font-size:.85rem;margin-top:.3rem">Tasa de rechazo: <strong id="p-rej-left">&mdash;</strong></div>
+    </div>
+    <div class="col-panel">
+      <h4>β<sub>1</sub> = <span id="p-b1-label">0.5</span> (H₀ falsa)</h4>
+      <div class="lab-chart" id="p-chart-right"></div>
+      <div style="font-size:.85rem;margin-top:.3rem">Tasa de rechazo (potencia): <strong id="p-rej-right">&mdash;</strong></div>
+    </div>
+  </div>
+  <div class="chart-legend">
+    <span class="chart-legend-item"><span class="chart-legend-line" style="background:var(--accent)"></span> Distribución de t bajo cada escenario</span>
+    <span class="chart-legend-item" style="background:var(--red-light);padding:.1rem .3rem;border-radius:3px"><span style="color:var(--red);font-weight:600">Zona de rechazo</span></span>
+  </div>
+  <div class="lab-stats">
+    <div class="stat-card"><div class="stat-label">Tamaño del test (α)</div><div class="stat-value">5%</div></div>
+    <div class="stat-card"><div class="stat-label">Rechazo con β₁=0</div><div class="stat-value" id="p-size">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Potencia</div><div class="stat-value" id="p-power">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">"No signif." cuando hay efecto</div><div class="stat-value" id="p-miss">&mdash;</div></div>
+  </div>
+</div>
+<div class="callout"><strong>Clave:</strong> si β<sub>1</sub> = 0.5, σ = 4 y n = 30, la potencia es muy baja. Esto significa que en la mayoría de las muestras <em>no detectamos el efecto</em> aunque es real. Aumentá <em>n</em> a 200 para ver cómo la potencia crece. "No significativo" puede simplemente indicar muestra insuficiente.</div>
+
+<h3>Significativo ≠ importante</h3>
+<p>Con <em>n</em> suficientemente grande, <strong>cualquier efecto</strong>, por minúsculo que sea, será significativo. Bajá β<sub>1</sub> a 0.1 y subí <em>n</em> a 300: el test rechazará frecuentemente, aunque el efecto práctico sea despreciable. Siempre hay que mirar el <strong>tamaño del coeficiente</strong>, no solo su significatividad.</p>
+</section>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 5: COMPARACIÓN DE MODELOS            -->
+<!-- =========================================== -->
+<section id="sec-modelos">
+<h2>5. Comparación de Modelos: ¿Qué Variables Incluir?</h2>
+<p>Cuando una variable no es significativa, puede convenir quitarla del modelo. Pero cuidado: sacar una variable relevante introduce <strong>sesgo por variable omitida</strong>. Veamos el trade-off en acción.</p>
+
+<div class="formula-block">
+  <span class="math" style="font-size:.95em">Var(β&#770;<sub>1</sub>) = <span class="frac"><span class="num">σ²</span><span class="den">STC<sub>1</sub> · (1 − R²<sub>1</sub>)</span></span> &nbsp;&nbsp;⟹&nbsp;&nbsp; <span class="n">Mayor correlación entre regresores ⟹ mayor varianza (VIF)</span></span>
+</div>
+
+<div class="lab">
+  <div class="lab-title">Modelo completo vs. modelo restringido</div>
+  <div class="info" style="margin-top:0;margin-bottom:.75rem;font-size:.88rem"><strong>DGP:</strong> <span class="math">y = 2 + 1.5 · x<sub>1</sub> + β<sub>2</sub> · x<sub>2</sub> + u</span>. Comparamos estimar con ambas variables vs. solo con <span class="math">x<sub>1</sub></span>.</div>
+  <div class="lab-controls">
+    <label>β<sub>2</sub> (verdadero): <input type="range" id="m-b2" min="0" max="3" value="0" step="0.1"><span class="val" id="m-b2-val">0.0</span></label>
+    <label>Corr(x₁,x₂): <input type="range" id="m-rho" min="0" max="0.9" value="0.3" step="0.1"><span class="val" id="m-rho-val">0.3</span></label>
+    <label>σ: <input type="range" id="m-sigma" min="1" max="8" value="3" step="0.5"><span class="val" id="m-sigma-val">3.0</span></label>
+    <label><em>n</em>: <input type="range" id="m-n" min="30" max="300" value="80" step="10"><span class="val" id="m-n-val">80</span></label>
+  </div>
+  <div class="lab-controls">
+    <button class="btn primary" id="m-btn-gen">Generar muestra</button>
+    <button class="btn primary" id="m-btn-sim">Simular 1000 muestras</button>
+  </div>
+
+  <div style="overflow-x:auto">
+  <table class="coef-table" id="m-table">
+    <thead><tr><th></th><th colspan="3" style="text-align:center;border-bottom:2px solid var(--accent)">Modelo completo (y ~ x₁ + x₂)</th><th colspan="3" style="text-align:center;border-bottom:2px solid var(--orange)">Modelo restringido (y ~ x₁)</th></tr>
+    <tr><th>Coef.</th><th>Estimación</th><th>SE</th><th>Signif.</th><th>Estimación</th><th>SE</th><th>Signif.</th></tr></thead>
+    <tbody id="m-tbody">
+      <tr><td colspan="7" style="text-align:center;color:var(--text-sec)">Generá una muestra para comparar</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="lab-stats" id="m-stats-single" style="display:none">
+    <div class="stat-card"><div class="stat-label">R² completo</div><div class="stat-value" id="m-r2f">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">R² restringido</div><div class="stat-value" id="m-r2r">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">R² adj. completo</div><div class="stat-value" id="m-ar2f">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">R² adj. restringido</div><div class="stat-value" id="m-ar2r">&mdash;</div></div>
+  </div>
+
+  <div id="m-sim-results" style="display:none;margin-top:1rem">
+    <h3>Resultados de 1000 simulaciones</h3>
+    <div class="lab-stats">
+      <div class="stat-card"><div class="stat-label">E[β&#770;<sub>1</sub>] completo</div><div class="stat-value" id="ms-eb1f">&mdash;</div></div>
+      <div class="stat-card"><div class="stat-label">E[β&#770;<sub>1</sub>] restringido</div><div class="stat-value" id="ms-eb1r">&mdash;</div></div>
+      <div class="stat-card"><div class="stat-label">SE(β&#770;<sub>1</sub>) promedio compl.</div><div class="stat-value" id="ms-se1f">&mdash;</div></div>
+      <div class="stat-card"><div class="stat-label">SE(β&#770;<sub>1</sub>) promedio restr.</div><div class="stat-value" id="ms-se1r">&mdash;</div></div>
+      <div class="stat-card"><div class="stat-label">β₂ significativa (%)</div><div class="stat-value" id="ms-b2sig">&mdash;</div></div>
+      <div class="stat-card"><div class="stat-label">Sesgo β&#770;<sub>1</sub> restr.</div><div class="stat-value" id="ms-bias">&mdash;</div></div>
+    </div>
+    <div class="lab-chart" id="m-sim-chart"></div>
+    <div class="chart-legend">
+      <span class="chart-legend-item"><span class="color-dot" style="background:var(--accent)"></span> β&#770;<sub>1</sub> completo</span>
+      <span class="chart-legend-item"><span class="color-dot" style="background:var(--orange)"></span> β&#770;<sub>1</sub> restringido</span>
+      <span class="chart-legend-item"><span class="chart-legend-dash" style="border-color:var(--red)"></span> β<sub>1</sub> = 1.5 (verdadero)</span>
+    </div>
+  </div>
+</div>
+<div class="tip"><strong>Probá estos escenarios:</strong><br>
+  &bull; <strong>β₂ = 0, Corr = 0.3:</strong> x₂ es irrelevante. El modelo restringido tiene menor SE para β&#770;<sub>1</sub> → conviene quitarla.<br>
+  &bull; <strong>β₂ = 1, Corr = 0.6:</strong> x₂ es relevante y correlacionada con x₁. Al quitarla, β&#770;<sub>1</sub> se sesga → NO conviene quitarla, aunque la SE sea menor.<br>
+  &bull; <strong>β₂ = 0, Corr = 0.8:</strong> x₂ irrelevante pero altamente correlacionada. El modelo completo tiene SE inflada por multicolinealidad → conviene quitarla.
+</div>
+</section>
+
+<footer class="page-footer">
+  <p>Econometría I &mdash; UADE &mdash; N. Sidicaro | E. Lorenzo | A. Quintero</p>
+  <p>Laboratorio interactivo para explorar inferencia estadística en regresión. Basado en la Clase 5: Inferencia Estadística I.</p>
+  <p>Bibliografía: Wooldridge, J.M. &mdash; <em>Introducción a la Econometría: Un Enfoque Moderno</em>, Cap. 4.</p>
+</footer>
+</article>
+
+<script>
+// ============================================================
+// STATISTICAL ENGINE
+// ============================================================
+const S = {
+  randn() {
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  },
+  rnorm(mu, sigma) { return mu + sigma * S.randn(); },
+  runif(a, b) { return a + Math.random() * (b - a); },
+  mean(arr) { return arr.reduce((s, x) => s + x, 0) / arr.length; },
+  variance(arr, ddof = 1) {
+    const m = S.mean(arr);
+    return arr.reduce((s, x) => s + (x - m) ** 2, 0) / (arr.length - ddof);
+  },
+  sd(arr, ddof = 1) { return Math.sqrt(S.variance(arr, ddof)); },
+  median(arr) {
+    const sorted = [...arr].sort((a, b) => a - b);
+    const m = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[m] : (sorted[m - 1] + sorted[m]) / 2;
+  },
+  generateNormal(n, mu, sigma) {
+    return Array.from({ length: n }, () => S.rnorm(mu, sigma));
+  },
+  generateCorrelated(n, rho, mu1, sd1, mu2, sd2) {
+    const z1 = Array.from({ length: n }, () => S.randn());
+    const z2 = z1.map(z => rho * z + Math.sqrt(1 - rho * rho) * S.randn());
+    return {
+      x1: z1.map(z => mu1 + sd1 * z),
+      x2: z2.map(z => mu2 + sd2 * z)
+    };
+  },
+
+  // Simple OLS: y = b0 + b1*x
+  olsSimple(x, y) {
+    const n = x.length;
+    const xm = S.mean(x), ym = S.mean(y);
+    let num = 0, den = 0;
+    for (let i = 0; i < n; i++) {
+      num += (x[i] - xm) * (y[i] - ym);
+      den += (x[i] - xm) ** 2;
+    }
+    if (den === 0) return null;
+    const b1 = num / den, b0 = ym - b1 * xm;
+    let ssr = 0, sst = 0;
+    for (let i = 0; i < n; i++) {
+      const yhat = b0 + b1 * x[i];
+      ssr += (y[i] - yhat) ** 2;
+      sst += (y[i] - ym) ** 2;
+    }
+    const df = n - 2;
+    const sigma2 = ssr / df;
+    const se1 = Math.sqrt(sigma2 / den);
+    const se0 = Math.sqrt(sigma2 * (1 / n + xm * xm / den));
+    const t1 = b1 / se1, t0 = b0 / se0;
+    const p1 = 2 * (1 - S.tCDF(Math.abs(t1), df));
+    const p0 = 2 * (1 - S.tCDF(Math.abs(t0), df));
+    const r2 = sst === 0 ? 0 : 1 - ssr / sst;
+    return { b0, b1, se0, se1, t0, t1, p0, p1, r2, sigma2, ssr, df, stcx: den };
+  },
+
+  // Multiple OLS with design matrix
+  olsMultiple(X, y) {
+    const n = y.length, k = X[0].length;
+    const XtX = Array.from({ length: k }, () => new Array(k).fill(0));
+    const Xty = new Array(k).fill(0);
+    for (let i = 0; i < n; i++)
+      for (let j = 0; j < k; j++) {
+        Xty[j] += X[i][j] * y[i];
+        for (let l = 0; l < k; l++) XtX[j][l] += X[i][j] * X[i][l];
+      }
+    const inv = S.invertMatrix(XtX);
+    if (!inv) return null;
+    const beta = new Array(k).fill(0);
+    for (let j = 0; j < k; j++)
+      for (let l = 0; l < k; l++) beta[j] += inv[j][l] * Xty[l];
+    let ssr = 0;
+    for (let i = 0; i < n; i++) {
+      let yhat = 0;
+      for (let j = 0; j < k; j++) yhat += X[i][j] * beta[j];
+      ssr += (y[i] - yhat) ** 2;
+    }
+    const df = n - k;
+    const sigma2 = ssr / df;
+    const se = new Array(k);
+    for (let j = 0; j < k; j++) se[j] = Math.sqrt(inv[j][j] * sigma2);
+    const tStats = beta.map((b, j) => b / se[j]);
+    const pValues = tStats.map(t => 2 * (1 - S.tCDF(Math.abs(t), df)));
+    const ym = S.mean(y);
+    let sst = 0;
+    for (let i = 0; i < n; i++) sst += (y[i] - ym) ** 2;
+    const r2 = sst === 0 ? 0 : 1 - ssr / sst;
+    const adjR2 = 1 - (1 - r2) * (n - 1) / df;
+    return { beta, se, tStats, pValues, r2, adjR2, sigma2, ssr, df };
+  },
+
+  invertMatrix(M) {
+    const n = M.length;
+    const aug = M.map((row, i) => [...row, ...Array.from({ length: n }, (_, j) => i === j ? 1 : 0)]);
+    for (let i = 0; i < n; i++) {
+      let maxVal = Math.abs(aug[i][i]), maxRow = i;
+      for (let k = i + 1; k < n; k++) {
+        if (Math.abs(aug[k][i]) > maxVal) { maxVal = Math.abs(aug[k][i]); maxRow = k; }
+      }
+      if (maxVal < 1e-12) return null;
+      [aug[i], aug[maxRow]] = [aug[maxRow], aug[i]];
+      const pivot = aug[i][i];
+      for (let j = 0; j < 2 * n; j++) aug[i][j] /= pivot;
+      for (let k = 0; k < n; k++) {
+        if (k === i) continue;
+        const factor = aug[k][i];
+        for (let j = 0; j < 2 * n; j++) aug[k][j] -= factor * aug[i][j];
+      }
+    }
+    return aug.map(row => row.slice(n));
+  },
+
+  // t-distribution functions
+  lnGamma(z) {
+    const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+      771.32342877765313, -176.61502916214059, 12.507343278686905,
+      -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+    if (z < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * z)) - S.lnGamma(1 - z);
+    z -= 1;
+    let x = c[0];
+    for (let i = 1; i < 9; i++) x += c[i] / (z + i);
+    const t = z + 7.5;
+    return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+  },
+
+  tPDF(t, df) {
+    const lnCoeff = S.lnGamma((df + 1) / 2) - S.lnGamma(df / 2) - 0.5 * Math.log(df * Math.PI);
+    return Math.exp(lnCoeff - ((df + 1) / 2) * Math.log(1 + t * t / df));
+  },
+
+  // Regularized incomplete beta function
+  ibeta(x, a, b) {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    const lnBeta = S.lnGamma(a) + S.lnGamma(b) - S.lnGamma(a + b);
+    const front = Math.exp(Math.log(x) * a + Math.log(1 - x) * b - lnBeta);
+    if (x < (a + 1) / (a + b + 2)) return front * S.betaCF(x, a, b) / a;
+    return 1 - front * S.betaCF(1 - x, b, a) / b;
+  },
+
+  betaCF(x, a, b) {
+    const maxIter = 200, eps = 1e-10;
+    let qab = a + b, qap = a + 1, qam = a - 1;
+    let c = 1, d = 1 - qab * x / qap;
+    if (Math.abs(d) < 1e-30) d = 1e-30;
+    d = 1 / d;
+    let h = d;
+    for (let m = 1; m <= maxIter; m++) {
+      let m2 = 2 * m;
+      let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+      d = 1 + aa * d; if (Math.abs(d) < 1e-30) d = 1e-30;
+      c = 1 + aa / c; if (Math.abs(c) < 1e-30) c = 1e-30;
+      d = 1 / d; h *= d * c;
+      aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+      d = 1 + aa * d; if (Math.abs(d) < 1e-30) d = 1e-30;
+      c = 1 + aa / c; if (Math.abs(c) < 1e-30) c = 1e-30;
+      d = 1 / d;
+      let del = d * c; h *= del;
+      if (Math.abs(del - 1) < eps) break;
+    }
+    return h;
+  },
+
+  tCDF(t, df) {
+    if (df <= 0) return NaN;
+    const x = df / (df + t * t);
+    const p = 0.5 * S.ibeta(x, df / 2, 0.5);
+    return t >= 0 ? 1 - p : p;
+  },
+
+  tQuantile(p, df) {
+    if (p <= 0) return -Infinity;
+    if (p >= 1) return Infinity;
+    if (p === 0.5) return 0;
+    // Newton-Raphson starting from normal approx
+    let t = S.normalQuantile(p);
+    for (let i = 0; i < 30; i++) {
+      const f = S.tCDF(t, df) - p;
+      const fp = S.tPDF(t, df);
+      if (Math.abs(fp) < 1e-15) break;
+      const step = f / fp;
+      t -= step;
+      if (Math.abs(step) < 1e-10) break;
+    }
+    return t;
+  },
+
+  normalQuantile(p) {
+    if (p <= 0) return -Infinity;
+    if (p >= 1) return Infinity;
+    if (p === 0.5) return 0;
+    const a = [-3.969683028665376e1, 2.209460984245205e2, -2.759285104469687e2,
+      1.383577518672690e2, -3.066479806614716e1, 2.506628277459239e0];
+    const b = [-5.447609879822406e1, 1.615858368580409e2, -1.556989798598866e2,
+      6.680131188771972e1, -1.328068155288572e1];
+    const c = [-7.784894002430293e-3, -3.223964580411365e-1, -2.400758277161838e0,
+      -2.549732539343734e0, 4.374664141464968e0, 2.938163982698783e0];
+    const d = [7.784695709041462e-3, 3.224671290700398e-1, 2.445134137142996e0, 3.754408661907416e0];
+    const pL = 0.02425, pH = 1 - pL;
+    let q, r;
+    if (p < pL) {
+      q = Math.sqrt(-2 * Math.log(p));
+      return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+    } else if (p <= pH) {
+      q = p - 0.5; r = q * q;
+      return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+    } else {
+      q = Math.sqrt(-2 * Math.log(1 - p));
+      return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+    }
+  },
+
+  kde(data, points, bandwidth) {
+    const n = data.length;
+    return points.map(x => {
+      let sum = 0;
+      for (let i = 0; i < n; i++) {
+        const z = (x - data[i]) / bandwidth;
+        sum += Math.exp(-0.5 * z * z) / Math.sqrt(2 * Math.PI);
+      }
+      return sum / (n * bandwidth);
+    });
+  }
+};
+
+// ============================================================
+// CHART HELPERS
+// ============================================================
+function getCSS(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+function makeHistogram(containerId, cfg) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const W = Math.min(el.clientWidth || 600, 740);
+  const H = cfg.height || 300;
+  const M = { t: 15, r: 15, b: 35, l: 45 };
+  const w = W - M.l - M.r, h = H - M.t - M.b;
+
+  d3.select('#' + containerId).select('svg').remove();
+  const svg = d3.select('#' + containerId).append('svg')
+    .attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'xMidYMid meet');
+  const g = svg.append('g').attr('transform', `translate(${M.l},${M.t})`);
+
+  const xScale = d3.scaleLinear().domain(cfg.xDomain).range([0, w]);
+  const bins = cfg.datasets.map(ds => {
+    const hist = d3.bin().domain(cfg.xDomain).thresholds(cfg.bins || 40);
+    return hist(ds.data);
+  });
+  const maxCount = d3.max(bins.flat(), d => d.length);
+  const yScale = d3.scaleLinear().domain([0, maxCount * 1.1]).range([h, 0]);
+
+  g.append('g').attr('transform', `translate(0,${h})`).call(d3.axisBottom(xScale).ticks(7))
+    .selectAll('text').style('fill', getCSS('--text-sec')).style('font-size', '10px');
+  g.append('g').call(d3.axisLeft(yScale).ticks(5))
+    .selectAll('text').style('fill', getCSS('--text-sec')).style('font-size', '10px');
+  g.selectAll('.domain,.tick line').attr('stroke', getCSS('--border'));
+
+  bins.forEach((b, i) => {
+    const ds = cfg.datasets[i];
+    g.selectAll(`.bar-${i}`).data(b).enter().append('rect')
+      .attr('x', d => xScale(d.x0) + 1)
+      .attr('width', d => Math.max(0, xScale(d.x1) - xScale(d.x0) - 2))
+      .attr('y', d => yScale(d.length))
+      .attr('height', d => h - yScale(d.length))
+      .attr('fill', ds.color).attr('opacity', ds.opacity || 0.5);
+  });
+
+  if (cfg.vlines) {
+    cfg.vlines.forEach(vl => {
+      g.append('line').attr('x1', xScale(vl.x)).attr('x2', xScale(vl.x))
+        .attr('y1', 0).attr('y2', h)
+        .attr('stroke', vl.color).attr('stroke-width', vl.width || 2)
+        .attr('stroke-dasharray', vl.dash || '');
+    });
+  }
+  return { svg, g, xScale, yScale, w, h };
+}
+
+function makeTDistChart(containerId, cfg) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const W = Math.min(el.clientWidth || 600, 740);
+  const H = cfg.height || 240;
+  const M = { t: 15, r: 15, b: 35, l: 45 };
+  const w = W - M.l - M.r, h = H - M.t - M.b;
+
+  d3.select('#' + containerId).select('svg').remove();
+  const svg = d3.select('#' + containerId).append('svg')
+    .attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'xMidYMid meet');
+  const g = svg.append('g').attr('transform', `translate(${M.l},${M.t})`);
+
+  const xDomain = cfg.xDomain || [-5, 5];
+  const xScale = d3.scaleLinear().domain(xDomain).range([0, w]);
+  const nPts = 300;
+  const xs = Array.from({ length: nPts }, (_, i) => xDomain[0] + i * (xDomain[1] - xDomain[0]) / (nPts - 1));
+  const ys = xs.map(x => S.tPDF(x, cfg.df));
+  const maxY = d3.max(ys);
+  const yScale = d3.scaleLinear().domain([0, maxY * 1.1]).range([h, 0]);
+
+  g.append('g').attr('transform', `translate(0,${h})`).call(d3.axisBottom(xScale).ticks(8))
+    .selectAll('text').style('fill', getCSS('--text-sec')).style('font-size', '10px');
+  g.selectAll('.domain,.tick line').attr('stroke', getCSS('--border'));
+
+  // Rejection regions
+  const crit = cfg.critical || S.tQuantile(0.975, cfg.df);
+  const rejLeft = xs.filter(x => x <= -crit);
+  const rejRight = xs.filter(x => x >= crit);
+
+  function areaPath(xArr) {
+    const pts = xArr.map(x => [xScale(x), yScale(S.tPDF(x, cfg.df))]);
+    if (pts.length === 0) return '';
+    let d = `M${xScale(xArr[0])},${yScale(0)}`;
+    pts.forEach(p => d += `L${p[0]},${p[1]}`);
+    d += `L${xScale(xArr[xArr.length - 1])},${yScale(0)}Z`;
+    return d;
+  }
+
+  g.append('path').attr('d', areaPath(rejLeft))
+    .attr('fill', getCSS('--red')).attr('opacity', 0.25);
+  g.append('path').attr('d', areaPath(rejRight))
+    .attr('fill', getCSS('--red')).attr('opacity', 0.25);
+
+  // t-distribution curve
+  const line = d3.line().x((_, i) => xScale(xs[i])).y(d => yScale(d)).curve(d3.curveBasis);
+  g.append('path').datum(ys).attr('d', line)
+    .attr('fill', 'none').attr('stroke', getCSS('--accent')).attr('stroke-width', 2);
+
+  // Critical value lines
+  g.append('line').attr('x1', xScale(-crit)).attr('x2', xScale(-crit))
+    .attr('y1', 0).attr('y2', h)
+    .attr('stroke', getCSS('--red')).attr('stroke-width', 1).attr('stroke-dasharray', '4 3');
+  g.append('line').attr('x1', xScale(crit)).attr('x2', xScale(crit))
+    .attr('y1', 0).attr('y2', h)
+    .attr('stroke', getCSS('--red')).attr('stroke-width', 1).attr('stroke-dasharray', '4 3');
+
+  // Critical value labels
+  g.append('text').attr('x', xScale(-crit)).attr('y', h + 25)
+    .attr('text-anchor', 'middle').style('fill', getCSS('--red')).style('font-size', '10px')
+    .text(`-${crit.toFixed(2)}`);
+  g.append('text').attr('x', xScale(crit)).attr('y', h + 25)
+    .attr('text-anchor', 'middle').style('fill', getCSS('--red')).style('font-size', '10px')
+    .text(crit.toFixed(2));
+
+  // Observed t-statistic
+  if (cfg.tObs !== undefined && !isNaN(cfg.tObs)) {
+    const tx = Math.max(xDomain[0], Math.min(xDomain[1], cfg.tObs));
+    g.append('line').attr('x1', xScale(tx)).attr('x2', xScale(tx))
+      .attr('y1', 0).attr('y2', h)
+      .attr('stroke', getCSS('--green')).attr('stroke-width', 2.5).attr('stroke-dasharray', '6 3');
+    g.append('text').attr('x', xScale(tx)).attr('y', -4)
+      .attr('text-anchor', 'middle').style('fill', getCSS('--green')).style('font-size', '11px').style('font-weight', '700')
+      .text(`t = ${cfg.tObs.toFixed(2)}`);
+  }
+}
+
+function makeScatter(containerId, cfg) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const W = Math.min(el.clientWidth || 600, 600);
+  const H = cfg.height || 300;
+  const M = { t: 15, r: 15, b: 40, l: 50 };
+  const w = W - M.l - M.r, h = H - M.t - M.b;
+
+  d3.select('#' + containerId).select('svg').remove();
+  const svg = d3.select('#' + containerId).append('svg')
+    .attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'xMidYMid meet');
+  const g = svg.append('g').attr('transform', `translate(${M.l},${M.t})`);
+
+  const xScale = d3.scaleLinear().domain(cfg.xDomain).range([0, w]);
+  const yScale = d3.scaleLinear().domain(cfg.yDomain).range([h, 0]);
+
+  g.append('g').attr('transform', `translate(0,${h})`).call(d3.axisBottom(xScale).ticks(6))
+    .selectAll('text').style('fill', getCSS('--text-sec')).style('font-size', '10px');
+  g.append('g').call(d3.axisLeft(yScale).ticks(6))
+    .selectAll('text').style('fill', getCSS('--text-sec')).style('font-size', '10px');
+  g.selectAll('.domain,.tick line').attr('stroke', getCSS('--border'));
+
+  // Regression line
+  if (cfg.line) {
+    const x0 = cfg.xDomain[0], x1 = cfg.xDomain[1];
+    const y0 = cfg.line.b0 + cfg.line.b1 * x0;
+    const y1 = cfg.line.b0 + cfg.line.b1 * x1;
+    g.append('line')
+      .attr('x1', xScale(x0)).attr('y1', yScale(y0))
+      .attr('x2', xScale(x1)).attr('y2', yScale(y1))
+      .attr('stroke', getCSS('--green')).attr('stroke-width', 2.5);
+  }
+
+  // Points
+  g.selectAll('circle').data(cfg.points).enter()
+    .append('circle')
+    .attr('cx', d => xScale(d.x)).attr('cy', d => yScale(d.y))
+    .attr('r', 3.5)
+    .attr('fill', getCSS('--accent')).attr('opacity', 0.6)
+    .attr('stroke', getCSS('--accent')).attr('stroke-width', 0.5);
+
+  // Axis labels
+  svg.append('text').attr('x', M.l + w / 2).attr('y', H - 3)
+    .attr('text-anchor', 'middle').style('font-size', '11px').style('fill', getCSS('--text')).style('font-weight', '600')
+    .text(cfg.xLabel || 'x');
+  svg.append('text').attr('x', 14).attr('y', M.t + h / 2)
+    .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
+    .attr('transform', `rotate(-90,14,${M.t + h / 2})`)
+    .style('font-size', '11px').style('fill', getCSS('--text')).style('font-weight', '600')
+    .text(cfg.yLabel || 'y');
+}
+
+function makeCIChart(containerId, cfg) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const W = Math.min(el.clientWidth || 600, 740);
+  const nCI = cfg.intervals.length;
+  const rowH = Math.max(3, Math.min(6, 350 / nCI));
+  const H = Math.max(200, nCI * rowH + 50);
+  const M = { t: 15, r: 15, b: 35, l: 45 };
+  const w = W - M.l - M.r, h = H - M.t - M.b;
+
+  d3.select('#' + containerId).select('svg').remove();
+  const svg = d3.select('#' + containerId).append('svg')
+    .attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'xMidYMid meet');
+  const g = svg.append('g').attr('transform', `translate(${M.l},${M.t})`);
+
+  const xScale = d3.scaleLinear().domain(cfg.xDomain).range([0, w]);
+  const yScale = d3.scaleLinear().domain([0, nCI]).range([0, h]);
+
+  g.append('g').attr('transform', `translate(0,${h})`).call(d3.axisBottom(xScale).ticks(7))
+    .selectAll('text').style('fill', getCSS('--text-sec')).style('font-size', '10px');
+  g.selectAll('.domain,.tick line').attr('stroke', getCSS('--border'));
+
+  // True value line
+  g.append('line').attr('x1', xScale(cfg.trueValue)).attr('x2', xScale(cfg.trueValue))
+    .attr('y1', 0).attr('y2', h)
+    .attr('stroke', getCSS('--red')).attr('stroke-width', 2).attr('stroke-dasharray', '6 3');
+
+  // Intervals
+  cfg.intervals.forEach((ci, i) => {
+    const covers = ci.lo <= cfg.trueValue && ci.hi >= cfg.trueValue;
+    const color = covers ? getCSS('--green') : getCSS('--red');
+    const y = yScale(i + 0.5);
+    g.append('line')
+      .attr('x1', xScale(ci.lo)).attr('x2', xScale(ci.hi))
+      .attr('y1', y).attr('y2', y)
+      .attr('stroke', color).attr('stroke-width', Math.max(1.5, rowH * 0.5)).attr('opacity', 0.7);
+    g.append('circle')
+      .attr('cx', xScale(ci.center)).attr('cy', y).attr('r', Math.max(1, rowH * 0.25))
+      .attr('fill', color);
+  });
+}
+
+// ============================================================
+// Formatting helpers
+// ============================================================
+function fmt(v, d) { return v.toFixed(d !== undefined ? d : (Math.abs(v) >= 100 ? 1 : Math.abs(v) >= 1 ? 3 : 4)); }
+function pStars(p) {
+  if (p < 0.01) return '<span class="stars" style="color:' + getCSS('--green') + '">***</span>';
+  if (p < 0.05) return '<span class="stars" style="color:' + getCSS('--green') + '">**</span>';
+  if (p < 0.10) return '<span class="stars" style="color:' + getCSS('--orange') + '">*</span>';
+  return '';
+}
+function sigBadge(p) {
+  if (p < 0.05) return '<span class="badge yes">Sí (5%)</span>';
+  if (p < 0.10) return '<span class="badge partial">Sí (10%)</span>';
+  return '<span class="badge no">No</span>';
+}
+
+// ============================================================
+// SECTION 1: VARIANCE OF OLS ESTIMATORS
+// ============================================================
+(function initVariance() {
+  const TRUE_B1 = 1.5;
+
+  function run() {
+    const sigma = +document.getElementById('v-sigma').value;
+    const sdx = +document.getElementById('v-sdx').value;
+    const n = +document.getElementById('v-n').value;
+    const N = 2000;
+    const betas = [];
+
+    for (let s = 0; s < N; s++) {
+      const x = Array.from({ length: n }, () => S.runif(5 - sdx, 5 + sdx * 2));
+      const y = x.map(xi => 2 + TRUE_B1 * xi + S.rnorm(0, sigma));
+      const xm = S.mean(x), ym = S.mean(y);
+      let num = 0, den = 0;
+      for (let i = 0; i < n; i++) { num += (x[i] - xm) * (y[i] - ym); den += (x[i] - xm) ** 2; }
+      if (den > 0) betas.push(num / den);
+    }
+
+    const simMean = S.mean(betas);
+    const simVar = S.variance(betas, 0);
+    // Theoretical: Var = sigma^2 / (n * Var(X)), Var(X) for Uniform(a,b) = (b-a)^2/12
+    const range = sdx * 3; // 5-sdx to 5+2*sdx, range = 3*sdx
+    const varX = range * range / 12;
+    const stcxApprox = n * varX;
+    const theorVar = (sigma * sigma) / stcxApprox;
+
+    document.getElementById('v-var-t').textContent = fmt(theorVar, 5);
+    document.getElementById('v-var-s').textContent = fmt(simVar, 5);
+    document.getElementById('v-se').textContent = fmt(Math.sqrt(theorVar), 4);
+    document.getElementById('v-mean').textContent = fmt(simMean, 4);
+
+    const spread = Math.max(3 * Math.sqrt(simVar), 0.2);
+    makeHistogram('v-chart', {
+      xDomain: [TRUE_B1 - spread * 1.5, TRUE_B1 + spread * 1.5],
+      bins: 50,
+      datasets: [{ data: betas, color: getCSS('--accent'), opacity: 0.55 }],
+      vlines: [
+        { x: TRUE_B1, color: getCSS('--red'), width: 2.5, dash: '8 4' },
+        { x: simMean, color: getCSS('--green'), width: 2 }
+      ]
+    });
+  }
+
+  document.getElementById('v-sigma').oninput = function () { document.getElementById('v-sigma-val').textContent = (+this.value).toFixed(1); };
+  document.getElementById('v-sdx').oninput = function () { document.getElementById('v-sdx-val').textContent = (+this.value).toFixed(1); };
+  document.getElementById('v-n').oninput = function () { document.getElementById('v-n-val').textContent = this.value; };
+  document.getElementById('v-btn-run').onclick = run;
+})();
+
+// ============================================================
+// SECTION 2: t-TEST EXPLORER
+// ============================================================
+(function initTTest() {
+  let sampleCount = 0, b1SigCount = 0, b2SigCount = 0;
+
+  function updateCounter() {
+    document.getElementById('t-counter').textContent =
+      `Muestras: ${sampleCount} | β₁ sig.: ${b1SigCount} (${sampleCount ? (100 * b1SigCount / sampleCount).toFixed(0) : 0}%) | β₂ sig.: ${b2SigCount} (${sampleCount ? (100 * b2SigCount / sampleCount).toFixed(0) : 0}%)`;
+  }
+
+  function generate() {
+    const b1 = +document.getElementById('t-b1').value;
+    const b2 = +document.getElementById('t-b2').value;
+    const sigma = +document.getElementById('t-sigma').value;
+    const n = +document.getElementById('t-n').value;
+
+    const educ = Array.from({ length: n }, () => Math.round(S.runif(6, 20)));
+    const exper = Array.from({ length: n }, () => Math.round(S.runif(0, 30)));
+    const y = educ.map((ed, i) => 3 + b1 * ed + b2 * exper[i] + S.rnorm(0, sigma));
+
+    // Design matrix: [1, educ, exper]
+    const X = educ.map((ed, i) => [1, ed, exper[i]]);
+    const result = S.olsMultiple(X, y);
+    if (!result) return;
+
+    sampleCount++;
+    if (result.pValues[1] < 0.05) b1SigCount++;
+    if (result.pValues[2] < 0.05) b2SigCount++;
+    updateCounter();
+
+    // Scatter plot (y vs educ)
+    const points = educ.map((ed, i) => ({ x: ed, y: y[i] }));
+    const xMin = d3.min(educ) - 1, xMax = d3.max(educ) + 1;
+    const yMin = d3.min(y) - 2, yMax = d3.max(y) + 2;
+
+    // For scatter, show partial regression line (holding exper at mean)
+    const experMean = S.mean(exper);
+    const lineB0 = result.beta[0] + result.beta[2] * experMean;
+    const lineB1 = result.beta[1];
+
+    makeScatter('t-scatter', {
+      points: points,
+      line: { b0: lineB0, b1: lineB1 },
+      xDomain: [xMin, xMax],
+      yDomain: [yMin, yMax],
+      xLabel: 'Educación (años)',
+      yLabel: 'Salario',
+      height: 300
+    });
+
+    // Coefficient table
+    const names = ['Intercepto (β₀)', 'Educación (β₁)', 'Experiencia (β₂)'];
+    const trueVals = [3, b1, b2];
+    document.getElementById('t-tbody').innerHTML = names.map((name, j) => {
+      const isB = j > 0;
+      return `<tr>
+        <td style="font-family:var(--font-b)">${name} <span style="color:var(--text-sec);font-size:.75rem">[real: ${trueVals[j]}]</span></td>
+        <td>${result.beta[j].toFixed(4)}</td>
+        <td>${result.se[j].toFixed(4)}</td>
+        <td>${result.tStats[j].toFixed(3)}</td>
+        <td>${result.pValues[j].toFixed(4)} ${pStars(result.pValues[j])}</td>
+        <td>${sigBadge(result.pValues[j])}</td>
+      </tr>`;
+    }).join('') + `<tr style="border-top:2px solid var(--border)">
+      <td colspan="3" style="font-family:var(--font-b)">R² = ${result.r2.toFixed(4)}</td>
+      <td colspan="3" style="font-family:var(--font-b)">σ̂ = ${Math.sqrt(result.sigma2).toFixed(3)} | gl = ${result.df}</td>
+    </tr>`;
+
+    // t-distribution chart for β₁
+    makeTDistChart('t-dist-chart', {
+      df: result.df,
+      tObs: result.tStats[1],
+      height: 220
+    });
+  }
+
+  ['t-b1', 't-b2', 't-sigma', 't-n'].forEach(id => {
+    document.getElementById(id).oninput = function () {
+      document.getElementById(id + '-val').textContent =
+        id === 't-n' ? this.value : (+this.value).toFixed(1);
+    };
+  });
+  document.getElementById('t-btn-gen').onclick = generate;
+  document.getElementById('t-btn-reset').onclick = function () {
+    sampleCount = 0; b1SigCount = 0; b2SigCount = 0;
+    updateCounter();
+  };
+})();
+
+// ============================================================
+// SECTION 3: CONFIDENCE INTERVALS
+// ============================================================
+(function initCI() {
+  function run() {
+    const trueB1 = +document.getElementById('ic-b1').value;
+    const sigma = +document.getElementById('ic-sigma').value;
+    const n = +document.getElementById('ic-n').value;
+    const level = +document.getElementById('ic-level').value / 100;
+    const alpha = 1 - level;
+
+    const intervals = [];
+    const N = 100;
+    let covers = 0;
+
+    for (let i = 0; i < N; i++) {
+      const x = Array.from({ length: n }, () => S.runif(6, 20));
+      const y = x.map(xi => 2 + trueB1 * xi + S.rnorm(0, sigma));
+      const ols = S.olsSimple(x, y);
+      if (!ols) continue;
+
+      const crit = S.tQuantile(1 - alpha / 2, ols.df);
+      const lo = ols.b1 - crit * ols.se1;
+      const hi = ols.b1 + crit * ols.se1;
+      const coversTrue = lo <= trueB1 && hi >= trueB1;
+      if (coversTrue) covers++;
+      intervals.push({ lo, hi, center: ols.b1, covers: coversTrue });
+    }
+
+    const avgWidth = S.mean(intervals.map(ci => ci.hi - ci.lo));
+    document.getElementById('ic-cover').textContent = `${covers} / ${N}`;
+    document.getElementById('ic-pct').textContent = `${(100 * covers / N).toFixed(0)}%`;
+    document.getElementById('ic-width').textContent = avgWidth.toFixed(3);
+
+    const allLo = d3.min(intervals, d => d.lo);
+    const allHi = d3.max(intervals, d => d.hi);
+    const spread = Math.max(allHi - allLo, 1);
+
+    makeCIChart('ic-chart', {
+      intervals: intervals,
+      trueValue: trueB1,
+      xDomain: [allLo - spread * 0.05, allHi + spread * 0.05]
+    });
+  }
+
+  ['ic-b1', 'ic-sigma', 'ic-n'].forEach(id => {
+    document.getElementById(id).oninput = function () {
+      document.getElementById(id + '-val').textContent =
+        id === 'ic-n' ? this.value : (+this.value).toFixed(1);
+    };
+  });
+  document.getElementById('ic-level').oninput = function () {
+    document.getElementById('ic-level-val').textContent = this.value + '%';
+  };
+  document.getElementById('ic-btn-run').onclick = run;
+})();
+
+// ============================================================
+// SECTION 4: POWER
+// ============================================================
+(function initPower() {
+  function run() {
+    const b1Alt = +document.getElementById('p-b1').value;
+    const sigma = +document.getElementById('p-sigma').value;
+    const n = +document.getElementById('p-n').value;
+    const N = 2000;
+
+    document.getElementById('p-b1-label').textContent = b1Alt.toFixed(1);
+
+    const tStats0 = [], tStats1 = [];
+    let rej0 = 0, rej1 = 0;
+
+    for (let i = 0; i < N; i++) {
+      const x = Array.from({ length: n }, () => S.runif(4, 16));
+
+      // H0 true: beta1 = 0
+      const y0 = x.map(xi => 2 + 0 * xi + S.rnorm(0, sigma));
+      const ols0 = S.olsSimple(x, y0);
+      if (ols0) {
+        tStats0.push(ols0.t1);
+        if (Math.abs(ols0.t1) > S.tQuantile(0.975, ols0.df)) rej0++;
+      }
+
+      // H0 false: beta1 = b1Alt
+      const y1 = x.map(xi => 2 + b1Alt * xi + S.rnorm(0, sigma));
+      const ols1 = S.olsSimple(x, y1);
+      if (ols1) {
+        tStats1.push(ols1.t1);
+        if (Math.abs(ols1.t1) > S.tQuantile(0.975, ols1.df)) rej1++;
+      }
+    }
+
+    const size = (100 * rej0 / N).toFixed(1);
+    const power = (100 * rej1 / N).toFixed(1);
+    const miss = (100 - parseFloat(power)).toFixed(1);
+
+    document.getElementById('p-rej-left').textContent = size + '%';
+    document.getElementById('p-rej-right').textContent = power + '%';
+    document.getElementById('p-size').textContent = size + '%';
+    document.getElementById('p-power').textContent = power + '%';
+    document.getElementById('p-miss').textContent = miss + '%';
+
+    const df = n - 2;
+    const crit = S.tQuantile(0.975, df);
+
+    // Left panel: t-stats under H0
+    makeHistogram('p-chart-left', {
+      xDomain: [-5, 5], bins: 45, height: 220,
+      datasets: [{ data: tStats0, color: getCSS('--accent'), opacity: 0.5 }],
+      vlines: [
+        { x: -crit, color: getCSS('--red'), width: 1.5, dash: '4 3' },
+        { x: crit, color: getCSS('--red'), width: 1.5, dash: '4 3' }
+      ]
+    });
+
+    // Right panel: t-stats under H1
+    const maxT1 = d3.max(tStats1.map(Math.abs));
+    const xHi = Math.max(5, maxT1 + 1);
+    makeHistogram('p-chart-right', {
+      xDomain: [-5, xHi], bins: 45, height: 220,
+      datasets: [{ data: tStats1, color: getCSS('--accent'), opacity: 0.5 }],
+      vlines: [
+        { x: -crit, color: getCSS('--red'), width: 1.5, dash: '4 3' },
+        { x: crit, color: getCSS('--red'), width: 1.5, dash: '4 3' }
+      ]
+    });
+  }
+
+  ['p-b1', 'p-sigma', 'p-n'].forEach(id => {
+    document.getElementById(id).oninput = function () {
+      document.getElementById(id + '-val').textContent =
+        id === 'p-n' ? this.value : (+this.value).toFixed(1);
+    };
+  });
+  document.getElementById('p-btn-run').onclick = run;
+})();
+
+// ============================================================
+// SECTION 5: MODEL COMPARISON
+// ============================================================
+(function initModels() {
+  function getParams() {
+    return {
+      b2: +document.getElementById('m-b2').value,
+      rho: +document.getElementById('m-rho').value,
+      sigma: +document.getElementById('m-sigma').value,
+      n: +document.getElementById('m-n').value
+    };
+  }
+
+  function generateSample(p) {
+    const { x1, x2 } = S.generateCorrelated(p.n, p.rho, 12, 3, 8, 2);
+    const y = x1.map((xi, i) => 2 + 1.5 * xi + p.b2 * x2[i] + S.rnorm(0, p.sigma));
+    return { x1, x2, y };
+  }
+
+  function estimateBoth(x1, x2, y) {
+    const n = y.length;
+    // Full model: y ~ 1 + x1 + x2
+    const Xf = x1.map((xi, i) => [1, xi, x2[i]]);
+    const full = S.olsMultiple(Xf, y);
+    // Restricted: y ~ 1 + x1
+    const Xr = x1.map(xi => [1, xi]);
+    const rest = S.olsMultiple(Xr, y);
+    return { full, rest };
+  }
+
+  function showSingle() {
+    const p = getParams();
+    const { x1, x2, y } = generateSample(p);
+    const { full, rest } = estimateBoth(x1, x2, y);
+    if (!full || !rest) return;
+
+    const names = ['β₀ (intercepto)', 'β₁ (x₁)', 'β₂ (x₂)'];
+    const trueVals = [2, 1.5, p.b2];
+
+    document.getElementById('m-tbody').innerHTML = names.map((name, j) => {
+      const fBeta = full.beta[j], fSe = full.se[j], fP = full.pValues[j];
+      const hasRestr = j < 2;
+      const rBeta = hasRestr ? rest.beta[j] : null;
+      const rSe = hasRestr ? rest.se[j] : null;
+      const rP = hasRestr ? rest.pValues[j] : null;
+      return `<tr>
+        <td style="font-family:var(--font-b)">${name} <span style="color:var(--text-sec);font-size:.72rem">[real: ${trueVals[j]}]</span></td>
+        <td>${fBeta.toFixed(4)}</td>
+        <td>${fSe.toFixed(4)}</td>
+        <td>${sigBadge(fP)}</td>
+        <td>${hasRestr ? rBeta.toFixed(4) : '—'}</td>
+        <td>${hasRestr ? rSe.toFixed(4) : '—'}</td>
+        <td>${hasRestr ? sigBadge(rP) : '—'}</td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('m-stats-single').style.display = '';
+    document.getElementById('m-r2f').textContent = full.r2.toFixed(4);
+    document.getElementById('m-r2r').textContent = rest.r2.toFixed(4);
+    document.getElementById('m-ar2f').textContent = full.adjR2.toFixed(4);
+    document.getElementById('m-ar2r').textContent = rest.adjR2.toFixed(4);
+  }
+
+  function simulate() {
+    const p = getParams();
+    const N = 1000;
+    const b1Full = [], b1Rest = [], se1Full = [], se1Rest = [];
+    let b2Sig = 0;
+
+    for (let i = 0; i < N; i++) {
+      const { x1, x2, y } = generateSample(p);
+      const { full, rest } = estimateBoth(x1, x2, y);
+      if (!full || !rest) continue;
+      b1Full.push(full.beta[1]);
+      b1Rest.push(rest.beta[1]);
+      se1Full.push(full.se[1]);
+      se1Rest.push(rest.se[1]);
+      if (full.pValues[2] < 0.05) b2Sig++;
+    }
+
+    const eb1f = S.mean(b1Full), eb1r = S.mean(b1Rest);
+    const avgSef = S.mean(se1Full), avgSer = S.mean(se1Rest);
+    const biasR = eb1r - 1.5;
+
+    document.getElementById('ms-eb1f').textContent = eb1f.toFixed(4);
+    document.getElementById('ms-eb1r').textContent = eb1r.toFixed(4);
+    document.getElementById('ms-se1f').textContent = avgSef.toFixed(4);
+    document.getElementById('ms-se1r').textContent = avgSer.toFixed(4);
+    document.getElementById('ms-b2sig').textContent = (100 * b2Sig / N).toFixed(1) + '%';
+
+    const biasEl = document.getElementById('ms-bias');
+    biasEl.textContent = biasR.toFixed(4);
+    biasEl.style.color = Math.abs(biasR) > 0.1 ? getCSS('--red') : getCSS('--green');
+
+    document.getElementById('m-sim-results').style.display = '';
+
+    const lo = Math.min(d3.min(b1Full), d3.min(b1Rest)) - 0.2;
+    const hi = Math.max(d3.max(b1Full), d3.max(b1Rest)) + 0.2;
+
+    makeHistogram('m-sim-chart', {
+      xDomain: [lo, hi], bins: 55,
+      datasets: [
+        { data: b1Rest, color: getCSS('--orange'), opacity: 0.4 },
+        { data: b1Full, color: getCSS('--accent'), opacity: 0.45 }
+      ],
+      vlines: [{ x: 1.5, color: getCSS('--red'), width: 2.5, dash: '8 4' }]
+    });
+  }
+
+  ['m-b2', 'm-rho', 'm-sigma', 'm-n'].forEach(id => {
+    document.getElementById(id).oninput = function () {
+      document.getElementById(id + '-val').textContent =
+        id === 'm-n' ? this.value : (+this.value).toFixed(1);
+    };
+  });
+  document.getElementById('m-btn-gen').onclick = showSingle;
+  document.getElementById('m-btn-sim').onclick = simulate;
+})();
+
+// ============================================================
+// NAVIGATION HIGHLIGHT
+// ============================================================
+(function initNav() {
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('nav.side-nav a');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const link = document.querySelector(`nav.side-nav a[href="#${e.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+  sections.forEach(s => obs.observe(s));
+})();
+</script>
+</body>
+</html>
