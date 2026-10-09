@@ -25,7 +25,7 @@ La siguiente tabla se ira actualizando a lo largo del cuatrimestre con los links
 | 8 | 15/09 | Inferencia estadistica II. Test F. Significatividad conjunta. Modelos restringidos vs. no restringidos. Repaso pre-parcial. | Nº 3 | | |
 | 9 | 22/09 | **Primer examen parcial** | | | |
 | 10 | 29/09 | Multicolinealidad perfecta e imperfecta. VIF. Estrategias de deteccion. | Nº 6 | | |
-| 11 | 06/10 | Heterocedasticidad. Tests de Breusch-Pagan y White. Errores estandar robustos. | Nº 7 | | |
+| 11 | 06/10 | Heterocedasticidad. Tests de Breusch-Pagan y White. Errores estandar robustos. | Nº 7 | [Heteroscedasticidad](heteroscedasticidad/tablero_heteroscedasticidad.html) | |
 | 12 | 13/10 | Variable dependiente dicotomica. MPL, Logit y Probit. Maxima verosimilitud. Efectos marginales. | Nº 8 | | |
 | 13 | 20/10 | Endogeneidad I. Variable omitida, simultaneidad, error de medicion. Concepto de instrumento. | Nº 9 | | |
 | 14 | 27/10 | Variables instrumentales y MC2E. Relevancia, exogeneidad, instrumentos debiles. Sobreidentificacion. | Nº 9 | | |

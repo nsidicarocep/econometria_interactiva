@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heteroscedasticidad — Laboratorio Interactivo</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+:root {
+  --bg: #F7F5F0;
+  --bg-alt: #EDEAE3;
+  --bg-canvas: #FFFFFF;
+  --text: #2C2C2E;
+  --text-sec: #636366;
+  --heading: #1A2744;
+  --accent: #3170A2;
+  --accent-light: #E3EEF6;
+  --green: #2D8659;
+  --green-light: #D4EDDF;
+  --red: #D45A3A;
+  --red-light: #FBEAE5;
+  --orange: #C87A1A;
+  --orange-light: #FDF0DB;
+  --purple: #7B5EA7;
+  --purple-light: #EDE7F6;
+  --blue: #5B9BD5;
+  --border: #DCDAD4;
+  --shadow: rgba(28,28,30,.07);
+  --font-d: Georgia,"Palatino Linotype","Book Antiqua",Palatino,serif;
+  --font-b: "Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-m: "Cascadia Code","Fira Code",Consolas,monospace;
+  --cw: 780px;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --green:#4DBB7F;--green-light:#1A3329;
+  --red:#F07A5A;--red-light:#3D2219;
+  --orange:#E8A84C;--orange-light:#3D2E14;
+  --purple:#A78BDB;--purple-light:#2A2040;
+  --blue:#7FC4F5;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --green:#4DBB7F;--green-light:#1A3329;
+  --red:#F07A5A;--red-light:#3D2219;
+  --orange:#E8A84C;--orange-light:#3D2E14;
+  --purple:#A78BDB;--purple-light:#2A2040;
+  --blue:#7FC4F5;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:17px;line-height:1.72;-webkit-font-smoothing:antialiased}
+article{max-width:var(--cw);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+
+h1{font-family:var(--font-d);font-size:clamp(2rem,5vw,2.8rem);color:var(--heading);line-height:1.12;text-wrap:balance;letter-spacing:-.025em;margin-bottom:.4rem}
+h2{font-family:var(--font-d);font-size:1.55rem;color:var(--heading);line-height:1.3;text-wrap:balance;margin-top:3.5rem;margin-bottom:.75rem;padding-bottom:.45rem;border-bottom:2px solid var(--accent)}
+h3{font-family:var(--font-d);font-size:1.15rem;color:var(--heading);margin-top:1.5rem;margin-bottom:.5rem}
+p{margin-bottom:1.15rem;max-width:65ch}
+ul,ol{margin:0 0 1.15rem 1.4rem;max-width:65ch}
+li{margin-bottom:.35rem}
+strong{color:var(--heading);font-weight:600}
+
+.eyebrow{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:600;margin-bottom:.5rem}
+.subtitle{font-family:var(--font-d);font-size:1.15rem;color:var(--text-sec);font-style:italic;margin-bottom:2rem;max-width:55ch}
+.lead{font-size:1.05rem;color:var(--text-sec);max-width:60ch}
+
+.formula-block{background:var(--bg-alt);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.25rem 0;border-radius:0 6px 6px 0;overflow-x:auto;text-align:center}
+.math{font-family:var(--font-d);font-style:italic;font-size:1.05em}
+.math .n{font-style:normal}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 2px}
+.frac .num{border-bottom:1.5px solid currentColor;padding:0 5px 3px;line-height:1.3;text-align:center}
+.frac .den{padding:3px 5px 0;line-height:1.3;text-align:center}
+
+.tip{background:var(--green-light);border-left:3px solid var(--green);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.callout{background:var(--red-light);border-left:3px solid var(--red);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.info{background:var(--accent-light);border-left:3px solid var(--accent);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.note{background:var(--purple-light);border-left:3px solid var(--purple);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.note-title{font-weight:700;color:var(--purple);margin-bottom:.25rem}
+
+nav.side-nav{position:fixed;top:50%;right:1.2rem;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:.5rem}
+nav.side-nav a{display:block;width:10px;height:10px;border-radius:50%;background:var(--border);transition:all .2s;text-indent:-9999px}
+nav.side-nav a:hover,nav.side-nav a.active{background:var(--accent);transform:scale(1.3)}
+@media(max-width:900px){nav.side-nav{display:none}}
+
+.lab{background:var(--bg-canvas);border:1px solid var(--border);border-radius:8px;padding:1.25rem;margin:1.5rem -1rem;box-shadow:0 2px 12px var(--shadow)}
+@media(min-width:800px){.lab{margin:1.5rem -2rem;padding:1.5rem}}
+.lab-title{font-family:var(--font-d);font-size:1.1rem;color:var(--heading);font-weight:700;margin-bottom:.75rem}
+.lab-chart{width:100%;overflow:hidden}
+.lab-chart svg{width:100%;display:block}
+
+.lab-controls{display:flex;flex-wrap:wrap;gap:.6rem 1rem;align-items:center;margin:.75rem 0}
+.lab-controls label{font-size:.85rem;color:var(--text-sec);display:flex;align-items:center;gap:.4rem}
+.lab-controls input[type=range]{width:120px;accent-color:var(--accent)}
+.lab-controls select{font-family:var(--font-b);font-size:.85rem;padding:.3rem .5rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text)}
+.lab-controls .val{font-family:var(--font-m);font-size:.85rem;min-width:36px;color:var(--heading);font-weight:600}
+
+.btn{font-family:var(--font-b);font-size:.82rem;padding:.4rem .85rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);cursor:pointer;transition:all .15s;font-weight:500}
+.btn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.primary:hover{background:var(--heading);border-color:var(--heading);color:var(--bg)}
+.tabs{display:flex;flex-wrap:wrap;gap:.35rem;margin:.5rem 0 .25rem}
+
+.lab-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;margin-top:1rem}
+.stat-card{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.6rem .8rem}
+.stat-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-sec);margin-bottom:.15rem}
+.stat-value{font-family:var(--font-d);font-size:1.2rem;color:var(--heading);font-variant-numeric:tabular-nums}
+
+.chart-legend{display:flex;flex-wrap:wrap;gap:.75rem;margin:.5rem 0;font-size:.82rem}
+.chart-legend-item{display:flex;align-items:center;gap:.3rem}
+.chart-legend-line{width:18px;height:3px;border-radius:2px}
+.chart-legend-dash{width:18px;height:0;border-top:2px dashed}
+.chart-legend-box{width:14px;height:10px;border-radius:2px}
+.color-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:.1rem;vertical-align:middle}
+
+.coef-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:1rem 0}
+.coef-table th{background:var(--bg-alt);padding:.5rem .6rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-sec);border-bottom:2px solid var(--border)}
+.coef-table td{padding:.5rem .6rem;border-bottom:1px solid var(--border);vertical-align:middle;font-family:var(--font-m);font-size:.82rem}
+.coef-table td.lbl{font-family:var(--font-b);font-weight:600;color:var(--heading)}
+.coef-table td.txt{font-family:var(--font-b);color:var(--text-sec);font-size:.8rem;line-height:1.45}
+.coef-table tr:hover td{background:var(--accent-light)}
+.coef-table tr.hi td{background:var(--accent-light)}
+.badge{display:inline-block;padding:.1rem .4rem;border-radius:3px;font-size:.75rem;font-weight:600;font-family:var(--font-b)}
+.badge.yes{background:var(--green-light);color:var(--green)}
+.badge.no{background:var(--red-light);color:var(--red)}
+.badge.partial{background:var(--orange-light);color:var(--orange)}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+@media(max-width:640px){.two-col{grid-template-columns:1fr}}
+.col-panel{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.75rem}
+.col-panel h4{font-family:var(--font-d);font-size:.95rem;color:var(--heading);margin-bottom:.35rem;text-align:center}
+
+.cause-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.7rem;margin:1.25rem 0}
+.cause{background:var(--bg-canvas);border:1px solid var(--border);border-radius:6px;padding:.75rem .9rem;font-size:.88rem;line-height:1.55}
+.cause b{display:block;font-family:var(--font-d);color:var(--heading);font-size:.98rem;margin-bottom:.2rem}
+.cause .arrow{font-family:var(--font-m);font-size:.78rem;color:var(--accent)}
+
+.steps{counter-reset:st;margin:1rem 0}
+.step{display:flex;gap:.8rem;align-items:flex-start;padding:.55rem .2rem;border-bottom:1px dashed var(--border);font-size:.9rem;line-height:1.55}
+.step:last-child{border-bottom:none}
+.step-n{flex:0 0 26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center;margin-top:.1rem}
+.step .mono{font-family:var(--font-m);font-size:.84rem;color:var(--heading)}
+.decision{margin-top:.6rem;padding:.6rem .9rem;border-radius:6px;font-weight:600;font-size:.92rem}
+.decision.rej{background:var(--red-light);color:var(--red)}
+.decision.acc{background:var(--green-light);color:var(--green)}
+
+.bar-cmp{margin-top:.75rem}
+.bar-cmp-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-sec);margin:.9rem 0 .4rem}
+.bar-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem;font-size:.85rem}
+.bar-name{width:170px;flex-shrink:0;color:var(--text-sec);font-size:.8rem;line-height:1.25}
+.bar-track{flex:1;height:20px;background:var(--bg-alt);border-radius:4px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:4px;transition:width .35s ease}
+.bar-ref{position:absolute;top:-2px;bottom:-2px;width:0;border-left:2px dashed var(--red)}
+.bar-val{width:70px;text-align:right;font-family:var(--font-m);font-size:.82rem;color:var(--heading)}
+
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.6rem;margin:1.25rem 0}
+.flow-card{border:1px solid var(--border);border-top:4px solid var(--accent);border-radius:6px;padding:.75rem .85rem;background:var(--bg-canvas);font-size:.86rem;line-height:1.5}
+.flow-card .fc-n{font-family:var(--font-m);font-size:.75rem;color:var(--text-sec)}
+.flow-card b{display:block;font-family:var(--font-d);color:var(--heading);font-size:.98rem;margin:.1rem 0 .3rem}
+
+.quiz-item{border:1px solid var(--border);border-radius:6px;margin-bottom:.6rem;background:var(--bg-canvas);overflow:hidden}
+.quiz-q{padding:.75rem 1rem;font-size:.92rem;line-height:1.6}
+.quiz-q .qid{font-family:var(--font-m);font-weight:700;color:var(--accent);margin-right:.4rem}
+.quiz-btns{display:flex;gap:.4rem;padding:0 1rem .75rem}
+.quiz-fb{display:none;padding:.75rem 1rem;font-size:.88rem;line-height:1.6;border-top:1px solid var(--border)}
+.quiz-fb.show{display:block}
+.quiz-fb.ok{background:var(--green-light)}
+.quiz-fb.no{background:var(--red-light)}
+.quiz-verdict{font-weight:700;display:block;margin-bottom:.2rem}
+.quiz-score{font-size:.88rem;color:var(--text-sec);margin:.5rem 0}
+
+footer.page-footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:.8rem;color:var(--text-sec)}
+footer.page-footer p{max-width:none;margin-bottom:.4rem}
+
+@media(max-width:600px){
+  article{padding:2rem 1rem 4rem}
+  .lab{margin:1.25rem -.5rem;padding:1rem}
+  .lab-stats{grid-template-columns:1fr 1fr}
+  h2{font-size:1.35rem}
+  .bar-name{width:110px}
+  .bar-val{width:56px}
+}
+</style>
+</head>
+<body>
+<nav class="side-nav">
+  <a href="#sec-que" title="¿Qué es?">1</a>
+  <a href="#sec-fuentes" title="¿Cuándo aparece?">2</a>
+  <a href="#sec-consec" title="Consecuencias">3</a>
+  <a href="#sec-deteccion" title="Detección">4</a>
+  <a href="#sec-correccion" title="Medidas correctivas">5</a>
+  <a href="#sec-estrategia" title="Estrategia práctica">6</a>
+  <a href="#sec-quiz" title="Autoevaluación">7</a>
+</nav>
+
+<article>
+<header>
+  <p class="eyebrow">Econometría I &mdash; UADE &mdash; Clase 11</p>
+  <h1>Heteroscedasticidad</h1>
+  <p class="subtitle">Qué es, por qué rompe la inferencia, cómo detectarla y cómo corregirla</p>
+  <p class="lead">Hasta ahora supusimos que la varianza del error era <strong>constante</strong> a lo largo de toda la muestra. En esta página vas a relajar ese supuesto: vas a ver cómo luce un error heteroscedástico, vas a comprobar con simulaciones que MCO sigue siendo insesgado pero que sus errores estándar mienten, vas a correr los tests de <strong>Breusch-Pagan</strong> y <strong>White</strong> paso a paso, y vas a aplicar las tres correcciones (errores robustos, MCP y logaritmos) a los datos de consumo e ingreso de Gujarati.</p>
+</header>
+
+<div class="tip"><strong>Cómo usar esta página.</strong> Cada laboratorio es independiente: movés los controles y los gráficos se recalculan. Los botones de simulación repiten el experimento miles de veces para que veas qué pasa <em>en promedio</em>, no en una muestra particular. Lectura: Gujarati y Porter, cap. 11; Wooldridge, cap. 8.</div>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 1: QUÉ ES                            -->
+<!-- =========================================== -->
+<section id="sec-que">
+<h2>1. ¿Qué es la heteroscedasticidad?</h2>
+<p>Considerá el modelo lineal <span class="math">Y<sub>i</sub> = β<sub>1</sub> + β<sub>2</sub>X<sub>2i</sub> + ⋯ + β<sub>k</sub>X<sub>ki</sub> + u<sub>i</sub></span>. El supuesto clásico de <strong>homoscedasticidad</strong> (MLR.5 en Wooldridge) dice que la dispersión del error es la misma para todos los valores de las regresoras:</p>
+
+<div class="formula-block">
+  <span class="math">Var(u<sub>i</sub> | X) = E(u<sub>i</sub>² | X) = σ² &nbsp;&nbsp;<span class="n">para todo</span> i</span>
+</div>
+
+<p>Hay <strong>heteroscedasticidad</strong> cuando esa varianza cambia de una observación a otra, típicamente porque depende del nivel de alguna regresora:</p>
+
+<div class="formula-block">
+  <span class="math">Var(u<sub>i</sub> | X) = E(u<sub>i</sub>² | X) = σ<sub>i</sub>²</span>
+</div>
+
+<p>Como suponemos <span class="math">E(u<sub>i</sub>) = 0</span>, la varianza es simplemente <span class="math">E(u<sub>i</sub>²)</span>. No observamos los <span class="math">u<sub>i</sub></span>, pero sí los residuos <span class="math">û<sub>i</sub></span>. Si la varianza cambia con <span class="math">X</span>, los <strong>residuos al cuadrado</strong> deberían crecer (o decrecer) sistemáticamente con <span class="math">X</span>. Esa idea es la base de todas las herramientas de esta página.</p>
+
+<div class="lab">
+  <div class="lab-title">Visualizador: ¿cómo luce un error heteroscedástico?</div>
+  <div class="info" style="margin-top:0;margin-bottom:.75rem;font-size:.88rem"><strong>Modelo:</strong> <span class="math">Y = 2 + 0.5 · X + u</span>, con <span class="math">u<sub>i</sub> ∼ N(0, σ<sub>i</sub>²)</span> y <span class="math">X ∼ U(2, 20)</span>. Elegí cómo depende <span class="math">σ<sub>i</sub></span> de <span class="math">X</span> y con qué intensidad. La banda sombreada es <span class="math">±2σ<sub>i</sub></span> alrededor de la recta poblacional.</div>
+  <div class="lab-controls">
+    <label>Patrón: <select id="v-form"></select></label>
+    <label>Intensidad <span class="math">h</span>: <input type="range" id="v-h" min="0" max="1.5" step="0.1" value="1"><span class="val" id="v-h-val">1.0</span></label>
+    <label><em>n</em>: <input type="range" id="v-n" min="30" max="400" step="10" value="150"><span class="val" id="v-n-val">150</span></label>
+  </div>
+  <div class="lab-controls">
+    <button class="btn primary" id="v-btn">Nueva muestra</button>
+    <label>Panel derecho: <select id="v-right"><option value="u2">û² vs X</option><option value="u">û vs Ŷ</option></select></label>
+  </div>
+  <div class="two-col">
+    <div class="col-panel"><h4>Datos y recta poblacional</h4><div class="lab-chart" id="v-chart1"></div></div>
+    <div class="col-panel"><h4 id="v-right-title">Residuos al cuadrado vs X</h4><div class="lab-chart" id="v-chart2"></div></div>
+  </div>
+  <div class="chart-legend">
+    <span class="chart-legend-item"><span class="chart-legend-box" style="background:var(--accent);opacity:.25"></span> ±2σ<sub>i</sub> (verdadero)</span>
+    <span class="chart-legend-item"><span class="chart-legend-line" style="background:var(--red)"></span> Recta poblacional</span>
+    <span class="chart-legend-item"><span class="chart-legend-line" style="background:var(--orange)"></span> Promedio móvil de û²</span>
+  </div>
+  <div class="lab-stats">
+    <div class="stat-card"><div class="stat-label">σ<sub>i</sub> en X = 4</div><div class="stat-value" id="v-s4">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">σ<sub>i</sub> en X = 11</div><div class="stat-value" id="v-s11">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">σ<sub>i</sub> en X = 18</div><div class="stat-value" id="v-s18">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">σ<sub>máx</sub> / σ<sub>mín</sub></div><div class="stat-value" id="v-ratio">&mdash;</div></div>
+  </div>
+</div>
+<div class="tip"><strong>Probá:</strong> con <span class="math">h = 0</span> todos los patrones coinciden: es el caso homoscedástico, la nube tiene el mismo "ancho" en todo el rango. Con "crece con X" y <span class="math">h = 1</span> tenés el caso clásico de Gujarati, <span class="math">σ<sub>i</sub>² = σ²X<sub>i</sub>²</span>: la nube se <strong>abre como un embudo</strong>, que es la firma típica de la heteroscedasticidad. Mirá cómo el promedio móvil de <span class="math">û²</span> copia la forma de la banda.</div>
+</section>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 2: FUENTES                           -->
+<!-- =========================================== -->
+<section id="sec-fuentes">
+<h2>2. ¿Cuándo aparece?</h2>
+<p>El ejemplo motivador de Gujarati (§11.1) es el <strong>ahorro en función del ingreso</strong>. Las familias de ingresos altos tienen más ingreso discrecional: pueden ahorrar mucho o casi nada. Las de ingresos bajos tienen poco margen, porque el ahorro está acotado por la subsistencia. Resultado: la varianza del ahorro crece con el ingreso. Las causas más frecuentes son:</p>
+
+<div class="cause-grid">
+  <div class="cause"><b>Modelos de aprendizaje</b>A medida que se gana experiencia, los errores de comportamiento se reducen.<br><span class="arrow">σ<sub>i</sub>² cae con la experiencia</span></div>
+  <div class="cause"><b>Ingreso discrecional</b>Más ingreso, más margen de decisión sobre ahorro o consumo.<br><span class="arrow">σ<sub>i</sub>² crece con el ingreso</span></div>
+  <div class="cause"><b>Mejores técnicas de medición</b>Los datos más recientes o de unidades más grandes suelen medirse con más precisión.<br><span class="arrow">σ<sub>i</sub>² menor</span></div>
+  <div class="cause"><b>Datos atípicos</b>Una sola observación muy lejana puede generar la apariencia de heteroscedasticidad.</div>
+  <div class="cause"><b>Errores de especificación</b>Omitir una variable relevante o usar una forma funcional incorrecta deja estructura en los residuos que se parece a heteroscedasticidad.</div>
+  <div class="cause"><b>Regresoras asimétricas</b>Ingreso, riqueza o tamaño de empresa abarcan varios órdenes de magnitud.</div>
+  <div class="cause"><b>Transformaciones inadecuadas</b>Razones o primeras diferencias mal elegidas pueden inducir varianzas distintas.</div>
+</div>
+
+<div class="info"><strong>Corte transversal vs. series de tiempo.</strong> El problema es típico de los datos de <strong>corte transversal</strong> (hogares, empresas, países en un mismo momento), donde conviven unidades de "tamaños" muy distintos. En series de tiempo las magnitudes son más parecidas y el problema habitual es la <strong>autocorrelación</strong>. La excepción son las series financieras, con <em>volatilidad agrupada</em> (modelos ARCH/GARCH).</div>
+</section>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 3: CONSECUENCIAS                     -->
+<!-- =========================================== -->
+<section id="sec-consec">
+<h2>3. Consecuencias: la estimación sobrevive, la inferencia no</h2>
+<p><strong>Las buenas noticias.</strong> Para probar que MCO es insesgado y consistente sólo se usan linealidad, muestreo aleatorio, ausencia de multicolinealidad perfecta y exogeneidad <span class="math">E(u | X) = 0</span>. La homoscedasticidad <strong>no interviene</strong>. Tampoco se ven afectados el <span class="math">R²</span> ni el <span class="math">R²</span> ajustado, que estiman varianzas no condicionales.</p>
+<p><strong>Lo que se rompe.</strong> La varianza de <span class="math">β̂<sub>2</sub></span> ya no es la que reportan los paquetes por defecto. En regresión simple, con <span class="math">x<sub>i</sub> = X<sub>i</sub> − X̄</span>:</p>
+
+<div class="formula-block">
+  <span class="math">
+  <span class="n">Clásica:</span>&nbsp; Var(β̂<sub>2</sub>) = <span class="frac"><span class="num">σ²</span><span class="den">Σ x<sub>i</sub>²</span></span>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <span class="n">Verdadera:</span>&nbsp; Var(β̂<sub>2</sub>) = <span class="frac"><span class="num">Σ x<sub>i</sub>² σ<sub>i</sub>²</span><span class="den">(Σ x<sub>i</sub>²)²</span></span>
+  </span>
+</div>
+
+<p>La fórmula verdadera pondera cada <span class="math">σ<sub>i</sub>²</span> por <span class="math">x<sub>i</sub>²</span>, la distancia al cuadrado a la media. Si la varianza es grande justamente donde <span class="math">X</span> está lejos de su media, la fórmula clásica <strong>subestima</strong>; si es grande cerca del centro, <strong>sobreestima</strong>. En general no sabemos hacia dónde va el sesgo. Además, MCO deja de ser <strong>MELI</strong>: el estimador de mínimos cuadrados generalizados (MCG), que pondera por <span class="math">1/σ<sub>i</sub>²</span>, tiene menor varianza.</p>
+
+<div class="lab">
+  <div class="lab-title">Monte Carlo: 2000 muestras con el mismo DGP</div>
+  <div class="info" style="margin-top:0;margin-bottom:.75rem;font-size:.88rem"><strong>DGP:</strong> <span class="math">Y = 2 + 0.5 · X + u</span>, con <span class="math">β<sub>2</sub> = 0.5</span>. Las <span class="math">X</span> quedan fijas en cada corrida (muestreo repetido como en Gujarati); sólo se redibujan los errores. En cada muestra estimamos MCO (con error estándar clásico y robusto) y MCG conociendo <span class="math">σ<sub>i</sub></span>, y testeamos la hipótesis <em>verdadera</em> <span class="math">H<sub>0</sub>: β<sub>2</sub> = 0.5</span> al 5%.</div>
+  <div class="lab-controls">
+    <label>Patrón: <select id="m-form"></select></label>
+    <label>Intensidad <span class="math">h</span>: <input type="range" id="m-h" min="0" max="1.5" step="0.1" value="1"><span class="val" id="m-h-val">1.0</span></label>
+    <label><em>n</em>: <input type="range" id="m-n" min="15" max="500" step="5" value="50"><span class="val" id="m-n-val">50</span></label>
+    <label>σ: <input type="range" id="m-sigma" min="1" max="6" step="0.5" value="3"><span class="val" id="m-sigma-val">3.0</span></label>
+  </div>
+  <div class="lab-controls"><button class="btn primary" id="m-btn">Simular 2000 muestras</button></div>
+  <div class="lab-chart" id="m-chart"></div>
+  <div class="chart-legend">
+    <span class="chart-legend-item"><span class="chart-legend-box" style="background:var(--accent);opacity:.55"></span> β̂<sub>2</sub> por MCO</span>
+    <span class="chart-legend-item"><span class="chart-legend-box" style="background:var(--green);opacity:.55"></span> β̂<sub>2</sub> por MCG (pesos 1/σ<sub>i</sub>²)</span>
+    <span class="chart-legend-item"><span class="chart-legend-dash" style="border-color:var(--red)"></span> β<sub>2</sub> = 0.5 (verdadero)</span>
+  </div>
+  <div class="lab-stats">
+    <div class="stat-card"><div class="stat-label">Media β̂<sub>2</sub> MCO</div><div class="stat-value" id="m-mean">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Var. clásica σ²/Σx²</div><div class="stat-value" id="m-vclas">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Var. verdadera</div><div class="stat-value" id="m-vtrue">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Var. simulada MCO</div><div class="stat-value" id="m-vsim">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-label">Var. MCG / Var. MCO</div><div class="stat-value" id="m-eff">&mdash;</div></div>
+  </div>
+  <div class="bar-cmp">
+    <div class="bar-cmp-title">Error estándar promedio vs. desvío verdadero de β̂<sub>2</sub></div>
+    <div id="m-bars-se"></div>
+    <div class="bar-cmp-title">Tasa de rechazo de H<sub>0</sub> verdadera (debería ser 5%, línea roja)</div>
+    <div id="m-bars-rej"></div>
+  </div>
+</div>
+<div class="tip"><strong>Probá estos escenarios:</strong><br>
+  &bull; <strong>Homoscedástico (h = 0):</strong> todo funciona. El EE clásico coincide con el desvío verdadero y se rechaza cerca del 5%.<br>
+  &bull; <strong>Mayor en los extremos, h = 1.5:</strong> el histograma sigue centrado en 0.5 (insesgado), pero el EE clásico <strong>subestima</strong> la incertidumbre y se rechaza una hipótesis verdadera mucho más del 5%: vemos efectos "significativos" que no existen.<br>
+  &bull; <strong>Mayor en el centro:</strong> ahora el EE clásico <strong>sobreestima</strong> y el test rechaza menos del 5%: perdemos potencia.<br>
+  &bull; <strong>n = 15 con heteroscedasticidad:</strong> el EE robusto HC0 también falla un poco; HC3 se comporta mejor en muestras chicas. Los errores robustos son válidos <em>asintóticamente</em>.
+</div>
+
+<h3>Resumen</h3>
+<div style="overflow-x:auto">
+<table class="coef-table">
+  <thead><tr><th>Propiedad</th><th>Homoscedasticidad</th><th>Heteroscedasticidad</th></tr></thead>
+  <tbody>
+    <tr><td class="lbl">β̂ insesgado</td><td><span class="badge yes">Sí</span></td><td><span class="badge yes">Sí</span></td></tr>
+    <tr><td class="lbl">β̂ consistente</td><td><span class="badge yes">Sí</span></td><td><span class="badge yes">Sí</span></td></tr>
+    <tr><td class="lbl">R² y R² ajustado válidos</td><td><span class="badge yes">Sí</span></td><td><span class="badge yes">Sí</span></td></tr>
+    <tr><td class="lbl">β̂ MELI (varianza mínima)</td><td><span class="badge yes">Sí</span></td><td><span class="badge no">No</span></td></tr>
+    <tr><td class="lbl">Fórmula usual de Var(β̂) válida</td><td><span class="badge yes">Sí</span></td><td><span class="badge no">No</span></td></tr>
+    <tr><td class="lbl">Tests t, F e intervalos de confianza</td><td><span class="badge yes">Sí</span></td><td><span class="badge no">No</span></td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout"><strong>Mensaje central:</strong> la heteroscedasticidad no rompe la estimación puntual, pero sí rompe la inferencia. Como la inferencia es lo que usamos para responder preguntas económicas ("¿es significativo el efecto de la educación sobre el salario?"), hay que detectarla y corregirla.</div>
+</section>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 4: DETECCIÓN                         -->
+<!-- =========================================== -->
+<section id="sec-deteccion">
+<h2>4. Detección: gráficos, Breusch-Pagan y White</h2>
+<p>La estrategia tiene tres pasos: estimar por MCO, mirar los residuos <span class="math">û<sub>i</sub></span> y <span class="math">û<sub>i</sub>²</span>, y aplicar tests formales. La idea común es que, si la varianza es constante, <span class="math">û<sub>i</sub>²</span> no debería tener ninguna relación sistemática con las regresoras.</p>
+
+<h3>Test de Breusch-Pagan (BP)</h3>
+<p>Se corre una <strong>regresión auxiliar</strong> de los residuos al cuadrado sobre las variables sospechosas <span class="math">Z</span> (típicamente, las propias <span class="math">X</span>):</p>
+<div class="formula-block">
+  <span class="math">û<sub>i</sub>² = α<sub>1</sub> + α<sub>2</sub>Z<sub>2i</sub> + ⋯ + α<sub>m</sub>Z<sub>mi</sub> + v<sub>i</sub>
+  &nbsp;&nbsp;&nbsp;⟹&nbsp;&nbsp;&nbsp;
+  BP = n · R²<sub>aux</sub> &nbsp;∼&nbsp; χ²<sub>m−1</sub> &nbsp;<span class="n">bajo</span>&nbsp; H<sub>0</sub>: α<sub>2</sub> = ⋯ = α<sub>m</sub> = 0</span>
+</div>
+<p>La versión original requería errores normales; la que usamos acá (y la que calcula <code>bptest()</code> en R por defecto) es la <strong>estudentizada de Koenker</strong>, <span class="math">n · R²</span>, robusta a la no normalidad. Wooldridge presenta también la versión <span class="math">F</span> de la significatividad conjunta de la auxiliar; ambas llevan a la misma conclusión en muestras moderadas.</p>
+
+<h3>Test de White</h3>
+<p>White (1980) generaliza el BP agregando <strong>cuadrados y productos cruzados</strong> de las regresoras, para captar formas no lineales de la varianza sin suponer normalidad. Con dos regresoras:</p>
+<div class="formula-block">
+  <span class="math">û<sub>i</sub>² = α<sub>1</sub> + α<sub>2</sub>X<sub>2i</sub> + α<sub>3</sub>X<sub>3i</sub> + α<sub>4</sub>X<sub>2i</sub>² + α<sub>5</sub>X<sub>3i</sub>² + α<sub>6</sub>X<sub>2i</sub>X<sub>3i</sub> + v<sub>i</sub>
+  &nbsp;&nbsp;⟹&nbsp;&nbsp; W = n · R²<sub>aux</sub> ∼ χ²<sub>5</sub></span>
+</div>
+
+<div class="lab">
+  <div class="lab-title">Laboratorio de detección: una muestra, paso a paso</div>
+  <div class="info" style="margin-top:0;margin-bottom:.75rem;font-size:.88rem"><strong>Modelo estimado:</strong> <span class="math">Y = β<sub>1</sub> + β<sub>2</sub>X + u</span>. El último patrón es una trampa: los errores son homoscedásticos, pero el modelo verdadero es <strong>cuadrático</strong> y estimamos uno lineal.</div>
+  <div class="lab-controls">
+    <label>Patrón: <select id="d-form"></select></label>
+    <label>Intensidad <span class="math">h</span>: <input type="range" id="d-h" min="0" max="1.5" step="0.1" value="1"><span class="val" id="d-h-val">1.0</span></label>
+    <label><em>n</em>: <input type="range" id="d-n" min="20" max="400" step="10" value="60"><span class="val" id="d-n-val">60</span></label>
+  </div>
+  <div class="lab-controls">
+    <button class="btn primary" id="d-btn">Nueva muestra</button>
+    <button class="btn" id="d-btn-sim">Simular 1000 muestras</button>
+  </div>
+  <div class="two-col">
+    <div class="col-panel"><h4>Residuos vs valores ajustados</h4><div class="lab-chart" id="d-chart1"></div></div>
+    <div class="col-panel"><h4>û² vs X y regresiones auxiliares</h4><div class="lab-chart" id="d-chart2"></div></div>
+  </div>
+  <div class="chart-legend">
+    <span class="chart-legend-item"><span class="chart-legend-line" style="background:var(--accent)"></span> Auxiliar BP (lineal en X)</span>
+    <span class="chart-legend-item"><span class="chart-legend-line" style="background:var(--purple)"></span> Auxiliar White (X y X²)</span>
+  </div>
+  <div class="steps" id="d-steps"></div>
+  <div class="two-col">
+    <div class="col-panel"><h4>Breusch-Pagan: χ²<sub>1</sub></h4><div class="lab-chart" id="d-chi1"></div></div>
+    <div class="col-panel"><h4>White: χ²<sub>2</sub></h4><div class="lab-chart" id="d-chi2"></div></div>
+  </div>
+  <div id="d-sim-out" style="display:none">
+    <div class="bar-cmp">
+      <div class="bar-cmp-title" id="d-sim-title">Porcentaje de muestras en que se rechaza H<sub>0</sub> al 5%</div>
+      <div id="d-bars"></div>
+    </div>
+  </div>
+</div>
+<div class="tip"><strong>Probá:</strong><br>
+  &bull; <strong>Homoscedástico:</strong> simulá 1000 muestras. Ambos tests rechazan cerca del 5% de las veces: ese es el <em>tamaño</em> del test.<br>
+  &bull; <strong>Crece con X:</strong> la varianza es casi lineal en X, así que el BP la capta muy bien. Bajá <span class="math">n</span> a 20 y mirá cómo cae la potencia.<br>
+  &bull; <strong>Mayor en los extremos:</strong> la relación entre <span class="math">û²</span> y X tiene forma de U. La recta del BP queda casi plana y el test casi no rechaza, mientras que White, con el término cuadrático, la detecta.<br>
+  &bull; <strong>Forma funcional mal especificada:</strong> no hay heteroscedasticidad, pero White rechaza igual. El test es "demasiado general": también detecta errores de especificación.
+</div>
+
+<h3>El costo en grados de libertad del test de White</h3>
+<p>Con <span class="math">k</span> regresoras, la auxiliar de White tiene <span class="math">k</span> niveles, <span class="math">k</span> cuadrados y <span class="math">k(k−1)/2</span> productos cruzados. Con muchas regresoras se come los grados de libertad. Wooldridge (§8.3) propone una <strong>forma especial</strong> que preserva el espíritu del test usando sólo los valores ajustados: <span class="math">û² = δ<sub>0</sub> + δ<sub>1</sub>Ŷ + δ<sub>2</sub>Ŷ² + error</span>, que siempre tiene 2 grados de libertad.</p>
+
+<div class="lab">
+  <div class="lab-title">Calculadora: regresoras de la auxiliar según el test</div>
+  <div class="lab-controls">
+    <label>Regresoras en el modelo, <span class="math">k</span>: <input type="range" id="w-k" min="1" max="12" step="1" value="3"><span class="val" id="w-k-val">3</span></label>
+  </div>
+  <div id="w-bars"></div>
+</div>
+
+<div class="note"><div class="note-title">Otros tests que menciona Gujarati</div>Park y Glejser (regresan <span class="math">ln û²</span> o <span class="math">|û|</span> sobre X), el test de correlación por rangos de Spearman y el de Goldfeld-Quandt (ordena por X, descarta las observaciones centrales y compara las SCR de los dos extremos con un test F). Todos comparten la idea de buscar relación entre el tamaño de los residuos y alguna variable.</div>
+
+<div class="callout"><strong>Limitaciones a tener en cuenta:</strong> si el test rechaza, no dice <em>qué variable</em> causa el problema ni con qué forma. Y un rechazo puede deberse a una forma funcional incorrecta o a una variable omitida: antes de "corregir la varianza", conviene revisar la especificación.</div>
+</section>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 5: CORRECCIÓN                        -->
+<!-- =========================================== -->
+<section id="sec-correccion">
+<h2>5. Medidas correctivas: consumo e ingreso (Gujarati, tabla 11.3)</h2>
+<p>Hay tres soluciones habituales y la mejor depende del origen del problema:</p>
+<ul>
+  <li><strong>Errores estándar robustos de White:</strong> dejamos los coeficientes de MCO y recalculamos los errores estándar para que sean válidos con cualquier patrón de heteroscedasticidad.</li>
+  <li><strong>Mínimos cuadrados ponderados (MCP):</strong> si conocemos o podemos modelar la forma de <span class="math">σ<sub>i</sub>²</span>, transformamos el modelo para que el error sea homoscedástico. Es más eficiente.</li>
+  <li><strong>Transformación logarítmica:</strong> si el problema es de escala (variables que abarcan varios órdenes de magnitud), el log comprime la escala y suele estabilizar la varianza.</li>
+</ul>
+
+<h3>Errores robustos de White</h3>
+<div class="formula-block">
+  <span class="math">V̂ar<sub>HC</sub>(β̂) = (X′X)<sup>−1</sup> <span style="font-size:1.25em">(</span> Σ<sub>i</sub> û<sub>i</sub>² x<sub>i</sub>x<sub>i</sub>′ <span style="font-size:1.25em">)</span> (X′X)<sup>−1</sup></span>
+</div>
+<p>Es la fórmula "sándwich": reemplaza el <span class="math">σ²</span> común por el <span class="math">û<sub>i</sub>²</span> de cada observación. Las variantes difieren en un ajuste por muestra chica: <strong>HC0</strong> es la original, <strong>HC1</strong> multiplica por <span class="math">n/(n−k)</span> (la que usa Stata con <code>robust</code>), y <strong>HC2</strong> y <strong>HC3</strong> dividen <span class="math">û<sub>i</sub>²</span> por <span class="math">(1−h<sub>ii</sub>)</span> y <span class="math">(1−h<sub>ii</sub>)²</span>, siendo <span class="math">h<sub>ii</sub></span> el apalancamiento de la observación.</p>
+
+<h3>Mínimos cuadrados ponderados</h3>
+<p>Si <span class="math">Var(u<sub>i</sub>) = σ²X<sub>i</sub>²</span>, dividimos todo el modelo por <span class="math">X<sub>i</sub></span>:</p>
+<div class="formula-block">
+  <span class="math"><span class="frac"><span class="num">Y<sub>i</sub></span><span class="den">X<sub>i</sub></span></span> = β<sub>1</sub><span class="frac"><span class="num">1</span><span class="den">X<sub>i</sub></span></span> + β<sub>2</sub> + v<sub>i</sub>,
+  &nbsp;&nbsp;&nbsp; Var(v<sub>i</sub>) = <span class="frac"><span class="num">σ²X<sub>i</sub>²</span><span class="den">X<sub>i</sub>²</span></span> = σ²</span>
+</div>
+<p>Equivale a minimizar <span class="math">Σ w<sub>i</sub>û<sub>i</sub>²</span> con <span class="math">w<sub>i</sub> = 1/σ<sub>i</sub>²</span>: las observaciones ruidosas pesan poco y las precisas pesan mucho. Como casi nunca conocemos <span class="math">σ<sub>i</sub>²</span>, Wooldridge (§8.4) propone <strong>MCG factibles (MCGF)</strong>: estimar <span class="math">ln û<sub>i</sub>²</span> sobre las X, tomar <span class="math">ĥ<sub>i</sub> = exp(ĝ<sub>i</sub>)</span> y ponderar por <span class="math">1/ĥ<sub>i</sub></span>.</p>
+
+<div class="lab">
+  <div class="lab-title">Laboratorio de corrección: 30 familias</div>
+  <div class="info" style="margin-top:0;margin-bottom:.75rem;font-size:.88rem"><strong>Datos:</strong> gasto de consumo (Y) e ingreso (X) semanal de 30 familias, Gujarati y Porter, tabla 11.3. Elegí el método para ver su ajuste y sus residuos. En MCP el tamaño de cada punto es proporcional a su peso.</div>
+  <div class="tabs" id="c-tabs">
+    <button class="btn primary" data-m="ols">MCO</button>
+    <button class="btn" data-m="wls">MCP (1/ingreso<sup>p</sup>)</button>
+    <button class="btn" data-m="fgls">MCGF (Wooldridge)</button>
+    <button class="btn" data-m="log">Log-log</button>
+  </div>
+  <div class="lab-controls">
+    <label>Potencia <span class="math">p</span> en <span class="math">w<sub>i</sub> = 1/ingreso<sub>i</sub><sup>p</sup></span>: <input type="range" id="c-p" min="0" max="4" step="0.5" value="2"><span class="val" id="c-p-val">2.0</span></label>
+    <label>Tipo robusto: <select id="c-hc"><option>HC0</option><option selected>HC1</option><option>HC2</option><option>HC3</option></select></label>
+  </div>
+  <div class="two-col">
+    <div class="col-panel"><h4 id="c-t1">Consumo vs ingreso</h4><div class="lab-chart" id="c-chart1"></div></div>
+    <div class="col-panel"><h4 id="c-t2">Residuos estandarizados</h4><div class="lab-chart" id="c-chart2"></div></div>
+  </div>
+  <div class="chart-legend" id="c-legend"></div>
+  <div style="overflow-x:auto">
+  <table class="coef-table">
+    <thead><tr><th>Método</th><th>β̂ pendiente</th><th>Error est.</th><th>t</th><th>IC 95%</th><th>BP (p-valor)</th></tr></thead>
+    <tbody id="c-tbody"></tbody>
+  </table>
+  </div>
+  <div class="steps" id="c-notes"></div>
+</div>
+<div class="tip"><strong>Para mirar:</strong><br>
+  &bull; En <strong>MCO</strong> los residuos se abren con el ingreso y el BP rechaza al 5%. Los robustos dejan la pendiente igual y sólo cambian el error estándar; acá resultan <strong>mayores</strong> que los clásicos: MCO subestimaba la incertidumbre.<br>
+  &bull; En <strong>MCP</strong> movés <span class="math">p</span>. Con <span class="math">p = 0</span> volvés a MCO; con <span class="math">p = 2</span> (el supuesto <span class="math">σ<sub>i</sub>² ∝ X<sub>i</sub>²</span> de Gujarati) los residuos transformados <span class="math">û<sub>i</sub>/X<sub>i</sub></span> dejan de abrirse y el error estándar baja respecto del robusto: ganancia de eficiencia.<br>
+  &bull; En <strong>log-log</strong> la pendiente pasa a ser una <strong>elasticidad</strong> y los residuos lucen homoscedásticos.
+</div>
+<div class="callout"><strong>Cuidado con MCP:</strong> si la forma postulada para <span class="math">σ<sub>i</sub>²</span> es incorrecta, los errores estándar de MCP tampoco son válidos y el estimador puede ser menos eficiente que MCO. Wooldridge recomienda, en la práctica, reportar MCP <em>con</em> errores robustos, por si la función de varianza está mal especificada.</div>
+
+<h3>Cuándo se puede usar el logaritmo</h3>
+<ul>
+  <li>La variable debe ser <strong>estrictamente positiva</strong> (salarios, precios, gasto, PIB). No se puede aplicar a ceros ni a negativos.</li>
+  <li>La interpretación cambia: el coeficiente pasa a ser una semielasticidad o una elasticidad, que muchas veces es lo económicamente interesante.</li>
+  <li>Es una transformación <em>ad hoc</em>: siempre hay que <strong>verificar</strong> con gráficos y tests que la heteroscedasticidad efectivamente se atenuó.</li>
+</ul>
+</section>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 6: ESTRATEGIA                        -->
+<!-- =========================================== -->
+<section id="sec-estrategia">
+<h2>6. Estrategia práctica</h2>
+<div class="flow">
+  <div class="flow-card"><span class="fc-n">PASO 1</span><b>Estimar por MCO</b>Los coeficientes son insesgados y consistentes, haya o no heteroscedasticidad.</div>
+  <div class="flow-card"><span class="fc-n">PASO 2</span><b>Mirar los residuos</b>û y û² contra Ŷ y contra cada X. Buscá embudos o formas de U.</div>
+  <div class="flow-card"><span class="fc-n">PASO 3</span><b>Testear</b>BP (y White si la muestra lo permite). Si rechaza, revisá primero la especificación.</div>
+  <div class="flow-card" style="border-top-color:var(--green)"><span class="fc-n">PASO 4</span><b>Corregir</b>Probá el log si Y &gt; 0 y abarca varios órdenes de magnitud. Reportá errores robustos siempre. Usá MCP si tenés una hipótesis fuerte sobre σ<sub>i</sub>².</div>
+</div>
+
+<div style="overflow-x:auto">
+<table class="coef-table">
+  <thead><tr><th>Método</th><th>¿β̂ correctos?</th><th>¿EE y tests válidos?</th><th>¿Eficiente?</th><th>Requisitos</th></tr></thead>
+  <tbody>
+    <tr><td class="lbl">MCO sin corregir</td><td><span class="badge yes">Sí</span></td><td><span class="badge no">No</span></td><td><span class="badge no">No</span></td><td class="txt">Ninguno</td></tr>
+    <tr><td class="lbl">MCO + robustos</td><td><span class="badge yes">Sí</span></td><td><span class="badge partial">Asintóticamente</span></td><td><span class="badge no">No</span></td><td class="txt">Muestra grande</td></tr>
+    <tr><td class="lbl">MCP con σ<sub>i</sub>² correcta</td><td><span class="badge yes">Sí</span></td><td><span class="badge yes">Sí</span></td><td><span class="badge yes">Sí</span></td><td class="txt">Conocer o modelar bien σ<sub>i</sub>²</td></tr>
+    <tr><td class="lbl">Logaritmo</td><td><span class="badge partial">Otra interpretación</span></td><td><span class="badge partial">Si elimina el problema</span></td><td><span class="badge partial">Depende</span></td><td class="txt">Y, X &gt; 0</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="info"><strong>En R:</strong> <code>lmtest::bptest(m)</code> para BP; <code>bptest(m, ~ x + I(x^2))</code> para White con una regresora; <code>coeftest(m, vcov = sandwich::vcovHC(m, type = "HC1"))</code> para errores robustos; <code>lm(y ~ x, weights = 1/x^2)</code> para MCP.</div>
+</section>
+
+<!-- =========================================== -->
+<!-- SECCIÓN 7: QUIZ                              -->
+<!-- =========================================== -->
+<section id="sec-quiz">
+<h2>7. Autoevaluación: verdadero o falso</h2>
+<p>Elegí una respuesta y la página te devuelve la justificación.</p>
+<div id="quizWrap"></div>
+<div class="quiz-score" id="quizScore"></div>
+<button class="btn" id="quizReset">Reiniciar</button>
+</section>
+
+<h2>Para llevarse</h2>
+<ul>
+  <li><strong>Definición.</strong> Heteroscedasticidad es <span class="math">Var(u<sub>i</sub>|X) = σ<sub>i</sub>²</span>: la dispersión del error cambia entre observaciones. Es típica del corte transversal.</li>
+  <li><strong>Consecuencias.</strong> MCO sigue siendo insesgado y consistente, pero deja de ser MELI y sus errores estándar usuales están sesgados, en una dirección que no conocemos de antemano. Los tests <span class="math">t</span>, <span class="math">F</span> y los intervalos dejan de ser válidos.</li>
+  <li><strong>Detección.</strong> Graficar <span class="math">û²</span> contra las X y contra <span class="math">Ŷ</span>. BP regresa <span class="math">û²</span> sobre las X; White agrega cuadrados y productos cruzados. En ambos, <span class="math">n · R²<sub>aux</sub> ∼ χ²</span>.</li>
+  <li><strong>Ojo.</strong> Un rechazo puede venir de una forma funcional incorrecta, no de heteroscedasticidad pura.</li>
+  <li><strong>Corrección.</strong> Errores robustos: mismos coeficientes, inferencia válida en muestras grandes. MCP: más eficiente si la forma de <span class="math">σ<sub>i</sub>²</span> es correcta. Logaritmo: estabiliza la varianza y da elasticidades, si las variables son positivas.</li>
+</ul>
+
+<footer class="page-footer">
+  <p>Econometría I &mdash; UADE &mdash; N. Sidicaro | E. Lorenzo | A. Quintero</p>
+  <p>Laboratorio interactivo basado en la Clase 11: Heteroscedasticidad.</p>
+  <p>Bibliografía: Gujarati, D. y Porter, D. &mdash; <em>Econometría</em>, cap. 11. Wooldridge, J.M. &mdash; <em>Introducción a la Econometría: Un Enfoque Moderno</em>, cap. 8.</p>
+</footer>
+</article>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const col = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+// ============================================================
+// MOTOR ESTADÍSTICO
+// ============================================================
+function randn() {
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+const mean = a => a.reduce((s, x) => s + x, 0) / a.length;
+const variance = a => { const m = mean(a); return a.reduce((s, x) => s + (x - m) ** 2, 0) / (a.length - 1); };
+
+function matInv(A) {
+  const n = A.length;
+  const M = A.map((r, i) => [...r, ...Array.from({ length: n }, (_, j) => i === j ? 1 : 0)]);
+  for (let c = 0; c < n; c++) {
+    let p = c;
+    for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    if (Math.abs(M[p][c]) < 1e-14) return null;
+    [M[c], M[p]] = [M[p], M[c]];
+    const pv = M[c][c];
+    for (let j = 0; j < 2 * n; j++) M[c][j] /= pv;
+    for (let r = 0; r < n; r++) {
+      if (r === c) continue;
+      const f = M[r][c];
+      if (f === 0) continue;
+      for (let j = 0; j < 2 * n; j++) M[r][j] -= f * M[c][j];
+    }
+  }
+  return M.map(r => r.slice(n));
+}
+
+// MCO con matriz de diseño X (incluye la columna de unos)
+function ols(X, y) {
+  const n = X.length, k = X[0].length;
+  const XtX = Array.from({ length: k }, () => Array(k).fill(0));
+  const Xty = Array(k).fill(0);
+  for (let i = 0; i < n; i++)
+    for (let a = 0; a < k; a++) {
+      Xty[a] += X[i][a] * y[i];
+      for (let b = 0; b < k; b++) XtX[a][b] += X[i][a] * X[i][b];
+    }
+  const inv = matInv(XtX);
+  if (!inv) return null;
+  const beta = inv.map(r => r.reduce((s, v, j) => s + v * Xty[j], 0));
+  const fitted = X.map(r => r.reduce((s, v, j) => s + v * beta[j], 0));
+  const resid = y.map((v, i) => v - fitted[i]);
+  const ssr = resid.reduce((s, e) => s + e * e, 0);
+  const ym = mean(y);
+  const sst = y.reduce((s, v) => s + (v - ym) ** 2, 0);
+  const df = n - k, s2 = ssr / df;
+  const se = inv.map((r, j) => Math.sqrt(r[j] * s2));
+  return { beta, fitted, resid, inv, s2, se, df, n, k, r2: sst > 0 ? 1 - ssr / sst : 0 };
+}
+
+// Errores estándar robustos HC0-HC3
+function hcSE(X, fit, type) {
+  const { inv, resid, n, k } = fit;
+  const meat = Array.from({ length: k }, () => Array(k).fill(0));
+  for (let i = 0; i < n; i++) {
+    const xi = X[i];
+    let h = 0;
+    for (let a = 0; a < k; a++) for (let b = 0; b < k; b++) h += xi[a] * inv[a][b] * xi[b];
+    let w = resid[i] ** 2;
+    if (type === 'HC2') w /= (1 - h);
+    if (type === 'HC3') w /= (1 - h) ** 2;
+    for (let a = 0; a < k; a++) for (let b = 0; b < k; b++) meat[a][b] += w * xi[a] * xi[b];
+  }
+  const adj = type === 'HC1' ? n / (n - k) : 1;
+  const se = [];
+  for (let j = 0; j < k; j++) {
+    let v = 0;
+    for (let a = 0; a < k; a++) for (let b = 0; b < k; b++) v += inv[j][a] * meat[a][b] * inv[b][j];
+    se.push(Math.sqrt(v * adj));
+  }
+  return se;
+}
+
+// Test n·R² de la regresión auxiliar de u² sobre las columnas de Z (sin constante)
+function auxTest(Z, u2) {
+  const fit = ols(Z.map(z => [1, ...z]), u2);
+  const df = Z[0].length;
+  const stat = u2.length * fit.r2;
+  return { stat, df, p: 1 - chi2CDF(stat, df), fit };
+}
+
+function lnGamma(z) {
+  const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313,
+    -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+  if (z < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * z)) - lnGamma(1 - z);
+  z -= 1;
+  let x = c[0];
+  for (let i = 1; i < 9; i++) x += c[i] / (z + i);
+  const t = z + 7.5;
+  return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+}
+function betaCF(x, a, b) {
+  const qab = a + b, qap = a + 1, qam = a - 1;
+  let c = 1, d = 1 - qab * x / qap;
+  if (Math.abs(d) < 1e-30) d = 1e-30;
+  d = 1 / d;
+  let h = d;
+  for (let m = 1; m <= 200; m++) {
+    const m2 = 2 * m;
+    let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+    d = 1 + aa * d; if (Math.abs(d) < 1e-30) d = 1e-30;
+    c = 1 + aa / c; if (Math.abs(c) < 1e-30) c = 1e-30;
+    d = 1 / d; h *= d * c;
+    aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+    d = 1 + aa * d; if (Math.abs(d) < 1e-30) d = 1e-30;
+    c = 1 + aa / c; if (Math.abs(c) < 1e-30) c = 1e-30;
+    d = 1 / d;
+    const del = d * c; h *= del;
+    if (Math.abs(del - 1) < 1e-10) break;
+  }
+  return h;
+}
+function ibeta(x, a, b) {
+  if (x <= 0) return 0;
+  if (x >= 1) return 1;
+  const front = Math.exp(Math.log(x) * a + Math.log(1 - x) * b - (lnGamma(a) + lnGamma(b) - lnGamma(a + b)));
+  if (x < (a + 1) / (a + b + 2)) return front * betaCF(x, a, b) / a;
+  return 1 - front * betaCF(1 - x, b, a) / b;
+}
+function tCDF(t, df) {
+  const p = 0.5 * ibeta(df / (df + t * t), df / 2, 0.5);
+  return t >= 0 ? 1 - p : p;
+}
+function tQuantile(p, df) {
+  let lo = 0, hi = 60;
+  for (let i = 0; i < 80; i++) { const m = (lo + hi) / 2; if (tCDF(m, df) < p) lo = m; else hi = m; }
+  return (lo + hi) / 2;
+}
+// Gamma incompleta regularizada P(a, x)
+function gammaP(a, x) {
+  if (x <= 0) return 0;
+  const gln = lnGamma(a);
+  if (x < a + 1) {
+    let ap = a, sum = 1 / a, del = sum;
+    for (let n = 0; n < 300; n++) { ap++; del *= x / ap; sum += del; if (Math.abs(del) < Math.abs(sum) * 1e-12) break; }
+    return sum * Math.exp(-x + a * Math.log(x) - gln);
+  }
+  let b = x + 1 - a, c = 1e30, d = 1 / b, h = d;
+  for (let i = 1; i < 300; i++) {
+    const an = -i * (i - a); b += 2;
+    d = an * d + b; if (Math.abs(d) < 1e-30) d = 1e-30;
+    c = b + an / c; if (Math.abs(c) < 1e-30) c = 1e-30;
+    d = 1 / d; const del = d * c; h *= del;
+    if (Math.abs(del - 1) < 1e-12) break;
+  }
+  return 1 - Math.exp(-x + a * Math.log(x) - gln) * h;
+}
+const chi2CDF = (x, k) => gammaP(k / 2, x / 2);
+const chi2PDF = (x, k) => x <= 0 ? 0 : Math.exp((k / 2 - 1) * Math.log(x) - x / 2 - (k / 2) * Math.log(2) - lnGamma(k / 2));
+function chi2Q(p, k) {
+  let lo = 0, hi = 200;
+  for (let i = 0; i < 80; i++) { const m = (lo + hi) / 2; if (chi2CDF(m, k) < p) lo = m; else hi = m; }
+  return (lo + hi) / 2;
+}
+
+// ============================================================
+// PATRONES DE HETEROSCEDASTICIDAD
+// ============================================================
+const XMIN = 2, XMAX = 20, XC = 11;
+const FORMS = {
+  homo:     { lab: 'Homoscedástico', g: () => 1 },
+  crece:    { lab: 'Crece con X (σᵢ ∝ Xʰ)', g: (x, h) => Math.pow(x / XC, h) },
+  decrece:  { lab: 'Decrece con X', g: (x, h) => Math.pow(XC / x, h) },
+  extremos: { lab: 'Mayor en los extremos', g: (x, h) => Math.exp(2 * h * (Math.abs(x - XC) / 9 - 0.5)) },
+  centro:   { lab: 'Mayor en el centro', g: (x, h) => Math.exp(-2 * h * (Math.abs(x - XC) / 9 - 0.5)) }
+};
+// Devuelve x -> σ_i relativo, normalizado para que E[s²] = 1 sobre U(2,20)
+function sFun(form, h) {
+  const g = FORMS[form].g;
+  let m = 0;
+  for (let i = 0; i < 400; i++) { const x = XMIN + (XMAX - XMIN) * (i + 0.5) / 400; m += g(x, h) ** 2; }
+  m = Math.sqrt(m / 400);
+  return x => g(x, h) / m;
+}
+function fillForms(id, extra) {
+  const sel = $(id);
+  const opts = Object.entries(FORMS).map(([k, f]) => `<option value="${k}">${f.lab}</option>`);
+  if (extra) opts.push(extra);
+  sel.innerHTML = opts.join('');
+  sel.value = 'crece';
+}
+const runifX = n => Array.from({ length: n }, () => XMIN + Math.random() * (XMAX - XMIN));
+
+// ============================================================
+// GRÁFICOS
+// ============================================================
+function axes(g, xs, ys, w, h, cfg) {
+  g.append('g').attr('transform', `translate(0,${h})`).call(d3.axisBottom(xs).ticks(cfg.xt || 6))
+    .selectAll('text').style('fill', col('--text-sec')).style('font-size', '10px');
+  if (!cfg.noY) g.append('g').call(d3.axisLeft(ys).ticks(cfg.yt || 5))
+    .selectAll('text').style('fill', col('--text-sec')).style('font-size', '10px');
+  g.selectAll('.domain,.tick line').attr('stroke', col('--border'));
+}
+function frame(id, cfg) {
+  const el = $(id);
+  const W = Math.max(260, el.clientWidth || 340);
+  const H = cfg.height || Math.round(Math.min(300, W * 0.72));
+  const M = { t: 14, r: 12, b: cfg.xLabel ? 40 : 28, l: cfg.yLabel ? 50 : 40 };
+  d3.select(el).selectAll('svg').remove();
+  const svg = d3.select(el).append('svg').attr('viewBox', `0 0 ${W} ${H}`);
+  const g = svg.append('g').attr('transform', `translate(${M.l},${M.t})`);
+  const w = W - M.l - M.r, h = H - M.t - M.b;
+  if (cfg.xLabel) svg.append('text').attr('x', M.l + w / 2).attr('y', H - 4).attr('text-anchor', 'middle')
+    .style('font-size', '11px').style('fill', col('--text')).style('font-weight', 600).text(cfg.xLabel);
+  if (cfg.yLabel) svg.append('text').attr('transform', `translate(13,${M.t + h / 2}) rotate(-90)`).attr('text-anchor', 'middle')
+    .style('font-size', '11px').style('fill', col('--text')).style('font-weight', 600).text(cfg.yLabel);
+  return { svg, g, w, h };
+}
+// Gráfico de dispersión genérico
+function scatter(id, cfg) {
+  const { g, w, h } = frame(id, cfg);
+  const xs = d3.scaleLinear().domain(cfg.xDomain).range([0, w]).nice();
+  const ys = d3.scaleLinear().domain(cfg.yDomain).range([h, 0]).nice();
+  axes(g, xs, ys, w, h, cfg);
+  const clip = 'clip-' + id;
+  g.append('clipPath').attr('id', clip).append('rect').attr('width', w).attr('height', h);
+  const layer = g.append('g').attr('clip-path', `url(#${clip})`);
+  (cfg.bands || []).forEach(b => {
+    layer.append('path').datum(b.pts)
+      .attr('d', d3.area().x(d => xs(d[0])).y0(d => ys(d[1])).y1(d => ys(d[2])))
+      .attr('fill', b.color).attr('opacity', b.opacity || 0.2);
+  });
+  (cfg.hlines || []).forEach(l => layer.append('line').attr('x1', 0).attr('x2', w).attr('y1', ys(l.y)).attr('y2', ys(l.y))
+    .attr('stroke', l.color || col('--text-sec')).attr('stroke-dasharray', l.dash || '4 3').attr('stroke-width', 1.2));
+  layer.selectAll('circle').data(cfg.points).enter().append('circle')
+    .attr('cx', d => xs(d.x)).attr('cy', d => ys(d.y)).attr('r', d => d.r || 3)
+    .attr('fill', d => d.c || col('--accent')).attr('opacity', d => d.o || 0.6);
+  (cfg.curves || []).forEach(c => {
+    layer.append('path').datum(c.pts).attr('d', d3.line().x(d => xs(d[0])).y(d => ys(d[1])))
+      .attr('fill', 'none').attr('stroke', c.color).attr('stroke-width', c.width || 2.2)
+      .attr('stroke-dasharray', c.dash || '');
+  });
+}
+function histogram(id, cfg) {
+  const { g, w, h } = frame(id, { height: cfg.height || 260, xLabel: cfg.xLabel });
+  const xs = d3.scaleLinear().domain(cfg.xDomain).range([0, w]);
+  const bin = d3.bin().domain(cfg.xDomain).thresholds(xs.ticks(cfg.bins || 45));
+  const sets = cfg.datasets.map(ds => bin(ds.data.filter(v => v >= cfg.xDomain[0] && v <= cfg.xDomain[1])));
+  const ys = d3.scaleLinear().domain([0, d3.max(sets.flat(), b => b.length) * 1.08]).range([h, 0]);
+  axes(g, xs, ys, w, h, { xt: 7, noY: true });
+  sets.forEach((bins, i) => g.selectAll(null).data(bins).enter().append('rect')
+    .attr('x', d => xs(d.x0) + 0.5).attr('width', d => Math.max(0, xs(d.x1) - xs(d.x0) - 1))
+    .attr('y', d => ys(d.length)).attr('height', d => h - ys(d.length))
+    .attr('fill', cfg.datasets[i].color).attr('opacity', 0.5));
+  (cfg.vlines || []).forEach(v => g.append('line').attr('x1', xs(v.x)).attr('x2', xs(v.x)).attr('y1', 0).attr('y2', h)
+    .attr('stroke', v.color).attr('stroke-width', 2.2).attr('stroke-dasharray', v.dash || ''));
+}
+function chi2Chart(id, k, stat) {
+  const crit = chi2Q(0.95, k);
+  const xmax = Math.max(crit * 1.8, Math.min(stat * 1.15, 60), 8);
+  const { g, w, h } = frame(id, { height: 190 });
+  const xs = d3.scaleLinear().domain([0, xmax]).range([0, w]);
+  const N = 240, pts = [];
+  for (let i = 0; i <= N; i++) { const x = Math.max(1e-3, xmax * i / N); pts.push([x, chi2PDF(x, k)]); }
+  const ymax = k === 1 ? 1.2 : d3.max(pts, d => d[1]) * 1.15;
+  const ys = d3.scaleLinear().domain([0, ymax]).range([h, 0]);
+  axes(g, xs, ys, w, h, { xt: 6, noY: true });
+  const clip = 'clip-' + id;
+  g.append('clipPath').attr('id', clip).append('rect').attr('width', w).attr('height', h);
+  const L = g.append('g').attr('clip-path', `url(#${clip})`);
+  L.append('path').datum(pts.filter(d => d[0] >= crit))
+    .attr('d', d3.area().x(d => xs(d[0])).y0(h).y1(d => ys(d[1]))).attr('fill', col('--red')).attr('opacity', 0.25);
+  L.append('path').datum(pts).attr('d', d3.line().x(d => xs(d[0])).y(d => ys(d[1])))
+    .attr('fill', 'none').attr('stroke', col('--accent')).attr('stroke-width', 2);
+  g.append('line').attr('x1', xs(crit)).attr('x2', xs(crit)).attr('y1', 0).attr('y2', h)
+    .attr('stroke', col('--red')).attr('stroke-dasharray', '4 3');
+  g.append('text').attr('x', xs(crit) + 3).attr('y', 12).style('font-size', '10px').style('fill', col('--red'))
+    .text(`crítico ${crit.toFixed(2)}`);
+  const sx = xs(Math.min(stat, xmax));
+  g.append('line').attr('x1', sx).attr('x2', sx).attr('y1', 0).attr('y2', h)
+    .attr('stroke', col('--green')).attr('stroke-width', 2.5).attr('stroke-dasharray', '6 3');
+  g.append('text').attr('x', sx).attr('y', h - 6).attr('text-anchor', sx > w * 0.75 ? 'end' : 'start').attr('dx', sx > w * 0.75 ? -4 : 4)
+    .style('font-size', '11px').style('font-weight', 700).style('fill', col('--green'))
+    .text(`n·R² = ${stat.toFixed(2)}${stat > xmax ? ' →' : ''}`);
+}
+function bars(id, rows, opts = {}) {
+  const max = opts.max || d3.max(rows, r => r.v) * 1.1;
+  $(id).innerHTML = rows.map(r => `
+    <div class="bar-row">
+      <div class="bar-name">${r.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${Math.min(100, 100 * r.v / max)}%;background:${r.c}"></div>
+        ${opts.ref !== undefined ? `<div class="bar-ref" style="left:${100 * opts.ref / max}%"></div>` : ''}
+      </div>
+      <div class="bar-val">${r.label}</div>
+    </div>`).join('');
+}
+const linspace = (a, b, n) => Array.from({ length: n }, (_, i) => a + (b - a) * i / (n - 1));
+const fmt = (v, d = 3) => (isFinite(v) ? v.toFixed(d) : '—');
+const fmtP = p => p < 0.001 ? '< 0.001' : p.toFixed(3);
+const pct = v => (100 * v).toFixed(1) + '%';
+
+const RENDERS = [];
+function bindRange(id, digits, cb) {
+  const el = $(id), out = $(id + '-val');
+  const show = () => { out.textContent = digits === 0 ? el.value : (+el.value).toFixed(digits); };
+  el.addEventListener('input', () => { show(); if (cb) cb(); });
+  show();
+}
+
+// ============================================================
+// SECCIÓN 1: VISUALIZADOR
+// ============================================================
+(function sec1() {
+  fillForms('v-form');
+  const SIG = 1.5;
+  let data = null;
+
+  function sample() {
+    const n = +$('v-n').value, form = $('v-form').value, h = +$('v-h').value;
+    const s = sFun(form, h);
+    const x = runifX(n);
+    const y = x.map(xi => 2 + 0.5 * xi + SIG * s(xi) * randn());
+    const fit = ols(x.map(v => [1, v]), y);
+    data = { x, y, fit, s };
+    draw();
+  }
+
+  function draw() {
+    if (!data) return;
+    const { x, y, fit, s } = data;
+    const grid = linspace(XMIN, XMAX, 120);
+    const band = grid.map(g => [g, 2 + 0.5 * g - 2 * SIG * s(g), 2 + 0.5 * g + 2 * SIG * s(g)]);
+    const ylo = Math.min(d3.min(y), d3.min(band, b => b[1])), yhi = Math.max(d3.max(y), d3.max(band, b => b[2]));
+    scatter('v-chart1', {
+      xDomain: [XMIN, XMAX], yDomain: [ylo, yhi], xLabel: 'X', yLabel: 'Y',
+      bands: [{ pts: band, color: col('--accent'), opacity: 0.16 }],
+      points: x.map((v, i) => ({ x: v, y: y[i], r: 2.6 })),
+      curves: [{ pts: [[XMIN, 3], [XMAX, 12]], color: col('--red') }]
+    });
+
+    const mode = $('v-right').value;
+    if (mode === 'u2') {
+      $('v-right-title').textContent = 'Residuos al cuadrado vs X';
+      const u2 = fit.resid.map(e => e * e);
+      const order = d3.range(x.length).sort((a, b) => x[a] - x[b]);
+      const win = Math.max(5, Math.round(x.length / 8));
+      const ma = order.map((idx, j) => {
+        const lo = Math.max(0, j - win), hi = Math.min(order.length - 1, j + win);
+        let sum = 0; for (let t = lo; t <= hi; t++) sum += u2[order[t]];
+        return [x[idx], sum / (hi - lo + 1)];
+      });
+      const ymax = d3.quantile([...u2].sort(d3.ascending), 0.98) * 1.1;
+      scatter('v-chart2', {
+        xDomain: [XMIN, XMAX], yDomain: [0, ymax], xLabel: 'X', yLabel: 'û²',
+        points: x.map((v, i) => ({ x: v, y: u2[i], r: 2.6, c: col('--red'), o: 0.45 })),
+        curves: [{ pts: ma, color: col('--orange'), width: 2.6 }]
+      });
+    } else {
+      $('v-right-title').textContent = 'Residuos vs valores ajustados';
+      const m = d3.max(fit.resid, Math.abs) * 1.08;
+      scatter('v-chart2', {
+        xDomain: d3.extent(fit.fitted), yDomain: [-m, m], xLabel: 'Ŷ', yLabel: 'û',
+        hlines: [{ y: 0 }],
+        points: fit.fitted.map((v, i) => ({ x: v, y: fit.resid[i], r: 2.6 }))
+      });
+    }
+    const s4 = SIG * s(4), s11 = SIG * s(11), s18 = SIG * s(18);
+    $('v-s4').textContent = s4.toFixed(2);
+    $('v-s11').textContent = s11.toFixed(2);
+    $('v-s18').textContent = s18.toFixed(2);
+    const gs = linspace(XMIN, XMAX, 200).map(s);
+    $('v-ratio').textContent = (d3.max(gs) / d3.min(gs)).toFixed(1) + '×';
+  }
+
+  bindRange('v-h', 1, sample);
+  bindRange('v-n', 0, sample);
+  $('v-form').onchange = sample;
+  $('v-right').onchange = draw;
+  $('v-btn').onclick = sample;
+  RENDERS.push(draw);
+  sample();
+})();
+
+// ============================================================
+// SECCIÓN 3: MONTE CARLO DE CONSECUENCIAS
+// ============================================================
+(function sec3() {
+  fillForms('m-form');
+  $('m-form').value = 'extremos';
+  $('m-h').value = 1.5;
+  const B1 = 0.5, R = 2000;
+  let res = null;
+
+  function run() {
+    const n = +$('m-n').value, form = $('m-form').value, h = +$('m-h').value, sig = +$('m-sigma').value;
+    const s = sFun(form, h);
+    const x = runifX(n);
+    const sd = x.map(v => sig * s(v));
+    const xm = mean(x);
+    const dx = x.map(v => v - xm);
+    const sst = dx.reduce((a, d) => a + d * d, 0);
+    const lev = dx.map(d => 1 / n + d * d / sst);
+    const w = sd.map(v => 1 / (v * v));
+    const sw = w.reduce((a, b) => a + b, 0);
+    const xw = w.reduce((a, wi, i) => a + wi * x[i], 0) / sw;
+    const sxxw = w.reduce((a, wi, i) => a + wi * (x[i] - xw) ** 2, 0);
+
+    const crit = tQuantile(0.975, n - 2);
+    const b1s = [], b1w = [];
+    let seO = 0, se0 = 0, se1 = 0, se3 = 0, rO = 0, r0 = 0, r1 = 0, r3 = 0;
+    const y = new Array(n), u = new Array(n);
+    for (let r = 0; r < R; r++) {
+      let ym = 0;
+      for (let i = 0; i < n; i++) { y[i] = 2 + B1 * x[i] + sd[i] * randn(); ym += y[i]; }
+      ym /= n;
+      let sxy = 0;
+      for (let i = 0; i < n; i++) sxy += dx[i] * y[i];
+      const b1 = sxy / sst, b0 = ym - b1 * xm;
+      let ssr = 0, m0 = 0, m3 = 0;
+      for (let i = 0; i < n; i++) {
+        u[i] = y[i] - b0 - b1 * x[i];
+        const e2 = u[i] * u[i], d2 = dx[i] * dx[i];
+        ssr += e2; m0 += d2 * e2; m3 += d2 * e2 / (1 - lev[i]) ** 2;
+      }
+      const sO = Math.sqrt(ssr / (n - 2) / sst);
+      const s0 = Math.sqrt(m0) / sst, s1 = s0 * Math.sqrt(n / (n - 2)), s3 = Math.sqrt(m3) / sst;
+      seO += sO; se0 += s0; se1 += s1; se3 += s3;
+      const d = Math.abs(b1 - B1);
+      if (d / sO > crit) rO++;
+      if (d / s0 > crit) r0++;
+      if (d / s1 > crit) r1++;
+      if (d / s3 > crit) r3++;
+      b1s.push(b1);
+      let swy = 0;
+      for (let i = 0; i < n; i++) swy += w[i] * (x[i] - xw) * y[i];
+      b1w.push(swy / sxxw);
+    }
+    const vTrue = dx.reduce((a, d, i) => a + d * d * sd[i] * sd[i], 0) / (sst * sst);
+    res = {
+      b1s, b1w, vTrue, vClas: sig * sig / sst, vSim: variance(b1s), vW: variance(b1w),
+      se: { O: seO / R, H0: se0 / R, H1: se1 / R, H3: se3 / R },
+      rej: { O: rO / R, H0: r0 / R, H1: r1 / R, H3: r3 / R }
+    };
+    draw();
+  }
+
+  function draw() {
+    if (!res) return;
+    const spread = 4 * Math.sqrt(Math.max(res.vSim, res.vW));
+    histogram('m-chart', {
+      xDomain: [B1 - spread, B1 + spread], bins: 50, xLabel: 'β̂₂',
+      datasets: [{ data: res.b1s, color: col('--accent') }, { data: res.b1w, color: col('--green') }],
+      vlines: [{ x: B1, color: col('--red'), dash: '7 4' }]
+    });
+    $('m-mean').textContent = fmt(mean(res.b1s), 4);
+    $('m-vclas').textContent = fmt(res.vClas, 5);
+    $('m-vtrue').textContent = fmt(res.vTrue, 5);
+    $('m-vsim').textContent = fmt(res.vSim, 5);
+    $('m-eff').textContent = fmt(res.vW / res.vSim, 2);
+
+    const sdTrue = Math.sqrt(res.vTrue);
+    const ok = v => Math.abs(v / sdTrue - 1) < 0.08 ? col('--green') : col('--red');
+    bars('m-bars-se', [
+      { name: 'Desvío verdadero de β̂₂', v: sdTrue, c: col('--heading'), label: fmt(sdTrue, 4) },
+      { name: 'EE clásico (MCO)', v: res.se.O, c: ok(res.se.O), label: fmt(res.se.O, 4) },
+      { name: 'EE robusto HC0', v: res.se.H0, c: ok(res.se.H0), label: fmt(res.se.H0, 4) },
+      { name: 'EE robusto HC1', v: res.se.H1, c: ok(res.se.H1), label: fmt(res.se.H1, 4) },
+      { name: 'EE robusto HC3', v: res.se.H3, c: ok(res.se.H3), label: fmt(res.se.H3, 4) }
+    ]);
+    const okR = v => Math.abs(v - 0.05) < 0.015 ? col('--green') : col('--red');
+    const maxR = Math.max(0.15, d3.max(Object.values(res.rej)) * 1.15);
+    bars('m-bars-rej', [
+      { name: 'Test t con EE clásico', v: res.rej.O, c: okR(res.rej.O), label: pct(res.rej.O) },
+      { name: 'Test t con HC0', v: res.rej.H0, c: okR(res.rej.H0), label: pct(res.rej.H0) },
+      { name: 'Test t con HC1', v: res.rej.H1, c: okR(res.rej.H1), label: pct(res.rej.H1) },
+      { name: 'Test t con HC3', v: res.rej.H3, c: okR(res.rej.H3), label: pct(res.rej.H3) }
+    ], { max: maxR, ref: 0.05 });
+  }
+
+  bindRange('m-h', 1);
+  bindRange('m-n', 0);
+  bindRange('m-sigma', 1);
+  $('m-btn').onclick = run;
+  RENDERS.push(draw);
+  run();
+})();
+
+// ============================================================
+// SECCIÓN 4: DETECCIÓN
+// ============================================================
+(function sec4() {
+  fillForms('d-form', '<option value="misspec">Homoscedástico, pero forma funcional mal especificada</option>');
+  const SIG = 2;
+  let cur = null;
+
+  function gen(n, form, h) {
+    const x = runifX(n);
+    let y;
+    if (form === 'misspec') {
+      const c = 0.12 * Math.max(h, 0.1);
+      y = x.map(v => 2 + 0.5 * v + c * (v - XC) ** 2 + SIG * randn());
+    } else {
+      const s = sFun(form, h);
+      y = x.map(v => 2 + 0.5 * v + SIG * s(v) * randn());
+    }
+    return { x, y };
+  }
+  function analyze(x, y) {
+    const fit = ols(x.map(v => [1, v]), y);
+    const u2 = fit.resid.map(e => e * e);
+    const bp = auxTest(x.map(v => [v]), u2);
+    const wh = auxTest(x.map(v => [v, v * v]), u2);
+    return { fit, u2, bp, wh };
+  }
+
+  function sample() {
+    const n = +$('d-n').value, form = $('d-form').value, h = +$('d-h').value;
+    const { x, y } = gen(n, form, h);
+    cur = { x, y, ...analyze(x, y) };
+    draw();
+  }
+
+  function draw() {
+    if (!cur) return;
+    const { x, fit, u2, bp, wh } = cur;
+    const n = x.length;
+    const m = d3.max(fit.resid, Math.abs) * 1.08;
+    scatter('d-chart1', {
+      xDomain: d3.extent(fit.fitted), yDomain: [-m, m], xLabel: 'Ŷ', yLabel: 'û', hlines: [{ y: 0 }],
+      points: fit.fitted.map((v, i) => ({ x: v, y: fit.resid[i], r: 2.8 }))
+    });
+    const grid = linspace(XMIN, XMAX, 100);
+    const a = bp.fit.beta, b = wh.fit.beta;
+    const ymax = d3.quantile([...u2].sort(d3.ascending), 0.97) * 1.15;
+    scatter('d-chart2', {
+      xDomain: [XMIN, XMAX], yDomain: [0, ymax], xLabel: 'X', yLabel: 'û²',
+      points: x.map((v, i) => ({ x: v, y: u2[i], r: 2.8, c: col('--red'), o: 0.45 })),
+      curves: [
+        { pts: grid.map(g => [g, a[0] + a[1] * g]), color: col('--accent') },
+        { pts: grid.map(g => [g, b[0] + b[1] * g + b[2] * g * g]), color: col('--purple') }
+      ]
+    });
+    const cb = chi2Q(0.95, 1), cw = chi2Q(0.95, 2);
+    const dec = (t, c, name) => t.stat > c
+      ? `<div class="decision rej">${name}: n·R² = ${t.stat.toFixed(3)} &gt; ${c.toFixed(3)} (p = ${fmtP(t.p)}) ⟹ se rechaza la homoscedasticidad al 5%</div>`
+      : `<div class="decision acc">${name}: n·R² = ${t.stat.toFixed(3)} ≤ ${c.toFixed(3)} (p = ${fmtP(t.p)}) ⟹ no se rechaza la homoscedasticidad al 5%</div>`;
+    $('d-steps').innerHTML = `
+      <div class="step"><div class="step-n">1</div><div>Estimar por MCO: <span class="mono">Ŷ = ${fmt(fit.beta[0], 3)} + ${fmt(fit.beta[1], 3)}·X</span> &nbsp;(n = ${n}) y guardar los residuos <span class="math">û<sub>i</sub></span>.</div></div>
+      <div class="step"><div class="step-n">2</div><div>Regresiones auxiliares de <span class="math">û²</span>:<br>
+        BP: <span class="mono">û² = ${fmt(a[0], 2)} ${a[1] >= 0 ? '+' : '−'} ${fmt(Math.abs(a[1]), 3)}·X</span> &nbsp;→ R²<sub>aux</sub> = <span class="mono">${fmt(bp.fit.r2, 4)}</span><br>
+        White: <span class="mono">û² = ${fmt(b[0], 2)} ${b[1] >= 0 ? '+' : '−'} ${fmt(Math.abs(b[1]), 3)}·X ${b[2] >= 0 ? '+' : '−'} ${fmt(Math.abs(b[2]), 4)}·X²</span> &nbsp;→ R²<sub>aux</sub> = <span class="mono">${fmt(wh.fit.r2, 4)}</span></div></div>
+      <div class="step"><div class="step-n">3</div><div>Estadísticos: BP = ${n} × ${fmt(bp.fit.r2, 4)} = <span class="mono">${fmt(bp.stat, 3)}</span> con 1 gl; White = ${n} × ${fmt(wh.fit.r2, 4)} = <span class="mono">${fmt(wh.stat, 3)}</span> con 2 gl.</div></div>
+      <div class="step"><div class="step-n">4</div><div style="flex:1">Decisión:${dec(bp, cb, 'BP')}${dec(wh, cw, 'White')}</div></div>`;
+    chi2Chart('d-chi1', 1, bp.stat);
+    chi2Chart('d-chi2', 2, wh.stat);
+  }
+
+  function simulate() {
+    const n = +$('d-n').value, form = $('d-form').value, h = +$('d-h').value;
+    const N = 1000;
+    const cb = chi2Q(0.95, 1), cw = chi2Q(0.95, 2);
+    let rb = 0, rw = 0;
+    for (let r = 0; r < N; r++) {
+      const { x, y } = gen(n, form, h);
+      const { bp, wh } = analyze(x, y);
+      if (bp.stat > cb) rb++;
+      if (wh.stat > cw) rw++;
+    }
+    const homo = form === 'homo' || form === 'misspec' || h === 0;
+    $('d-sim-title').innerHTML = homo
+      ? 'Rechazos de H<sub>0</sub> en 1000 muestras (no hay heteroscedasticidad: idealmente ≈ 5%)'
+      : 'Rechazos de H<sub>0</sub> en 1000 muestras (hay heteroscedasticidad: es la potencia del test)';
+    const c = v => homo ? (Math.abs(v - 0.05) < 0.02 ? col('--green') : col('--red')) : col('--accent');
+    bars('d-bars', [
+      { name: 'Breusch-Pagan', v: rb / N, c: c(rb / N), label: pct(rb / N) },
+      { name: 'White', v: rw / N, c: c(rw / N), label: pct(rw / N) }
+    ], { max: 1, ref: 0.05 });
+    $('d-sim-out').style.display = '';
+  }
+
+  bindRange('d-h', 1, sample);
+  bindRange('d-n', 0, sample);
+  $('d-form').onchange = () => { $('d-sim-out').style.display = 'none'; sample(); };
+  $('d-btn').onclick = sample;
+  $('d-btn-sim').onclick = simulate;
+  RENDERS.push(draw);
+  sample();
+
+  // Calculadora de grados de libertad
+  function dfCalc() {
+    const k = +$('w-k').value;
+    const full = 2 * k + k * (k - 1) / 2;
+    bars('w-bars', [
+      { name: 'Breusch-Pagan (las X)', v: k, c: col('--accent'), label: k + ' gl' },
+      { name: 'White completo (X, X², cruzados)', v: full, c: col('--purple'), label: full + ' gl' },
+      { name: 'White, forma especial (Ŷ, Ŷ²)', v: 2, c: col('--green'), label: '2 gl' }
+    ], { max: 90 });
+  }
+  bindRange('w-k', 0, dfCalc);
+  dfCalc();
+})();
+
+// ============================================================
+// SECCIÓN 5: CORRECCIÓN CON DATOS DE GUJARATI
+// ============================================================
+(function sec5() {
+  const Y = [55, 65, 70, 80, 79, 84, 98, 95, 90, 75, 74, 110, 113, 125, 108, 115, 140, 120, 145, 130,
+    152, 144, 175, 180, 135, 140, 178, 191, 137, 189];
+  const X = [80, 100, 85, 110, 120, 115, 130, 140, 125, 90, 105, 160, 150, 165, 145, 180, 225, 200, 240, 185,
+    220, 210, 245, 260, 190, 205, 265, 270, 230, 250];
+  const n = Y.length;
+  const tc = tQuantile(0.975, n - 2);
+  let method = 'ols';
+
+  // MCP: transformar filas por sqrt(w)
+  function wls(w) {
+    const sw = w.map(Math.sqrt);
+    const Xs = X.map((x, i) => [sw[i], sw[i] * x]);
+    const ys = Y.map((y, i) => sw[i] * y);
+    const fit = ols(Xs, ys);
+    const v = fit.resid;                         // residuos transformados: √w·û
+    const bp = auxTest(X.map(x => [x]), v.map(e => e * e));
+    return { fit, v, bp, w };
+  }
+
+  function compute() {
+    const p = +$('c-p').value, hc = $('c-hc').value;
+    const Xd = X.map(x => [1, x]);
+    const o = ols(Xd, Y);
+    const oBP = auxTest(X.map(x => [x]), o.resid.map(e => e * e));
+    const seR = hcSE(Xd, o, hc);
+    const mw = wls(X.map(x => 1 / Math.pow(x, p)));
+    const g = ols(Xd, o.resid.map(e => Math.log(e * e)));
+    const mf = wls(g.fitted.map(v => 1 / Math.exp(v)));
+    const lX = X.map(Math.log), lY = Y.map(Math.log);
+    const lg = ols(lX.map(v => [1, v]), lY);
+    const lBP = auxTest(lX.map(v => [v]), lg.resid.map(e => e * e));
+    return { p, hc, o, oBP, seR, mw, mf, g, lg, lBP, lX, lY };
+  }
+
+  function row(name, b, se, bp, key, note) {
+    const t = b / se;
+    const bpCell = bp === null ? '<span style="color:var(--text-sec)">igual que MCO</span>'
+      : `${fmt(bp.stat, 2)} (${fmtP(bp.p)}) ${bp.p < 0.05 ? '<span class="badge no">rechaza</span>' : '<span class="badge yes">no rechaza</span>'}`;
+    return `<tr class="${key === method ? 'hi' : ''}"><td class="lbl">${name}${note ? `<br><span style="font-weight:400;color:var(--text-sec);font-size:.75rem">${note}</span>` : ''}</td>
+      <td>${fmt(b, 4)}</td><td>${fmt(se, 4)}</td><td>${fmt(t, 2)}</td>
+      <td>[${fmt(b - tc * se, 3)}, ${fmt(b + tc * se, 3)}]</td><td>${bpCell}</td></tr>`;
+  }
+
+  function draw() {
+    const R = compute();
+    const { o, mw, mf, lg } = R;
+    $('c-tbody').innerHTML =
+      row('MCO, EE clásico', o.beta[1], o.se[1], R.oBP, 'ols') +
+      row(`MCO, EE robusto ${R.hc}`, o.beta[1], R.seR[1], null, 'rob', 'mismos coeficientes') +
+      row(`MCP, w = 1/ingreso<sup>${R.p}</sup>`, mw.fit.beta[1], mw.fit.se[1], mw.bp, 'wls', 'BP sobre û/ingreso<sup>p/2</sup>') +
+      row('MCGF (Wooldridge)', mf.fit.beta[1], mf.fit.se[1], mf.bp, 'fgls', 'pesos estimados con ln û²') +
+      row('Log-log', lg.beta[1], lg.se[1], R.lBP, 'log', 'pendiente = elasticidad');
+
+    const C = { pt: col('--accent'), ols: col('--red'), m: col('--green') };
+    const grid = linspace(70, 280, 60);
+    const olsLine = { pts: grid.map(g => [g, o.beta[0] + o.beta[1] * g]), color: C.ols, dash: method === 'ols' ? '' : '6 4', width: 2 };
+    let pts, curves, resid, rx, t1, t2, legend, xl = 'Ingreso (X)', yl = 'Consumo (Y)', yDom = [40, 200], xDom = [70, 280];
+
+    const std = arr => { const s = Math.sqrt(arr.reduce((a, e) => a + e * e, 0) / (arr.length - 2)); return arr.map(e => e / s); };
+    if (method === 'ols') {
+      pts = X.map((x, i) => ({ x, y: Y[i], r: 4 }));
+      curves = [olsLine];
+      resid = std(o.resid); rx = X;
+      t2 = 'Residuos estandarizados de MCO';
+      legend = `<span class="chart-legend-item"><span class="chart-legend-line" style="background:${C.ols}"></span> MCO</span>`;
+    } else if (method === 'wls' || method === 'fgls') {
+      const M = method === 'wls' ? mw : mf;
+      const wmax = d3.max(M.w);
+      pts = X.map((x, i) => ({ x, y: Y[i], r: 2 + 7 * Math.sqrt(M.w[i] / wmax), o: 0.55 }));
+      curves = [olsLine, { pts: grid.map(g => [g, M.fit.beta[0] + M.fit.beta[1] * g]), color: C.m, width: 2.4 }];
+      resid = std(M.v); rx = X;
+      t2 = method === 'wls' ? 'Residuos transformados √wᵢ·ûᵢ (estand.)' : 'Residuos ponderados MCGF (estand.)';
+      legend = `<span class="chart-legend-item"><span class="chart-legend-dash" style="border-color:${C.ols}"></span> MCO</span>
+        <span class="chart-legend-item"><span class="chart-legend-line" style="background:${C.m}"></span> ${method === 'wls' ? 'MCP' : 'MCGF'}</span>
+        <span class="chart-legend-item"><span class="color-dot" style="background:${C.pt}"></span> tamaño ∝ peso wᵢ</span>`;
+    } else {
+      pts = R.lX.map((x, i) => ({ x, y: R.lY[i], r: 4 }));
+      const lgrid = linspace(4.25, 5.65, 40);
+      curves = [{ pts: lgrid.map(g => [g, lg.beta[0] + lg.beta[1] * g]), color: C.m, width: 2.4 }];
+      resid = std(lg.resid); rx = R.lX;
+      xl = 'ln(ingreso)'; yl = 'ln(consumo)'; xDom = [4.25, 5.65]; yDom = [3.9, 5.35];
+      t2 = 'Residuos estandarizados del log-log';
+      legend = `<span class="chart-legend-item"><span class="chart-legend-line" style="background:${C.m}"></span> Ajuste log-log</span>`;
+    }
+    $('c-t1').textContent = method === 'log' ? 'ln(consumo) vs ln(ingreso)' : 'Consumo vs ingreso';
+    $('c-t2').textContent = t2;
+    $('c-legend').innerHTML = legend;
+    scatter('c-chart1', { xDomain: xDom, yDomain: yDom, xLabel: xl, yLabel: yl, points: pts, curves });
+    const rm = Math.max(3, d3.max(resid, Math.abs) * 1.1);
+    scatter('c-chart2', {
+      xDomain: method === 'log' ? xDom : [70, 280], yDomain: [-rm, rm], xLabel: method === 'log' ? 'ln(ingreso)' : 'Ingreso (X)', yLabel: 'residuo est.',
+      hlines: [{ y: 0 }, { y: 2, color: col('--border') }, { y: -2, color: col('--border') }],
+      points: rx.map((x, i) => ({ x, y: resid[i], r: 3.6, c: col('--red'), o: 0.6 }))
+    });
+
+    const notes = {
+      ols: `<div class="step"><div class="step-n">i</div><div>La pendiente MCO es <span class="mono">${fmt(o.beta[1], 4)}</span>: por cada peso adicional de ingreso, el consumo aumenta en promedio unos ${fmt(o.beta[1], 2)} pesos. El BP (<span class="mono">${fmt(R.oBP.stat, 3)}</span>, p = ${fmtP(R.oBP.p)}) rechaza la homoscedasticidad al 5%: el EE clásico <span class="mono">${fmt(o.se[1], 4)}</span> no es confiable. Con ${R.hc} el EE pasa a <span class="mono">${fmt(R.seR[1], 4)}</span> (${R.seR[1] > o.se[1] ? 'mayor' : 'menor'}), sin tocar la pendiente.</div></div>`,
+      wls: `<div class="step"><div class="step-n">i</div><div>Con <span class="math">w<sub>i</sub> = 1/ingreso<sub>i</sub><sup>${R.p}</sup></span> suponemos <span class="math">σ<sub>i</sub> ∝ ingreso<sub>i</sub><sup>${(R.p / 2).toFixed(2).replace(/\.?0+$/, '')}</sup></span>. ${R.p === 0 ? 'Con p = 0 todos los pesos son iguales: es exactamente MCO.' : `La pendiente cambia a <span class="mono">${fmt(mw.fit.beta[1], 4)}</span> porque las familias de ingreso alto (más ruidosas) pesan menos. El BP sobre los residuos transformados da p = ${fmtP(mw.bp.p)}.`} El EE de MCP (<span class="mono">${fmt(mw.fit.se[1], 4)}</span>) es válido sólo si la forma postulada es correcta.</div></div>`,
+      fgls: `<div class="step"><div class="step-n">i</div><div>Paso 1: regresar <span class="math">ln û<sub>i</sub>²</span> sobre el ingreso: <span class="mono">ĝ = ${fmt(R.g.beta[0], 3)} + ${fmt(R.g.beta[1], 4)}·ingreso</span>. Paso 2: <span class="math">ĥ<sub>i</sub> = exp(ĝ<sub>i</sub>)</span>. Paso 3: MCP con pesos <span class="math">1/ĥ<sub>i</sub></span>. Pendiente <span class="mono">${fmt(mf.fit.beta[1], 4)}</span>, EE <span class="mono">${fmt(mf.fit.se[1], 4)}</span>. La forma exponencial garantiza varianzas estimadas positivas.</div></div>`,
+      log: `<div class="step"><div class="step-n">i</div><div>La pendiente <span class="mono">${fmt(lg.beta[1], 3)}</span> es una <strong>elasticidad</strong>: un aumento de 1% en el ingreso se asocia con un aumento de aproximadamente ${(lg.beta[1]).toFixed(2)}% en el consumo. El BP sobre el modelo log-log (<span class="mono">${fmt(R.lBP.stat, 3)}</span>, p = ${fmtP(R.lBP.p)}) ya no rechaza: la heteroscedasticidad desapareció.</div></div>`
+    };
+    $('c-notes').innerHTML = notes[method];
+  }
+
+  document.querySelectorAll('#c-tabs .btn').forEach(b => b.onclick = () => {
+    method = b.dataset.m;
+    document.querySelectorAll('#c-tabs .btn').forEach(x => x.classList.toggle('primary', x === b));
+    draw();
+  });
+  bindRange('c-p', 1, () => {
+    if (method !== 'wls') { method = 'wls'; document.querySelectorAll('#c-tabs .btn').forEach(x => x.classList.toggle('primary', x.dataset.m === 'wls')); }
+    draw();
+  });
+  $('c-hc').onchange = draw;
+  RENDERS.push(draw);
+  draw();
+})();
+
+// ============================================================
+// SECCIÓN 7: AUTOEVALUACIÓN
+// ============================================================
+(function quiz() {
+  const QUIZ = [
+    { q: 'Con heteroscedasticidad, los estimadores MCO de los coeficientes son sesgados.', ans: false,
+      why: 'El insesgamiento sólo requiere linealidad, muestreo aleatorio, ausencia de multicolinealidad perfecta y E(u|X) = 0. La homoscedasticidad no interviene en esa demostración. Lo viste en el Monte Carlo: el histograma de β̂₂ sigue centrado en el valor verdadero.' },
+    { q: 'Bajo heteroscedasticidad, los errores estándar usuales de MCO siempre subestiman la verdadera variabilidad de β̂.', ans: false,
+      why: 'El sesgo puede ir en cualquier dirección. Si σᵢ² es grande donde X está lejos de su media, se subestima; si es grande cerca del centro, se sobreestima. Probalo con los patrones "mayor en los extremos" y "mayor en el centro".' },
+    { q: 'Los errores estándar robustos de White modifican los coeficientes estimados por MCO.', ans: false,
+      why: 'Los coeficientes son exactamente los mismos. Cambian los errores estándar y, con ellos, los estadísticos t, los p-valores y los intervalos de confianza.' },
+    { q: 'El R² de la regresión deja de ser interpretable cuando hay heteroscedasticidad.', ans: false,
+      why: 'Wooldridge (§8.1) lo remarca: el R² y el R² ajustado estiman 1 − σᵤ²/σᵧ² con varianzas no condicionales, que no dependen de la homoscedasticidad.' },
+    { q: 'En el test de Breusch-Pagan, la hipótesis nula es que todos los coeficientes de la regresión auxiliar, salvo la constante, son cero.', ans: true,
+      why: 'Si α₂ = ⋯ = αₘ = 0, el valor esperado de û² no depende de las Z: la varianza es constante. Bajo esa H₀, n·R²ₐᵤₓ se distribuye χ² con tantos grados de libertad como regresoras tenga la auxiliar.' },
+    { q: 'Si el test de White rechaza H₀, podemos concluir con seguridad que el problema es heteroscedasticidad.', ans: false,
+      why: 'White es muy general: también rechaza ante errores de especificación, como una forma funcional incorrecta o una variable omitida. Lo viste con el patrón "forma funcional mal especificada", donde los errores eran homoscedásticos.' },
+    { q: 'Si la forma de σᵢ² postulada es correcta, MCP produce estimadores con menor varianza que MCO.', ans: true,
+      why: 'MCP (un caso de MCG) es MELI en el modelo transformado, que es homoscedástico. Por eso pondera más a las observaciones precisas y es más eficiente que MCO, que les da a todas el mismo peso.' },
+    { q: 'Ponderar con wᵢ = 1/Xᵢ² equivale a suponer que el desvío estándar del error es proporcional a Xᵢ.', ans: true,
+      why: 'wᵢ = 1/σᵢ², así que wᵢ = 1/Xᵢ² implica σᵢ² = σ²Xᵢ², es decir σᵢ = σXᵢ. Es el supuesto de Gujarati para los datos de consumo e ingreso.' },
+    { q: 'Los errores estándar robustos son igual de confiables con 15 observaciones que con 500.', ans: false,
+      why: 'Su validez es asintótica. En muestras chicas HC0 tiende a subestimar la variabilidad y a rechazar de más; las variantes HC1, HC2 y sobre todo HC3 corrigen parcialmente ese problema.' },
+    { q: 'La transformación logarítmica se puede aplicar siempre para atenuar la heteroscedasticidad.', ans: false,
+      why: 'Sólo si las variables son estrictamente positivas. Además cambia la interpretación (elasticidades o semielasticidades) y hay que verificar después que la heteroscedasticidad efectivamente se atenuó.' }
+  ];
+  let answers = {};
+  function render() {
+    $('quizWrap').innerHTML = QUIZ.map((q, i) => `
+      <div class="quiz-item">
+        <div class="quiz-q"><span class="qid">${i + 1})</span>${q.q}</div>
+        <div class="quiz-btns">
+          <button class="btn" data-i="${i}" data-a="1">Verdadero</button>
+          <button class="btn" data-i="${i}" data-a="0">Falso</button>
+        </div>
+        <div class="quiz-fb" id="qfb-${i}"></div>
+      </div>`).join('');
+    document.querySelectorAll('#quizWrap .btn').forEach(b => b.onclick = () => answer(+b.dataset.i, b.dataset.a === '1'));
+    score();
+  }
+  function answer(i, a) {
+    const q = QUIZ[i], ok = a === q.ans;
+    answers[i] = ok;
+    const fb = $('qfb-' + i);
+    fb.className = 'quiz-fb show ' + (ok ? 'ok' : 'no');
+    fb.innerHTML = `<span class="quiz-verdict" style="color:var(${ok ? '--green' : '--red'})">${ok ? 'Correcto' : 'Incorrecto'} — la afirmación es ${q.ans ? 'VERDADERA' : 'FALSA'}</span>${q.why}`;
+    score();
+  }
+  function score() {
+    const done = Object.keys(answers).length, right = Object.values(answers).filter(Boolean).length;
+    $('quizScore').textContent = done === 0 ? '' : `Respondidas: ${done} de ${QUIZ.length} · Correctas: ${right}`;
+  }
+  $('quizReset').onclick = () => { answers = {}; render(); };
+  render();
+})();
+
+// ============================================================
+// NAVEGACIÓN, TEMA Y REDIMENSIONADO
+// ============================================================
+(function initNav() {
+  const links = document.querySelectorAll('nav.side-nav a');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+      }
+    });
+  }, { threshold: 0.2 });
+  document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+})();
+(function rerender() {
+  let t = null;
+  const redraw = () => { clearTimeout(t); t = setTimeout(() => RENDERS.forEach(f => f()), 150); };
+  window.addEventListener('resize', redraw);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
+})();
+</script>
+</body>
+</html>
