@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variable Dependiente Dicotómica — Laboratorio Interactivo</title>
+<style>
+:root {
+  --bg: #F7F5F0;
+  --bg-alt: #EDEAE3;
+  --bg-canvas: #FFFFFF;
+  --text: #2C2C2E;
+  --text-sec: #636366;
+  --heading: #1A2744;
+  --accent: #3170A2;
+  --accent-light: #E3EEF6;
+  --green: #2D8659;
+  --green-light: #D4EDDF;
+  --red: #D45A3A;
+  --red-light: #FBEAE5;
+  --orange: #C87A1A;
+  --orange-light: #FDF0DB;
+  --purple: #7B5EA7;
+  --purple-light: #EDE7F6;
+  --blue: #5B9BD5;
+  --border: #DCDAD4;
+  --shadow: rgba(28,28,30,.07);
+  --font-d: Georgia,"Palatino Linotype","Book Antiqua",Palatino,serif;
+  --font-b: "Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-m: "Cascadia Code","Fira Code",Consolas,monospace;
+  --cw: 780px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --green:#4DBB7F;--green-light:#1A3329;
+  --red:#F07A5A;--red-light:#3D2219;
+  --orange:#E8A84C;--orange-light:#3D2E14;
+  --purple:#A78BDB;--purple-light:#2A2040;
+  --blue:#7FC4F5;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --green:#4DBB7F;--green-light:#1A3329;
+  --red:#F07A5A;--red-light:#3D2219;
+  --orange:#E8A84C;--orange-light:#3D2E14;
+  --purple:#A78BDB;--purple-light:#2A2040;
+  --blue:#7FC4F5;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}
+:root[data-theme="light"]{
+  --bg:#F7F5F0;--bg-alt:#EDEAE3;--bg-canvas:#FFFFFF;
+  --text:#2C2C2E;--text-sec:#636366;--heading:#1A2744;
+  --accent:#3170A2;--accent-light:#E3EEF6;
+  --green:#2D8659;--green-light:#D4EDDF;
+  --red:#D45A3A;--red-light:#FBEAE5;
+  --orange:#C87A1A;--orange-light:#FDF0DB;
+  --purple:#7B5EA7;--purple-light:#EDE7F6;
+  --blue:#5B9BD5;
+  --border:#DCDAD4;--shadow:rgba(28,28,30,.07);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:17px;line-height:1.72;-webkit-font-smoothing:antialiased}
+article{max-width:var(--cw);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+
+h1{font-family:var(--font-d);font-size:clamp(2rem,5vw,2.8rem);color:var(--heading);line-height:1.12;text-wrap:balance;letter-spacing:-.025em;margin-bottom:.4rem}
+h2{font-family:var(--font-d);font-size:1.55rem;color:var(--heading);line-height:1.3;text-wrap:balance;margin-top:3.5rem;margin-bottom:.75rem;padding-bottom:.45rem;border-bottom:2px solid var(--accent)}
+h3{font-family:var(--font-d);font-size:1.15rem;color:var(--heading);margin-top:1.5rem;margin-bottom:.5rem}
+p{margin-bottom:1.15rem;max-width:65ch}
+strong{color:var(--heading);font-weight:600}
+ul,ol{margin:0 0 1.15rem 1.3rem;max-width:65ch}
+li{margin-bottom:.3rem}
+
+.eyebrow{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:600;margin-bottom:.5rem}
+.subtitle{font-family:var(--font-d);font-size:1.15rem;color:var(--text-sec);font-style:italic;margin-bottom:2rem;max-width:55ch}
+.lead{font-size:1.05rem;color:var(--text-sec);max-width:60ch}
+
+.formula-block{background:var(--bg-alt);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.25rem 0;border-radius:0 6px 6px 0;overflow-x:auto}
+.math{font-family:var(--font-d);font-style:italic;font-size:1.05em}
+.math .n{font-style:normal}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 2px}
+.frac .num{border-bottom:1.5px solid currentColor;padding:0 5px 3px;line-height:1.3;text-align:center}
+.frac .den{padding:3px 5px 0;line-height:1.3;text-align:center}
+
+.callout{background:var(--red-light);border-left:3px solid var(--red);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.callout-title{font-weight:700;color:var(--red);margin-bottom:.25rem}
+.tip{background:var(--green-light);border-left:3px solid var(--green);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.note{background:var(--orange-light);border-left:3px solid var(--orange);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.note-title{font-weight:700;color:var(--orange);margin-bottom:.25rem}
+
+/* Lab */
+.lab{background:var(--bg-canvas);border:1px solid var(--border);border-radius:8px;padding:1.25rem;margin:1.5rem -1rem;box-shadow:0 2px 12px var(--shadow)}
+@media(min-width:800px){.lab{margin:1.5rem -3rem;padding:1.5rem}}
+.lab-title{font-family:var(--font-d);font-size:1.1rem;color:var(--heading);font-weight:700;margin-bottom:.75rem}
+.lab-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:1rem}
+.lab-sub{font-size:.85rem;color:var(--text-sec);margin:-.4rem 0 .9rem;max-width:70ch}
+
+.lab-canvas-wrap{position:relative;width:100%;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--bg-canvas)}
+.lab-canvas-wrap canvas{display:block;width:100%}
+.lab-canvas-wrap.clickable canvas{cursor:crosshair}
+
+.lab-btns{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem}
+.btn{font-family:var(--font-b);font-size:.82rem;padding:.4rem .85rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);cursor:pointer;transition:all .15s;font-weight:500}
+.btn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.btn:active{transform:scale(.97)}
+.btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;font-size:.88rem;padding:.5rem 1.2rem}
+.btn-primary:hover{background:var(--heading);border-color:var(--heading);color:#fff}
+.btn-sm{font-size:.78rem;padding:.3rem .6rem}
+
+.lab-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.6rem;margin-top:1rem}
+.stat-card{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.6rem .8rem}
+.stat-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-sec);margin-bottom:.15rem}
+.stat-value{font-family:var(--font-d);font-size:1.3rem;color:var(--heading);font-variant-numeric:tabular-nums}
+.stat-value.accent{color:var(--accent)}
+.stat-value.green{color:var(--green)}
+.stat-value.orange{color:var(--red)}
+.stat-value.purple{color:var(--purple)}
+.stat-value.sm{font-size:1.05rem}
+.stat-note{font-size:.7rem;color:var(--text-sec);margin-top:.15rem;line-height:1.35}
+
+.lab-equation{background:var(--accent-light);border-radius:6px;padding:.75rem 1rem;margin-top:.75rem;text-align:center;font-family:var(--font-d);font-size:1.15rem;color:var(--heading);font-style:italic}
+
+/* Simulation controls */
+.sim-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem;margin-bottom:1rem}
+.sim-control{display:flex;flex-direction:column;gap:.2rem}
+.sim-control label{font-size:.78rem;font-weight:600;color:var(--text-sec);text-transform:uppercase;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:baseline;gap:.4rem}
+.sim-control input[type="range"]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:var(--border);outline:none;transition:background .15s}
+.sim-control input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg-canvas);box-shadow:0 1px 4px var(--shadow)}
+.sim-control input[type="range"]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg-canvas);box-shadow:0 1px 4px var(--shadow)}
+.sim-control select,.sim-control input[type="number"]{font-family:var(--font-b);font-size:.88rem;padding:.35rem .5rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);outline:none}
+.sim-control select:focus,.sim-control input[type="number"]:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-light)}
+.sim-val{font-family:var(--font-m);font-size:.88rem;color:var(--accent);font-variant-numeric:tabular-nums}
+.sim-canvas-wrap{position:relative;width:100%;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--bg-canvas)}
+.sim-canvas-wrap canvas{display:block;width:100%}
+.sim-result-row{display:flex;flex-wrap:wrap;gap:1rem;margin-top:.75rem;padding:.75rem;background:var(--bg-alt);border-radius:6px;font-size:.9rem;align-items:center}
+
+/* Segmented toggles */
+.seg{display:flex;flex-wrap:wrap;gap:.35rem;margin:.25rem 0 .75rem}
+.legend{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:.5rem;font-size:.8rem;color:var(--text-sec)}
+.legend-item{display:flex;align-items:center;gap:.35rem}
+.legend-dot{width:14px;height:3px;border-radius:2px;display:inline-block}
+.legend-box{width:13px;height:11px;border-radius:2px;display:inline-block;opacity:.35}
+
+/* Tables */
+.results-wrap{overflow-x:auto;margin-top:1rem;border:1px solid var(--border);border-radius:6px}
+.results-table{width:100%;border-collapse:collapse;font-size:.82rem;white-space:nowrap}
+.results-table th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-sec);font-weight:600;padding:.5rem .6rem;text-align:center;border-bottom:2px solid var(--border);background:var(--bg-alt);position:sticky;top:0}
+.results-table td{padding:.4rem .6rem;text-align:center;border-bottom:1px solid var(--border);font-family:var(--font-m);font-size:.8rem}
+.results-table td.lbl{font-family:var(--font-b);text-align:left;font-weight:600;color:var(--heading)}
+.results-table tr:hover td{background:var(--bg-alt)}
+.results-table tr.hi td{background:var(--accent-light)}
+.results-table td.txt{font-family:var(--font-b);text-align:left;white-space:normal;font-size:.82rem;color:var(--text-sec);line-height:1.5}
+
+/* Regression output table (Bloque 4) */
+.reg-out{border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-top:1rem;background:var(--bg)}
+.reg-out-head{background:var(--bg-alt);padding:.6rem 1rem;font-family:var(--font-d);font-weight:700;color:var(--heading);font-size:.95rem;border-bottom:1px solid var(--border);text-align:center}
+.reg-row{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:.55rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.reg-row:hover{background:var(--accent-light)}
+.reg-row.open{background:var(--accent-light)}
+.reg-var{font-family:var(--font-m);font-size:.85rem;color:var(--heading)}
+.reg-coef{font-family:var(--font-m);font-size:.85rem;text-align:right;white-space:nowrap}
+.reg-se{display:block;color:var(--text-sec);font-size:.78rem}
+.reg-foot{padding:.5rem 1rem;font-size:.78rem;color:var(--text-sec);display:flex;flex-wrap:wrap;gap:1.2rem}
+.reg-explain{display:none;padding:.75rem 1rem;background:var(--bg-alt);border-bottom:1px solid var(--border);font-size:.88rem;line-height:1.6}
+.reg-explain.open{display:block}
+.reg-hint{font-size:.78rem;color:var(--text-sec);font-style:italic;margin-top:.4rem}
+
+/* Quiz */
+.quiz-item{border:1px solid var(--border);border-radius:6px;margin-bottom:.6rem;background:var(--bg);overflow:hidden}
+.quiz-q{padding:.75rem 1rem;font-size:.92rem;line-height:1.6}
+.quiz-q .qid{font-family:var(--font-m);font-weight:700;color:var(--accent);margin-right:.4rem}
+.quiz-btns{display:flex;gap:.4rem;padding:0 1rem .75rem}
+.quiz-fb{display:none;padding:.75rem 1rem;font-size:.88rem;line-height:1.6;border-top:1px solid var(--border)}
+.quiz-fb.show{display:block}
+.quiz-fb.ok{background:var(--green-light)}
+.quiz-fb.no{background:var(--red-light)}
+.quiz-verdict{font-weight:700;display:block;margin-bottom:.2rem}
+.quiz-score{font-size:.88rem;color:var(--text-sec);margin-top:.5rem}
+
+/* Bars */
+.bar-cmp{margin-top:.75rem}
+.bar-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.45rem;font-size:.85rem}
+.bar-name{width:130px;flex-shrink:0;color:var(--text-sec);font-size:.8rem}
+.bar-track{flex:1;height:22px;background:var(--bg-alt);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .35s ease}
+.bar-val{width:90px;text-align:right;font-family:var(--font-m);font-size:.82rem;color:var(--heading)}
+
+@media(max-width:600px){
+  .lab{margin:1rem -.5rem;padding:1rem}
+  .lab-stats{grid-template-columns:repeat(auto-fit,minmax(115px,1fr))}
+  .stat-value{font-size:1.1rem}
+  .bar-name{width:90px}
+  .bar-val{width:70px}
+}
+
+/* Extras de esta página */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-top:1rem}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}}
+.panel{border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--bg)}
+.panel-head{background:var(--bg-alt);padding:.5rem .8rem;font-size:.8rem;font-weight:700;color:var(--heading);border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.06em}
+.panel-body{padding:.7rem .8rem;font-size:.85rem}
+.badge{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.12rem .45rem;border-radius:3px;margin-left:.35rem;vertical-align:middle}
+.badge.ok{background:var(--green-light);color:var(--green)}
+.badge.no{background:var(--red-light);color:var(--red)}
+.toc{background:var(--bg-alt);border-radius:8px;padding:1rem 1.25rem;margin:1.5rem 0;font-size:.9rem}
+.toc ol{margin:.4rem 0 0 1.2rem}
+.toc a{color:var(--accent);text-decoration:none}
+.toc a:hover{text-decoration:underline}
+.c-mpl{color:var(--red)} .c-logit{color:var(--orange)} .c-probit{color:var(--accent)}
+.spec{background:var(--bg-alt);border:1px solid var(--border);border-radius:8px;padding:.9rem 1rem;margin:1.25rem 0}
+.spec-title{font-weight:700;color:var(--heading);font-size:.92rem;margin-bottom:.15rem}
+.spec-sub{font-size:.8rem;color:var(--text-sec);margin-bottom:.6rem}
+.chk-row{display:flex;flex-wrap:wrap;gap:.4rem .5rem}
+.chk{display:inline-flex;align-items:center;gap:.35rem;font-family:var(--font-m);font-size:.8rem;padding:.3rem .6rem;border:1px solid var(--border);border-radius:14px;background:var(--bg);cursor:pointer;user-select:none}
+.chk input{accent-color:var(--accent);margin:0}
+.chk.on{border-color:var(--accent);background:var(--accent-light);color:var(--heading)}
+.chk.dis{opacity:.45;cursor:not-allowed}
+.spec-eq{font-family:var(--font-m);font-size:.78rem;color:var(--text-sec);margin-top:.6rem;line-height:1.5;word-break:break-word}
+.model-chip{font-family:var(--font-m);font-size:.74rem;color:var(--text-sec);background:var(--bg-alt);border-radius:4px;padding:.3rem .55rem;margin-bottom:.8rem;word-break:break-word}
+.sim-control.off{opacity:.4}
+.sim-control.off input{pointer-events:none}
+.pbar{margin-top:.6rem}
+.pbar-row{display:grid;grid-template-columns:70px 1fr 76px;align-items:center;gap:.6rem;margin-bottom:.5rem;font-size:.85rem}
+.pbar-name{font-weight:700;font-size:.82rem}
+.pbar-track{position:relative;height:24px;background:var(--bg-alt);border-radius:4px;overflow:hidden}
+.pbar-zone{position:absolute;top:0;bottom:0;background:var(--red-light)}
+.pbar-fill{position:absolute;top:3px;bottom:3px;border-radius:3px;transition:left .2s,width .2s}
+.pbar-tick{position:absolute;top:0;bottom:0;width:1px;background:var(--text-sec);opacity:.6}
+.pbar-tlab{position:absolute;bottom:-15px;font-size:.65rem;color:var(--text-sec);transform:translateX(-50%)}
+.pbar-val{text-align:right;font-family:var(--font-m);font-size:.88rem;color:var(--heading);font-variant-numeric:tabular-nums}
+.pbar-val.bad{color:var(--red);font-weight:700}
+.conf{display:grid;grid-template-columns:auto 1fr 1fr auto;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:6px;overflow:hidden;font-size:.85rem;margin-top:.75rem}
+.conf>div{background:var(--bg);padding:.5rem .6rem;text-align:center}
+.conf .hd{background:var(--bg-alt);font-weight:700;color:var(--heading);font-size:.74rem;text-transform:uppercase;letter-spacing:.04em}
+.conf .ok{background:var(--green-light)}
+.conf .no{background:var(--red-light)}
+.conf .cv{font-family:var(--font-m);font-size:1.05rem;color:var(--heading);display:block}
+.conf .cl{font-size:.68rem;color:var(--text-sec);display:block}
+.results-table td.sig{color:var(--accent);font-weight:700;text-align:left}
+.results-table td.neg{color:var(--red)}
+.results-table th.mpl{color:var(--red)} .results-table th.logit{color:var(--orange)} .results-table th.probit{color:var(--accent)}
+.nt{text-transform:none}
+@media(max-width:600px){.reg-coef{white-space:normal}.reg-se{font-size:.72rem}}
+.stat-value.logit{color:var(--orange)}
+.hint{font-size:.78rem;color:var(--text-sec);font-style:italic;margin-top:.45rem}
+.row-inline{display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end}
+</style>
+</head>
+<body>
+<article>
+
+<p class="eyebrow">Econometría I — Clase 12</p>
+<h1>Variable dependiente dicotómica</h1>
+<p class="subtitle">Modelo lineal de probabilidad, Logit y Probit: predicciones, efectos marginales y bondad de ajuste</p>
+
+<p class="lead">Hasta acá la variable dependiente fue siempre cuantitativa: salario, consumo, precio. Hoy la <span class="math">Y</span> sólo puede valer <strong>0 o 1</strong>: trabajar o no, pagar o no un crédito, aprobar o no una materia. La pregunta cambia de forma: ya no es "¿cuánto vale <span class="math">Y</span>?" sino <strong>"¿qué tan probable es que <span class="math">Y = 1</span>?"</strong>. Esta página te deja estimar los tres modelos de la clase sobre los datos reales de Mroz y ver con tus ojos en qué se parecen y en qué no.</p>
+
+<div class="tip">
+  <strong>Cómo usar esta página.</strong> Todo se recalcula al instante en tu navegador, incluidas las estimaciones por máxima verosimilitud. En la sección 2 podés elegir qué regresoras entran al modelo, y esa elección se arrastra a los laboratorios de las secciones 3, 4, 7 y 8. Con la especificación completa los números coinciden con los de las diapositivas.
+</div>
+
+<div class="toc">
+  <strong>Recorrido</strong>
+  <ol>
+    <li><a href="#s1">Una Y que sólo vale 0 o 1</a></li>
+    <li><a href="#s2">El Modelo Lineal de Probabilidad sobre Mroz</a></li>
+    <li><a href="#s3">Simulador: armá una persona y compará los tres modelos</a></li>
+    <li><a href="#s4">Los problemas del MPL</a></li>
+    <li><a href="#s5">La función G: Logit y Probit</a></li>
+    <li><a href="#s6">Cómo se estiman: máxima verosimilitud</a></li>
+    <li><a href="#s7">Coeficientes vs. efectos marginales (AME y MEM)</a></li>
+    <li><a href="#s8">Bondad de ajuste: tasa de acierto y pseudo R²</a></li>
+    <li><a href="#s9">Autoevaluación</a></li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s1">1. Una Y que sólo vale 0 o 1</h2>
+
+<p>Codificamos <span class="math">Y = 1</span> si ocurre el evento y <span class="math">Y = 0</span> si no. Entonces <span class="math">Y</span> es una Bernoulli, y su esperanza condicional es directamente una probabilidad:</p>
+
+<div class="formula-block">
+  <span class="math">E(Y | X) = 1&sdot;P(Y = 1 | X) + 0&sdot;P(Y = 0 | X) = P(Y = 1 | X)</span>
+</div>
+
+<p>La regresión siempre fue un modelo de la <strong>media condicional</strong>. Con <span class="math">Y</span> binaria, esa media condicional <em>es</em> la probabilidad. Por eso tiene sentido preguntarse si OLS sirve para estimarla, y qué problemas trae.</p>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 1 · Recta contra curva en S</span></div>
+  <p class="lab-sub">Datos simulados donde la verdadera probabilidad sigue una curva logística. Cada punto está en 0 o en 1 (los separamos un poco en vertical para que se vean). Los cuadrados muestran la <strong>proporción de unos</strong> en cada tramo de <span class="math">X</span>: eso es lo que cualquier modelo debería seguir.</p>
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label for="m1b">Pendiente verdadera <span class="sim-val" id="m1bV"></span></label>
+      <input type="range" id="m1b" min="0.05" max="2" step="0.05" value="0.4">
+    </div>
+    <div class="sim-control">
+      <label for="m1c">X donde P = 0.5 <span class="sim-val" id="m1cV"></span></label>
+      <input type="range" id="m1c" min="2" max="18" step="0.5" value="7.5">
+    </div>
+    <div class="sim-control">
+      <label for="m1n">Tamaño de muestra <span class="sim-val" id="m1nV"></span></label>
+      <input type="range" id="m1n" min="50" max="1000" step="50" value="200">
+    </div>
+  </div>
+  <div class="seg">
+    <button class="btn btn-sm active" id="m1sOls" onclick="tog1('ols')">Recta OLS (MPL)</button>
+    <button class="btn btn-sm active" id="m1sLog" onclick="tog1('log')">Curva Logit estimada</button>
+    <button class="btn btn-sm" id="m1sTrue" onclick="tog1('true')">Probabilidad verdadera</button>
+    <button class="btn btn-sm active" id="m1sBin" onclick="tog1('bin')">Proporciones por tramo</button>
+  </div>
+  <div class="sim-canvas-wrap"><canvas id="cv1"></canvas></div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>MPL (OLS)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--orange)"></span>Logit</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--text-sec)"></span>Verdadera</span>
+    <span class="legend-item"><span class="legend-box" style="background:var(--green);opacity:.8"></span>Proporción observada</span>
+  </div>
+  <div class="lab-stats" id="st1"></div>
+  <div class="lab-btns"><button class="btn btn-primary" onclick="newSample1()">Nueva muestra</button></div>
+  <div id="nt1"></div>
+</div>
+
+<div class="note">
+  <div class="note-title">Probá esto</div>
+  Subí la pendiente verdadera a 1 o más. La proporción de unos pasa de casi 0 a casi 1 en un tramo corto, y la recta, para acompañar ese salto, tiene que salirse del intervalo <span class="math">[0, 1]</span> en los extremos. Con pendientes chicas, en cambio, la curva en S es casi recta en el rango de los datos y las dos coinciden.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s2">2. El Modelo Lineal de Probabilidad sobre Mroz</h2>
+
+<p>La idea más simple es suponer que la probabilidad es lineal en las regresoras y estimar por OLS, exactamente como hasta ahora:</p>
+
+<div class="formula-block">
+  <span class="math">P(Y = 1 | X) = &beta;<sub>0</sub> + &beta;<sub>1</sub>X<sub>1</sub> + &hellip; + &beta;<sub>k</sub>X<sub>k</sub>
+  &nbsp;&nbsp;&rArr;&nbsp;&nbsp;
+  &part;P / &part;X<sub>j</sub> = &beta;<sub>j</sub></span>
+</div>
+
+<p>Lo único nuevo es la <strong>interpretación</strong>: <span class="math">&beta;<sub>j</sub></span> es el cambio en la probabilidad, medido en <strong>puntos porcentuales</strong>, cuando <span class="math">X<sub>j</sub></span> aumenta una unidad y lo demás queda constante.</p>
+
+<p>Los datos son los de <strong>Mroz (1975)</strong>: 753 mujeres casadas de EE.UU. La variable dependiente es <span class="math">inlf</span> (1 si participa de la fuerza laboral). Elegí qué regresoras entran:</p>
+
+<div class="spec" id="specBox">
+  <div class="spec-title">Especificación del modelo</div>
+  <div class="spec-sub">Esta elección se usa en los laboratorios 2, 3, 4, 7 y 8. Cada cambio vuelve a estimar MPL, Logit y Probit.</div>
+  <div class="chk-row" id="specChk"></div>
+  <div class="lab-btns">
+    <button class="btn btn-sm" onclick="setSpec('all')">Modelo de la clase (todas)</button>
+    <button class="btn btn-sm" onclick="setSpec('educ')">Sólo educ</button>
+    <button class="btn btn-sm" onclick="setSpec('kids')">educ + hijos</button>
+  </div>
+  <div class="spec-eq" id="specEq"></div>
+</div>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 2 · El output del MPL</span></div>
+  <p class="lab-sub">Hacé clic en cualquier fila para leer la interpretación del coeficiente. Probá también cambiar los errores estándar a robustos: los coeficientes no se mueven, pero los errores estándar sí (volvemos sobre esto en la sección 4).</p>
+  <div class="seg">
+    <button class="btn btn-sm active" id="seClas" onclick="setSE('clas')">EE clásicos</button>
+    <button class="btn btn-sm" id="seRob" onclick="setSE('rob')">EE robustos (White, HC1)</button>
+  </div>
+  <div class="reg-out" id="mplOut"></div>
+  <p class="reg-hint">*** p &lt; 0.01, ** p &lt; 0.05, * p &lt; 0.10</p>
+
+  <h3>La experiencia entra en forma cuadrática</h3>
+  <p class="lab-sub" style="margin-top:0">Con <span class="math">exper</span> y <span class="math">exper²</span>, el efecto parcial es <span class="math">&beta;<sub>exper</sub> + 2&beta;<sub>exper²</sub>&sdot;exper</span>: depende del nivel de experiencia. Movelo y mirá cómo se achica.</p>
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label for="m2x">Años de experiencia <span class="sim-val" id="m2xV"></span></label>
+      <input type="range" id="m2x" min="0" max="45" step="1" value="10">
+    </div>
+  </div>
+  <div class="lab-stats" id="st2"></div>
+</div>
+
+<div class="callout">
+  <div class="callout-title">Puntos porcentuales no es lo mismo que por ciento</div>
+  Si la probabilidad pasa de 0.20 a 0.24, aumentó <strong>4 puntos porcentuales</strong>, que es un aumento <strong>relativo del 20%</strong>. El coeficiente del MPL siempre se lee en puntos porcentuales: <span class="math">&beta;&#770; = 0.04</span> es "+4 pp", nunca "+4%".
+</div>
+
+<div class="note">
+  <div class="note-title">¿Y el R²?</div>
+  En un modelo con <span class="math">Y</span> binaria el R² siempre es bajo: los valores observados son 0 o 1 y las predicciones son números intermedios, así que los residuos son grandes por construcción. No hay que obsesionarse con él. Lo que importa es el signo, la magnitud y la significancia de los efectos parciales.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s3">3. Simulador: armá una persona y compará los tres modelos</h2>
+
+<p>Este es el laboratorio central de la página. Definí las características de una mujer y mirá qué probabilidad de participar le asigna cada modelo. Logit y Probit se presentan formalmente en la sección 5; por ahora alcanza con saber que reemplazan la recta por una curva en S que nunca sale de <span class="math">[0, 1]</span>.</p>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 3 · Predicción con MPL, Logit y Probit</span></div>
+  <div class="model-chip" id="chip3"></div>
+  <div class="lab-btns" style="margin-top:0;margin-bottom:.9rem">
+    <button class="btn btn-sm" onclick="preset3('clase')">Ejemplo de la clase</button>
+    <button class="btn btn-sm" onclick="preset3('prom')">Mujer "promedio"</button>
+    <button class="btn btn-sm" onclick="preset3('neg')">Caso extremo: P baja</button>
+    <button class="btn btn-sm" onclick="preset3('alta')">Caso extremo: P alta</button>
+  </div>
+  <div class="sim-controls" id="sl3"></div>
+
+  <div class="pbar" id="pbar3"></div>
+  <div style="height:.6rem"></div>
+
+  <div class="row-inline">
+    <div class="sim-control" style="min-width:220px">
+      <label for="m3var">Variable en el eje horizontal</label>
+      <select id="m3var" onchange="draw3()"></select>
+    </div>
+    <div class="seg" style="margin:0">
+      <button class="btn btn-sm" id="m3tan" onclick="tog3tan()">Mostrar pendientes (efecto marginal)</button>
+    </div>
+  </div>
+  <div class="sim-canvas-wrap" style="margin-top:.6rem"><canvas id="cv3"></canvas></div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>MPL</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--orange)"></span>Logit</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--accent)"></span>Probit</span>
+    <span class="legend-item"><span class="legend-box" style="background:var(--red)"></span>Fuera de [0, 1]</span>
+  </div>
+  <p class="hint">Las demás características quedan fijas en los valores de los controles de arriba.</p>
+
+  <h3>Efectos marginales en este punto</h3>
+  <p class="lab-sub" style="margin-top:0">Cambio en la probabilidad (en pp) por una unidad más de cada variable, evaluado en la persona que armaste. Mové cualquier control y fijate qué columna queda quieta y cuáles cambian.</p>
+  <div class="results-wrap"><table class="results-table" id="me3"></table></div>
+  <div id="nt3"></div>
+</div>
+
+<div class="tip">
+  <strong>Lo que tenés que ver acá.</strong> En el MPL la columna de efectos marginales no cambia nunca: es el coeficiente, igual para todas las personas. En Logit y Probit el efecto es grande cuando la probabilidad está cerca de 0.5 y se achica cuando se acerca a 0 o a 1. Probá el caso extremo "P baja": tener otro hijo chico casi no cambia nada para Logit y Probit, porque la probabilidad ya está en el piso, mientras que el MPL sigue restando 26 pp hasta llegar a probabilidades negativas.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s4">4. Los problemas del MPL</h2>
+
+<ol>
+  <li>Predicciones <strong>fuera de [0, 1]</strong>: probabilidades negativas o mayores que uno.</li>
+  <li><strong>Heteroscedasticidad</strong> inevitable: <span class="math">var(u | X) = p(1 − p)</span> depende de las regresoras.</li>
+  <li><strong>Efecto parcial constante</strong>: poco realista para una probabilidad (lo viste en el laboratorio 3).</li>
+  <li>Errores <strong>no normales</strong>: para cada <span class="math">X</span> el residuo sólo puede valer <span class="math">1 − Ŷ</span> o <span class="math">−Ŷ</span>. Con muestras grandes, el TCL rescata los tests t y F.</li>
+</ol>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 4 · Diagnóstico del MPL</span></div>
+  <div class="model-chip" id="chip4"></div>
+  <div class="seg">
+    <button class="btn btn-sm active" id="m4a" onclick="set4('hist')">Probabilidades predichas</button>
+    <button class="btn btn-sm" id="m4b" onclick="set4('res')">Residuos y heteroscedasticidad</button>
+  </div>
+  <div class="sim-canvas-wrap"><canvas id="cv4"></canvas></div>
+  <div class="lab-stats" id="st4"></div>
+  <div id="nt4"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s5">5. La función G: Logit y Probit</h2>
+
+<p>Queremos un modelo <span class="math">P(Y = 1 | X) = G(&beta;<sub>0</sub> + &beta;<sub>1</sub>X<sub>1</sub> + &hellip; + &beta;<sub>k</sub>X<sub>k</sub>) = G(<b>x</b>&beta;)</span> donde <span class="math">G</span> esté entre 0 y 1, sea creciente y tenga forma de S. Las <strong>funciones de distribución acumulada</strong> cumplen todo eso. Las dos más usadas son:</p>
+
+<div class="grid2">
+  <div class="panel">
+    <div class="panel-head c-logit">Logit</div>
+    <div class="panel-body">FDA logística: <span class="math">&Lambda;(z) = e<sup>z</sup> / (1 + e<sup>z</sup>)</span><br>Densidad: <span class="math">&lambda;(z) = &Lambda;(z)[1 − &Lambda;(z)]</span>, con máximo 0.25 en z = 0.</div>
+  </div>
+  <div class="panel">
+    <div class="panel-head c-probit">Probit</div>
+    <div class="panel-body">FDA normal estándar: <span class="math">&Phi;(z)</span><br>Densidad: <span class="math">&phi;(z) = e<sup>−z²/2</sup> / &radic;(2&pi;)</span>, con máximo 0.399 en z = 0.</div>
+  </div>
+</div>
+
+<p>En ambos casos el <strong>efecto marginal</strong> es la densidad evaluada en el índice, multiplicada por el coeficiente:</p>
+<div class="formula-block">
+  <span class="math">&part;P / &part;X<sub>j</sub> = g(<b>x</b>&beta;)&sdot;&beta;<sub>j</sub></span>
+  &nbsp;&nbsp;con <span class="math">g = &lambda;</span> en Logit y <span class="math">g = &phi;</span> en Probit.
+</div>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 5 · Explorá G(z) y g(z)</span></div>
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label for="m5z"><span>Índice lineal <span class="nt">z = x&beta;</span></span> <span class="sim-val" id="m5zV"></span></label>
+      <input type="range" id="m5z" min="-5" max="5" step="0.05" value="0">
+    </div>
+    <div class="sim-control">
+      <label for="m5b"><span>Coeficiente <span class="nt">&beta;<sub>j</sub></span></span> <span class="sim-val" id="m5bV"></span></label>
+      <input type="range" id="m5b" min="-1" max="1" step="0.05" value="0.5">
+    </div>
+  </div>
+  <div class="seg">
+    <button class="btn btn-sm active" id="m5cdf" onclick="set5('cdf')">FDA G(z)</button>
+    <button class="btn btn-sm" id="m5pdf" onclick="set5('pdf')">Densidad g(z)</button>
+    <button class="btn btn-sm" id="m5mpl" onclick="tog5('mpl')">Agregar recta MPL</button>
+    <button class="btn btn-sm" id="m5sc" onclick="tog5('sc')">Probit reescalado &Phi;(z/1.6)</button>
+  </div>
+  <div class="sim-canvas-wrap"><canvas id="cv5"></canvas></div>
+  <div class="legend" id="lg5"></div>
+  <div class="lab-stats" id="st5"></div>
+  <div id="nt5"></div>
+</div>
+
+<div class="note">
+  <div class="note-title">El logit tiene otra lectura: el log de las chances</div>
+  Despejando, <span class="math">ln[P / (1 − P)] = <b>x</b>&beta;</span>. El cociente <span class="math">P / (1 − P)</span> son las <strong>chances</strong> (odds). Con <span class="math">z = 0</span> las chances son 1 a 1 (P = 0.5); con <span class="math">z = 1</span> son <span class="math">e ≈ 2.72</span> a 1 (P = 0.73). El laboratorio de arriba te muestra las chances para cada valor de <span class="math">z</span>.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s6">6. Cómo se estiman: máxima verosimilitud</h2>
+
+<p>Logit y Probit no se estiman por OLS. Cada observación tiene probabilidad <span class="math">p<sub>i</sub> = G(<b>x</b><sub>i</sub>&beta;)</span> de ser un 1, así que la probabilidad de observar exactamente lo que observamos es</p>
+
+<div class="formula-block">
+  <span class="math">ln L(&beta;) = &Sigma;<sub>i</sub> [ Y<sub>i</sub>&sdot;ln p<sub>i</sub> + (1 − Y<sub>i</sub>)&sdot;ln(1 − p<sub>i</sub>) ]</span>
+</div>
+
+<p>El estimador de <strong>máxima verosimilitud</strong> elige los <span class="math">&beta;</span> que hacen más probable la muestra observada. No hay fórmula cerrada: la computadora lo busca por pasos sucesivos.</p>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 6 · Buscá vos el máximo</span></div>
+  <p class="lab-sub">Un modelo con una sola regresora: <span class="math">P(inlf = 1) = G[a + b&sdot;(educ − 12)]</span>. Centramos la educación en 12 años para que <span class="math">a</span> sea el índice de una mujer con secundario completo. Mové <span class="math">a</span> y <span class="math">b</span> (o hacé clic en el mapa de la derecha) e intentá llegar a la log-verosimilitud más alta. Después tocá "Maximizar" para ver cómo lo hace el algoritmo.</p>
+  <div class="seg">
+    <button class="btn btn-sm active" id="m6lo" onclick="set6link('logit')">Logit</button>
+    <button class="btn btn-sm" id="m6pr" onclick="set6link('probit')">Probit</button>
+  </div>
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label for="m6a"><span><span class="nt">a</span> (constante)</span> <span class="sim-val" id="m6aV"></span></label>
+      <input type="range" id="m6a" min="-1" max="1" step="0.01" value="-0.6">
+    </div>
+    <div class="sim-control">
+      <label for="m6b"><span><span class="nt">b</span> (pendiente de educ)</span> <span class="sim-val" id="m6bV"></span></label>
+      <input type="range" id="m6b" min="-0.1" max="0.4" step="0.002" value="0">
+    </div>
+  </div>
+  <div class="grid2" style="margin-top:0">
+    <div class="sim-canvas-wrap"><canvas id="cv6a"></canvas></div>
+    <div class="sim-canvas-wrap clickable"><canvas id="cv6b" style="cursor:crosshair"></canvas></div>
+  </div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--purple)"></span>Tu curva</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--text-sec)"></span>Máximo (MV)</span>
+    <span class="legend-item"><span class="legend-box" style="background:var(--green);opacity:.8"></span>Proporción observada por años de educación</span>
+  </div>
+  <div class="lab-stats" id="st6"></div>
+  <div class="lab-btns">
+    <button class="btn btn-primary" id="m6go" onclick="run6()">Maximizar (paso a paso)</button>
+    <button class="btn" onclick="reset6()">Volver al inicio</button>
+  </div>
+  <div id="nt6"></div>
+</div>
+
+<div class="tip">
+  <strong>Lo que hace el algoritmo.</strong> En cada paso mira hacia dónde sube la log-verosimilitud (el gradiente) y qué tan curvada está (la información de Fisher), y da un salto en esa dirección. Desde casi cualquier punto de partida llega al máximo en 4 a 6 pasos. Los errores estándar salen de la curvatura en el máximo: cuanto más "puntiaguda" es la montaña, más precisa es la estimación.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s7">7. Coeficientes vs. efectos marginales</h2>
+
+<div class="callout">
+  <div class="callout-title">El error más común</div>
+  El <span class="math">&beta;&#770;<sub>j</sub></span> de un Logit o un Probit <strong>no es</strong> el cambio en la probabilidad. Del output sólo se leen directamente el <strong>signo</strong> (porque la densidad es siempre positiva) y la <strong>significancia</strong>. Para hablar de magnitudes hay que calcular efectos marginales.
+</div>
+
+<p>Como <span class="math">g(<b>x</b>&beta;)&sdot;&beta;<sub>j</sub></span> depende de las <span class="math">X</span>, hay que elegir dónde evaluarlo:</p>
+<ul>
+  <li><strong>MEM</strong> (efecto marginal en la media): se evalúa la densidad en los promedios, <span class="math">g(<b>x̄</b>&beta;&#770;)&sdot;&beta;&#770;<sub>j</sub></span>. Es el efecto para un individuo "promedio", que puede no existir.</li>
+  <li><strong>AME</strong> (promedio de los efectos marginales): se calcula el efecto para cada persona y se promedia, <span class="math">(1/n)&Sigma; g(<b>x</b><sub>i</sub>&beta;&#770;)&sdot;&beta;&#770;<sub>j</sub></span>. Es la práctica estándar.</li>
+</ul>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 7 · Los tres modelos lado a lado</span></div>
+  <div class="model-chip" id="chip7"></div>
+  <div class="seg">
+    <button class="btn btn-sm active" id="m7c" onclick="set7('coef')">Coeficientes (output crudo)</button>
+    <button class="btn btn-sm" id="m7m" onclick="set7('me')">Efectos marginales</button>
+  </div>
+  <div class="results-wrap"><table class="results-table" id="tb7"></table></div>
+  <div id="nt7a"></div>
+
+  <h3>¿De dónde sale el AME?</h3>
+  <p class="lab-sub" style="margin-top:0">Cada barra del histograma es un grupo de mujeres con un efecto marginal individual parecido. El AME es el promedio de todas; el MEM es el efecto de la mujer "promedio".</p>
+  <div class="row-inline">
+    <div class="sim-control" style="min-width:180px">
+      <label for="m7var">Variable</label>
+      <select id="m7var" onchange="draw7()"></select>
+    </div>
+    <div class="seg" style="margin:0">
+      <button class="btn btn-sm active" id="m7lo" onclick="set7mod('logit')">Logit</button>
+      <button class="btn btn-sm" id="m7pr" onclick="set7mod('probit')">Probit</button>
+    </div>
+  </div>
+  <div class="sim-canvas-wrap" style="margin-top:.6rem"><canvas id="cv7"></canvas></div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--heading)"></span>AME</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--purple)"></span>MEM</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>Coeficiente MPL</span>
+  </div>
+  <div class="lab-stats" id="st7"></div>
+</div>
+
+<div class="note">
+  <div class="note-title">Sobre la experiencia y las dummies</div>
+  Para <span class="math">exper</span> calculamos el efecto incluyendo el término cuadrático, <span class="math">g(&middot;)&sdot;(&beta;<sub>exper</sub> + 2&beta;<sub>exper²</sub>&sdot;exper)</span>. Si en R cargás <span class="math">expersq</span> como una columna aparte, <code>margins</code> no sabe que está atada a <span class="math">exper</span> y reporta un número distinto; para que lo haga bien hay que escribir <code>I(exper^2)</code> en la fórmula. Para <span class="math">city</span> y los conteos de hijos usamos la derivada, igual que en las diapositivas; la alternativa es el cambio discreto <span class="math">G(<b>x</b>&beta; con D = 1) − G(<b>x</b>&beta; con D = 0)</span>, que da valores muy parecidos.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s8">8. Bondad de ajuste: tasa de acierto y pseudo R²</h2>
+
+<p>La <strong>tasa de acierto</strong> clasifica cada observación como <span class="math">Ŷ = 1</span> si <span class="math">p̂ &gt; c</span> (habitualmente <span class="math">c = 0.5</span>) y cuenta cuántas veces el modelo acierta. El <strong>pseudo R² de McFadden</strong> compara la log-verosimilitud del modelo con la de un modelo con sólo constante: <span class="math">1 − ln L<sub>modelo</sub> / ln L<sub>nulo</sub></span>.</p>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 8 · Matriz de confusión y umbral</span></div>
+  <div class="model-chip" id="chip8"></div>
+  <div class="row-inline">
+    <div class="seg" style="margin:0">
+      <button class="btn btn-sm" id="m8mpl" onclick="set8mod('mpl')">MPL</button>
+      <button class="btn btn-sm active" id="m8lo" onclick="set8mod('logit')">Logit</button>
+      <button class="btn btn-sm" id="m8pr" onclick="set8mod('probit')">Probit</button>
+    </div>
+    <div class="sim-control" style="flex:1;min-width:200px">
+      <label for="m8c"><span>Umbral <span class="nt">c</span></span> <span class="sim-val" id="m8cV"></span></label>
+      <input type="range" id="m8c" min="0.05" max="0.95" step="0.01" value="0.5">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <div class="conf" id="conf8"></div>
+      <div class="lab-stats" id="st8a"></div>
+    </div>
+    <div class="sim-canvas-wrap"><canvas id="cv8"></canvas></div>
+  </div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--heading)"></span>Tasa de acierto</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>Sensitividad (aciertos entre los 1)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--purple)"></span>Especificidad (aciertos entre los 0)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--text-sec)"></span>Modelo naive</span>
+  </div>
+  <h3>Comparación de ajuste</h3>
+  <div class="results-wrap"><table class="results-table" id="tb8"></table></div>
+  <div id="nt8"></div>
+</div>
+
+<div class="callout">
+  <div class="callout-title">El pseudo R² no es un R²</div>
+  No mide proporción de varianza explicada y no se compara con el R² del MPL. Como antes: en estos modelos importan más el signo, la significancia y los efectos marginales que el ajuste global.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s9">9. Autoevaluación</h2>
+
+<p>Elegí una respuesta y la página devuelve la justificación. Varias se pueden comprobar en los laboratorios de arriba.</p>
+
+<div id="quizWrap"></div>
+<div class="quiz-score" id="quizScore"></div>
+<div class="lab-btns"><button class="btn btn-sm" onclick="resetQuiz()">Reiniciar</button></div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>Para llevarse</h2>
+
+<ul>
+  <li><strong>Con Y binaria, E(Y | X) es una probabilidad.</strong> Modelar la media condicional es modelar <span class="math">P(Y = 1 | X)</span>.</li>
+  <li><strong>El MPL es OLS de siempre.</strong> Los coeficientes se leen directo como cambios en puntos porcentuales. Es simple y suele dar efectos promedio razonables, pero predice fuera de [0, 1], supone efectos constantes y es heteroscedástico por construcción: siempre con errores estándar robustos.</li>
+  <li><strong>Logit y Probit</strong> usan una FDA para mantener las probabilidades en [0, 1] y generar efectos más chicos en los extremos. Se estiman por máxima verosimilitud.</li>
+  <li><strong>Sus coeficientes no son efectos marginales.</strong> Del output se leen signo y significancia; las magnitudes salen del AME (o el MEM).</li>
+  <li><strong>Logit vs. Probit casi nunca importa.</strong> Los coeficientes difieren en escala (Logit ≈ 1.6 × Probit), pero los efectos marginales y las predicciones son prácticamente iguales.</li>
+  <li><strong>Bondad de ajuste:</strong> la tasa de acierto hay que compararla con el modelo naive, y el pseudo R² no es comparable con el R² de OLS.</li>
+</ul>
+
+</article>
+<script>
+"use strict";
+/* Datos: wooldridge::mroz (inlf, nwifeinc, educ, exper, age, kidslt6, kidsge6, city) */
+const MROZ={inlf:[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+nwifeinc:[10.91,19.5,12.04,6.8,20.1,9.859,9.152,10.9,17.305,12.925,24.3,19.7,15,14.6,24.631,17.531,14.1,15.839,14.1,10.3,22.655,8.09,17.479,9.56,8.275,27.35,16,17,15.1,15.7,5.119,16.75,13.6,17.1,16.734,14.197,10.32,11.384,14.594,17.5,15.51,22,22.5,19.994,14.13,5,21.155,7.142,16.65,6.352,27.314,14.5,16.258,9.5,8,12.5,14,20.8,19.385,12.387,28.5,15.05,10.5,11.81,6.95,12.42,17.4,15.5,21.217,18,11.9,26.752,12.15,10.2,8.12,10.66,18.1,8.6,13.665,32.35,12.085,12.15,17.695,24.7,2.134,20.95,10.5,10.55,45.75,13.632,18.239,17.09,30.235,28.7,19.63,12.825,23.8,26.3,20.7,26,10.877,25.612,20.989,70.75,17.05,21,8.12,20.886,17.669,25.2,14.245,14.3,23.7,46,43,14.749,16.15,17.774,91,22.3,34.6,9.62,10.9,14.5,22,17.9,23.675,11.8,16.142,18.4,15.5,17.324,19.205,21.3,23.56,20.85,26.15,17,20.72,17,16,19.5,12,13.732,27.2,5.315,16,27.872,40,15.9,27.5,17.02,22.395,11.1,32.7,27.8,2.2,19.721,10,13.2,12.709,27.3,21.2,14.4,20.576,12.5,17.5,44,13.119,14,9.645,17.397,7.8,13.134,25.6,13.9,19.298,9.2,38,44,21.372,23.668,9,25.2,21.22,33.97,17.07,6.016,17.1,8.237,13.3,16,12.54,18,31.2,20.75,11.1,20.68,18,32.43,32.9,24.1,17.8,20.5,10.5,10.437,18.195,12.845,13.8,22.2,6.7,6.25,15.6,3.3,3.671,7.79,18.272,10.954,13.5,11.2,21,25.7,8.933,19.16,26.59,22.4,20.633,28.2,28.8,9,11.4,10.4,19.08,9.466,6.5,29.117,19.103,16.35,32.025,16.7,4.811,24.626,17.4,13.025,19.007,14.03,14.9,25,10.7,24.25,39.14,7.2,31.811,10,20.66,13.5,25.38,18.275,39.213,10.5,34.857,28.502,13,41.4,14.78,15.05,29.7,16.165,25.205,14.2,18.159,28.981,13.392,9.175,27.04,13.15,16.4,21.3,17.201,8.56,6.491,12.5,27,53.5,52.5,38.4,13.892,3.9,34.2,19.7,18.5,11,43.3,18.76,4.8,21.5,28.04,26,27,17.8,17.402,19.31,10,11.18,18.857,12.3,13.677,9.56,24.5,23.15,15.591,14.421,17.455,9.8,17.574,16.555,13.295,11.844,46.645,14.7,26.09,9.9,9.048,30.75,8.5,22.25,42.91,33.3,13.82,23.6,13,20.75,6.3,7.789,10.47,12,16.98,17.9,15.54,9.884,28.6,17.66,26,13.602,15.8,41.1,10.775,9,24.399,37.3,28,13.7,17.21,14,35.755,23.5,32,17.15,20.25,5.486,25.075,18.22,26,34.5,12.4,10.787,16.323,30.5,51.3,33.05,34.75,16.4,19.7,6.6,9.02,10.4,14.52,17.2,43,13.872,-0.029,16.77,7.8,14.5,7.9,79.8,7.176,17.507,20.6,18.56,9.3,5.12,14.5,19.8,18.3,34,11.628,11.8,39.1,18.43,21,59,25.3,23.249,24.928,14.782,18.9,21,10,29.31,13.14,25.09,14.6,1.2,32,16.12,26.5,12.75,12.9,10.7,14.434,23.709,15.1,18.2,22.641,21.64,24,16,21.025,23.6,22.8,35.91,21.7,21.823,31,15.3,12.925,15.83,30.2,16.6,11,15,20.528,13.126,15.55,18.01,18.874,24.8,17.5,16.15,15.189,6,37.25,27.76,9.09,14.5,19.7,16.788,18.52,20.95,7.574,10.027,5,7.04,40.8,16.05,33.1,33.856,20.5,28.6,18.75,20.3,13.42,18.4,16.682,32.685,7.05,10.867,18.22,26.613,25,15.7,40.25,73.6,10.592,8,13.4,23.7,18.9,48.3,24.47,28.63,25.32,13.53,14.8,17.4,15.98,16.576,21.85,14.6,21.6,24,20.883,19.5,42.8,41.5,18.965,16.1,14.7,18.8,14.75,21,35.4,10.7,24.5,17.045,18.8,14,18.214,20.177,8.3,14.2,21.768,29.553,4.35,24,18.3,17.2,16.476,13.4,44.988,18.2,28,11.55,28.45,15.096,8.009,10.04,16.7,8.4,13,17.97,18.45,31,24.135,31.7,10.19,21.574,26.68,17.7,29.4,22.159,35,8.63,17.08,32.5,16,18.85,17.5,19.392,14.45,21.8,7.7,31.8,17.258,13.399,16.073,23.26,37.3,11,13.075,13.7,25.1,18.6,29,19.237,19.855,9.45,30,15,24.701,15.9,16.24,21.1,23,6.34,42.25,14.694,21.417,20.2,12.09,24.76,23,19.365,5.55,68.035,29.3,18.5,22.582,21.5,28.07,50.3,23.5,15.5,13.44,8.1,9.8,20.3,15,56.1,22.846,22.225,17.635,18.5,13.39,15.15,16.2,33.92,14,16.736,30.65,12.4,19.022,11.203,19.876,57,18.29,20.22,22.15,30.623,9.38,22,23.675,33.671,12.367,21.95,32,22.61,12.092,3.777,36,26.9,32.242,35.02,37.6,1.5,96,18.15,15.5,14,14.756,22,24.466,24.4,24,15.5,30.8,10.66,13.35,10.09,55.6,25.7,29,7.286,37.752,13.072,7.044,18.2,27,30.3,12,31.5,27.092,20.968,27,11.225,37.7,28.2,34,63.2,7.5,17.41,51,12.916,21.9,17.64,20,15,14.06,15.825,16.51,13,10,22,29.8,15,22.3,14.55,19.73,35,21.014,10.876,27.85,9.56,30.3,7.72,10.55,24.106,22.995,6,24.35,7.608,28.2,16.15,51.2,12.646,19,19,14.4,7.232,21.943,47.5,28.9,12.4,6.531,22.422,22.2,77,88,26.04,63.5,12.1,17.505,18,28.069,14,8.117,11.895,45.25,31.106,4,40.5,21.62,23.426,26,7.84,6.8,5.33,28.2,10,9.952,24.984,28.363],
+educ:[12,12,12,12,14,12,16,12,12,12,12,11,12,12,10,11,12,12,12,12,16,12,13,12,12,17,12,12,17,12,11,16,13,12,16,11,12,10,14,17,12,12,16,12,12,12,16,12,12,12,12,12,12,8,10,16,14,17,14,12,14,12,8,12,12,8,17,12,12,12,12,12,9,10,12,12,12,17,15,12,6,14,12,14,9,17,13,9,15,12,12,12,12,12,12,12,12,13,12,13,12,12,12,16,12,13,11,12,12,12,17,14,16,17,12,11,12,12,17,10,13,11,12,16,17,12,16,12,16,8,12,12,12,13,11,12,12,14,12,12,12,17,14,12,9,12,12,12,14,16,17,15,12,16,17,17,12,16,13,12,11,16,14,16,12,9,17,14,12,12,11,12,12,10,12,5,17,11,12,12,14,11,12,14,12,10,16,13,12,12,12,11,12,9,13,12,12,12,13,16,12,16,17,12,12,9,12,12,13,12,12,12,12,10,12,16,12,11,12,10,12,12,12,12,16,17,12,17,12,12,12,8,12,13,12,12,8,12,17,17,12,13,12,12,12,12,9,10,12,16,13,8,16,13,12,11,13,12,12,10,12,17,15,16,10,11,12,12,14,16,14,8,7,12,12,14,12,12,12,14,16,12,12,12,13,13,10,12,12,12,12,14,17,10,9,12,12,16,12,17,12,17,11,16,11,13,11,8,11,12,10,17,12,12,17,14,12,12,12,12,12,12,9,10,12,12,12,12,12,17,12,17,12,10,12,12,12,12,12,12,16,13,13,12,16,17,12,14,12,17,12,14,12,12,17,16,16,12,9,12,12,16,14,12,12,11,12,16,17,17,14,12,14,12,10,12,13,16,12,7,16,14,12,10,12,16,10,12,14,12,6,15,12,17,14,13,6,16,14,15,14,8,14,12,12,12,12,12,12,8,12,17,12,12,14,13,17,8,12,11,12,12,17,10,12,13,12,12,12,16,12,12,12,12,13,12,12,10,12,12,7,12,9,12,10,14,14,12,12,17,8,12,17,12,12,12,9,11,12,12,9,11,12,9,12,17,12,14,12,12,10,12,12,10,12,13,12,8,12,13,12,12,13,13,8,12,8,14,9,16,12,16,12,12,12,12,11,12,13,12,12,16,16,12,12,14,14,12,13,12,11,12,15,7,12,12,12,12,13,12,10,12,14,12,10,11,12,12,12,8,7,16,14,12,16,12,10,7,12,10,8,11,15,12,12,13,9,12,12,12,12,6,12,12,12,12,12,12,8,12,12,7,15,12,6,12,12,12,12,12,12,12,12,17,16,12,11,12,10,10,12,14,10,12,16,5,12,12,12,13,8,12,8,8,12,8,12,11,13,8,12,15,12,10,13,12,11,12,11,13,12,11,12,12,12,10,7,12,12,12,12,11,12,10,11,16,10,14,11,12,5,10,16,12,11,12,12,12,12,6,14,12,12,16,12,12,17,12,12,9,12,12,12,12,12,12,14,10,12,9,14,16,11,12,12,12,12,12,11,12,12,17,10,11,14,12,8,13,12,16,8,9,16,12,12,12,15,12,9,9,12,16,9,15,12,12,15,12,17,12,12,10,13,12,11,8,12,16,12,12,12,10,12,12,15,10,14,12,8,8,12,12,16,12,5,8,13,12,12,14,12,12,12,12,14,12,12,9,14,11,12,12,11,12,10,12,10,12,13,12,12,12,9],
+exper:[14,5,15,6,7,33,11,35,24,21,15,14,0,14,6,9,20,6,23,9,5,11,18,15,4,21,31,9,7,7,32,11,16,14,27,0,17,28,24,11,1,14,6,10,6,4,10,22,16,6,12,32,15,17,34,9,37,10,35,6,19,10,11,15,12,12,14,11,9,24,12,13,29,11,13,19,2,24,9,6,22,30,10,6,29,29,36,19,8,13,16,11,15,6,13,22,24,2,6,2,2,14,9,11,9,6,19,26,19,3,7,28,13,9,15,20,29,9,1,8,19,23,3,13,8,17,4,15,11,7,0,0,10,8,2,4,6,18,3,22,33,28,23,27,11,6,11,14,17,17,14,11,7,8,6,8,4,25,24,11,19,9,19,14,22,6,23,15,6,11,2,22,10,14,12,9,13,18,8,11,9,9,14,9,2,12,15,11,7,9,19,11,8,13,4,7,19,14,14,3,9,7,7,14,29,19,14,16,10,12,24,6,9,14,26,7,4,15,23,1,29,9,6,11,17,6,7,2,24,4,11,25,11,2,19,7,2,20,10,19,17,12,11,6,10,4,2,13,21,9,4,2,19,4,9,14,6,24,1,13,3,10,16,9,19,4,10,5,7,3,38,16,13,1,7,15,10,2,19,25,25,7,15,11,25,19,4,14,19,18,14,11,4,29,21,24,19,31,28,15,27,13,4,10,8,4,18,3,11,8,10,33,19,35,21,7,18,4,12,16,14,3,1,27,12,6,9,2,6,9,16,22,26,11,11,15,13,6,20,17,8,13,15,14,14,6,24,10,2,9,23,12,8,16,10,7,19,2,9,14,9,16,7,6,22,9,9,14,17,12,13,8,10,16,1,6,4,8,4,15,7,14,16,15,23,19,4,12,12,25,14,14,11,7,18,4,37,13,14,17,5,2,0,3,21,20,19,4,19,11,14,8,13,24,1,1,3,4,21,10,13,9,14,2,21,22,14,7,2,5,12,1,12,4,9,9,6,5,5,8,2,6,0,3,7,3,10,3,2,12,15,5,4,10,1,8,20,4,7,10,3,5,10,0,3,10,2,10,4,0,10,5,0,0,19,2,12,5,5,5,10,0,4,3,2,1,0,1,1,6,12,6,9,14,13,8,0,1,3,13,3,8,8,18,2,3,5,2,10,30,1,5,8,0,4,2,30,25,3,20,20,0,15,10,4,3,10,9,7,12,0,16,4,7,7,14,2,20,5,10,20,10,8,11,3,6,4,4,9,10,3,2,2,0,8,6,15,15,9,8,18,3,10,6,20,8,3,4,13,4,17,4,0,15,11,23,1,5,1,5,3,3,19,20,5,0,3,3,7,7,1,13,0,0,12,0,5,45,10,2,3,1,5,10,4,7,9,5,4,11,9,4,2,23,3,15,8,3,25,2,0,19,3,7,1,9,3,8,0,5,20,3,12,5,1,0,7,13,3,0,2,0,2,1,10,10,1,3,32,0,7,5,2,5,3,25,0,3,10,10,7,5,15,1,5,9,18,1,0,6,1,2,15,25,1,0,0,0,8,22,5,10,1,1,6,4,6,0,1,3,15,33,2,1,10,0,14,15,15,10,6,18,15,30,15,10,0,0,4,0,3,20,3,1,5,7,6,2,0,10,6,4,8,18,7,15,7,8,8,3,10,9,24,12,2,6,18,17,7,6,10,5,7,11,14,5,2,4,5,14,4,15,12],
+age:[32,30,35,34,31,54,37,54,48,39,33,42,30,43,43,35,43,39,45,35,42,30,48,45,31,43,59,32,31,42,50,59,36,51,45,42,46,46,51,30,30,57,31,48,30,34,48,45,51,30,46,58,37,52,52,31,55,34,55,39,40,43,48,47,41,36,46,34,41,51,33,52,58,34,31,48,32,49,32,58,50,60,50,56,51,54,59,46,46,39,44,33,33,48,31,45,45,32,47,34,37,36,47,48,42,33,46,47,44,36,31,55,45,47,46,49,49,45,38,47,54,41,43,31,47,35,45,33,54,35,31,55,34,38,45,47,39,36,33,50,58,49,41,51,53,36,46,36,53,40,42,33,43,31,47,54,33,43,46,35,37,37,34,43,46,35,46,46,43,30,41,54,31,44,32,47,46,37,51,49,36,39,48,38,40,39,37,49,33,30,54,39,43,31,33,40,36,51,44,42,40,34,30,54,51,44,43,34,45,39,50,52,41,59,52,46,41,33,45,36,48,47,45,37,46,43,42,34,52,37,37,52,30,31,38,43,49,55,38,52,48,32,32,38,46,40,31,43,51,30,52,30,51,31,34,49,35,53,32,38,54,47,45,47,59,32,45,40,47,36,56,41,48,36,41,41,36,37,38,43,54,38,30,49,45,51,34,34,41,49,32,32,32,47,39,49,37,59,50,32,46,43,37,32,39,34,39,45,50,40,30,57,39,53,48,46,47,43,47,47,47,46,34,48,30,51,52,37,32,36,35,45,56,40,45,32,45,40,38,49,47,52,34,44,36,50,45,44,57,35,46,30,42,34,45,35,40,32,54,38,43,54,39,37,46,56,41,45,44,50,37,44,32,34,32,37,44,34,33,43,35,43,34,36,41,41,35,32,30,43,54,35,50,34,52,35,55,35,49,38,42,48,51,43,43,38,44,36,38,47,34,40,31,46,36,39,36,37,39,36,49,45,32,36,40,43,33,30,49,30,30,41,45,43,42,60,57,38,56,32,49,55,36,44,44,35,44,45,34,30,39,36,38,53,36,32,51,38,33,54,38,30,34,34,50,30,38,54,30,55,51,44,53,42,38,38,41,35,33,48,47,34,33,31,58,49,55,44,44,36,38,37,47,47,32,43,42,56,38,52,50,33,44,41,45,53,53,42,32,56,37,40,54,53,48,36,57,51,33,52,56,36,36,46,31,52,46,35,59,36,51,31,31,32,35,40,33,54,36,50,54,48,41,50,46,42,31,53,51,47,50,37,30,49,52,47,49,44,53,30,54,47,56,49,48,49,56,46,45,32,43,34,30,38,33,52,43,33,45,36,34,37,46,47,31,57,30,30,44,53,51,39,52,46,47,52,45,60,41,39,49,32,33,36,37,30,44,48,40,47,36,40,46,52,44,45,30,40,43,49,46,52,31,42,33,57,49,45,56,41,56,48,52,51,35,45,54,54,31,53,35,36,59,54,37,44,34,49,49,60,51,30,47,36,35,58,41,51,47,45,60,30,55,32,36,55,47,47,37,50,30,48,43,48,41,50,58,38,37,50,42,37,41,31,51,36,54,49,48,42,41,55,42,32,43,33,48,43,47,54,51,51,43,53,34,31,56,42,32,35,30,51,47,54,31,47,47,40,48,34,38,32,48,41,49,59,58,41,45,30,41,30,53,31,43,31,51,43,31,48,31,44,48,53,42,39,32,36,40,31,43,60,39],
+kidslt6:[1,0,1,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,1,0,2,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,0,0,0,0,0,1,0,1,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,2,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,1,2,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,2,0,1,2,0,0,0,0,0,1,0,0,2,0,0,2,2,0,0,2,0,0,1,0,0,0,0,0,0,1,1,0,1,0,0,0,2,3,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,2,0,1,1,0,0,0,1,0,0,0,0,0,1,1,0,0,0,0,2,0,0,1,1,0,1,1,0,1,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,2,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,1,1,1,2,1,0,0,1,0,2,1,0,0,0,2,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,0,3,1,1,0,0,0,0,0,0,0,0,0,2,1,0,0,1,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,2,1,0,0,1,0,1,0,0,0,0,1,0,0,1,0,1,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,0,0,0,1,0,0,1,0,1,0,0,0,0,1,0,0,1,0,0,0,1,0,1,1,0,0,0,1,1,0,0,0,3,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,2,0,0,0,1,0,0,1,0,1,0,0,0,0,2,1,0,0,2,0,0,0],
+kidsge6:[0,2,3,3,2,0,2,0,2,2,1,1,2,2,1,3,2,5,0,4,2,0,0,0,1,2,0,3,0,0,0,0,2,1,3,1,0,1,0,0,2,0,2,2,3,2,2,0,0,2,1,0,8,0,0,0,0,0,0,2,3,4,0,0,4,0,2,0,3,1,0,0,0,4,1,1,2,0,2,0,0,0,1,0,0,1,0,2,1,3,2,0,2,2,4,1,1,2,0,2,1,1,2,1,2,3,0,3,1,4,0,0,1,0,3,0,0,2,3,0,3,0,2,1,0,2,3,0,1,4,2,0,2,1,1,1,2,0,2,0,0,0,2,1,0,2,2,2,1,3,2,1,3,0,0,0,3,0,1,3,3,2,3,0,0,3,0,0,2,0,2,1,1,0,1,0,1,0,2,1,4,1,2,2,2,5,0,1,3,0,0,4,3,3,3,3,1,0,1,3,1,1,0,0,0,2,1,1,0,0,0,0,2,0,0,0,5,2,0,2,1,1,0,2,4,3,2,2,0,3,1,0,0,1,1,3,1,0,2,0,0,2,1,2,3,3,4,1,0,0,0,5,0,2,4,0,3,0,3,3,0,1,1,1,0,1,1,4,2,2,0,1,3,2,0,0,3,3,0,2,0,1,0,0,1,0,0,2,1,1,0,0,2,0,1,0,3,0,0,1,0,2,3,2,1,2,1,3,0,1,1,0,1,0,1,1,0,1,0,1,0,0,4,0,1,1,5,2,2,2,2,0,0,2,2,2,0,2,1,4,1,0,1,2,3,0,0,2,2,0,0,1,3,1,2,2,0,1,0,3,3,0,3,1,2,0,3,1,1,1,5,1,2,1,2,3,1,2,3,3,2,1,0,3,2,0,3,3,0,0,0,2,0,1,0,3,0,0,1,2,2,1,0,2,1,1,1,3,0,0,2,2,1,0,3,2,2,4,4,3,2,1,0,5,1,2,1,1,1,0,0,4,1,5,1,0,0,2,0,3,1,0,1,3,1,2,3,1,0,0,1,2,2,0,2,1,3,0,0,0,3,2,3,1,2,0,2,0,2,0,1,1,0,2,2,3,4,3,2,0,0,5,1,1,0,0,1,0,0,3,3,3,0,3,1,2,4,0,5,2,0,0,2,1,1,0,0,1,0,0,3,2,3,0,1,2,0,0,4,0,0,2,0,1,3,0,2,0,0,1,3,0,2,1,2,3,2,0,1,1,0,1,4,4,2,1,2,0,1,1,1,1,2,0,2,2,0,4,0,0,2,1,0,1,0,1,1,0,2,2,1,1,1,0,1,0,3,1,0,1,1,2,1,0,1,0,1,0,3,0,0,3,0,4,5,2,2,0,2,3,1,1,3,4,3,2,1,1,4,0,2,2,1,0,1,1,1,3,1,2,4,0,1,1,3,0,0,1,0,3,0,1,2,0,3,0,0,2,0,3,2,3,0,0,1,0,2,0,0,0,0,1,2,4,3,0,3,1,0,2,0,1,0,2,2,0,0,1,1,2,3,1,2,0,2,0,0,5,1,0,4,3,2,2,0,2,0,0,1,2,2,0,0,1,2,3,1,2,3,0,1,1,1,0,1,1,0,1,2,3,1,0,3,1,0,0,3,3,0,7,3,3,1,2,2,0,0,3,2,1,1,0,1,0,2,1,0,0,2,0,1,1,1,1,3,6,2,2,2,3,0,0,3],
+city:[0,1,0,0,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,1,0,1,1,1,1,0,0,1,1,0,1,1,0,1,0,0,1,0,1,1,0,0,0,1,0,0,0,1,1,0,1,0,1,1,1,1,1,0,1,1,1,1,0,0,1,1,0,1,1,1,1,1,1,0,1,1,1,1,0,1,1,0,1,1,1,1,0,1,1,1,1,0,0,1,1,0,0,1,0,1,1,0,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,0,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,1,1,1,1,1,1,0,1,1,0,1,0,0,1,1,1,1,0,1,1,1,1,1,1,0,0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0,1,1,0,0,1,1,1,1,1,0,0,0,0,1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,0,0,0,0,0,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,0,0,0,1,1,0,1,1,1,1,1,1,1,1,1,0,0,0,1,0,1,1,0,0,1,0,1,0,0,1,1,0,0,0,1,0,0,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,0,0,1,1,0,0,0,1,0,0,0,1,0,1,1,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,0,0,1,1,1,0,1,1,1,1,1,1,0,1,0,1,0,1,1,1,0,0,0,0,1,1,0,0,1,1,1,1,1,1,0,1,1,1,1,1,1,0,1,0,1,0,0,0,1,1,0,1,1,1,0,0,1,1,0,1,1,1,1,1,0,0,0,0,1,0,1,1,1,1,0,1,0,0,0,1,1,1,1,0,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,1,0,1,1,1,0,1,0,1,1,1,0,0,0,1,1,1,1,1,0,1,1,0,0,1,0,1,1,0,0,0,1,1,1,0,0,1,1,1,1,1,1,0,1,1,1,0,1,0,0,1,1,1,1,1,0,1,0,1,1,0,0,1,1,0,0,1,1,0,1,1,1,1,1,1,0,1,0,1,1,1,0,1,0,1,1,0,0,0,1,1,1,1,1,1,1,0,0,1,0,1,0,1,1,0,1,0,1,1,1,1,1,1,1,1,1,1,0,0,1,1,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,1,0,0,1,0,0,1,1,1,0,0,0,0,1,0,0,0,0,1,0,1,1,0,1,0,1,1,1,1,0,1,0,0,1,0,0,1,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,0,1,1,1,1,0,0,1,1,1,1,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,1,1]};
+
+const $ = s => document.querySelector(s);
+const CS = () => getComputedStyle(document.documentElement);
+const col = v => CS().getPropertyValue(v).trim();
+
+/* ══════════ Utilidades numéricas ══════════ */
+function matInv(A){
+  const n=A.length;
+  const M=A.map((r,i)=>[...r, ...Array.from({length:n},(_,j)=>i===j?1:0)]);
+  for(let c=0;c<n;c++){
+    let p=c;
+    for(let r=c+1;r<n;r++) if(Math.abs(M[r][c])>Math.abs(M[p][c])) p=r;
+    if(Math.abs(M[p][c])<1e-12) return null;
+    const tmp=M[c]; M[c]=M[p]; M[p]=tmp;
+    const pv=M[c][c];
+    for(let j=0;j<2*n;j++) M[c][j]/=pv;
+    for(let r=0;r<n;r++){
+      if(r===c) continue;
+      const f=M[r][c];
+      if(f===0) continue;
+      for(let j=0;j<2*n;j++) M[r][j]-=f*M[c][j];
+    }
+  }
+  return M.map(r=>r.slice(n));
+}
+const dot=(a,b)=>{let s=0;for(let i=0;i<a.length;i++) s+=a[i]*b[i];return s;};
+const zeros=k=>Array(k).fill(0);
+const zeros2=k=>Array.from({length:k},()=>Array(k).fill(0));
+const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+
+/* Distribuciones */
+function erfc(x){
+  const z=Math.abs(x), t=1/(1+0.5*z);
+  const r=t*Math.exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+t*(-0.18628806+
+          t*(0.27886807+t*(-1.13520398+t*(1.48851587+t*(-0.82215223+t*0.17087277)))))))));
+  return x>=0 ? r : 2-r;
+}
+const Phi=z=>0.5*erfc(-z/Math.SQRT2);
+const phi=z=>Math.exp(-0.5*z*z)/Math.sqrt(2*Math.PI);
+const Lam=z=>z>=0 ? 1/(1+Math.exp(-z)) : Math.exp(z)/(1+Math.exp(z));
+const lam=z=>{const p=Lam(z); return p*(1-p);};
+const LINK={logit:{G:Lam,g:lam}, probit:{G:Phi,g:phi}};
+const clampP=p=>Math.min(1-1e-12, Math.max(1e-12, p));
+const pNorm2=z=>erfc(Math.abs(z)/Math.SQRT2);   // P(|Z|>|z|)
+
+function lgamma(x){
+  const g=[76.18009172947146,-86.50532032941677,24.01409824083091,
+           -1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];
+  let y=x, tmp=x+5.5;
+  tmp-=(x+0.5)*Math.log(tmp);
+  let ser=1.000000000190015;
+  for(let j=0;j<6;j++) ser+=g[j]/++y;
+  return -tmp+Math.log(2.5066282746310005*ser/x);
+}
+function betacf(a,b,x){
+  const FPMIN=1e-300, qab=a+b, qap=a+1, qam=a-1;
+  let c=1, d=1-qab*x/qap;
+  if(Math.abs(d)<FPMIN) d=FPMIN;
+  d=1/d; let h=d;
+  for(let m=1;m<=200;m++){
+    const m2=2*m;
+    let aa=m*(b-m)*x/((qam+m2)*(a+m2));
+    d=1+aa*d; if(Math.abs(d)<FPMIN) d=FPMIN;
+    c=1+aa/c; if(Math.abs(c)<FPMIN) c=FPMIN;
+    d=1/d; h*=d*c;
+    aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));
+    d=1+aa*d; if(Math.abs(d)<FPMIN) d=FPMIN;
+    c=1+aa/c; if(Math.abs(c)<FPMIN) c=FPMIN;
+    d=1/d;
+    const del=d*c; h*=del;
+    if(Math.abs(del-1)<3e-12) break;
+  }
+  return h;
+}
+function betai(a,b,x){
+  if(x<=0) return 0;
+  if(x>=1) return 1;
+  const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));
+  return x<(a+1)/(a+b+2) ? bt*betacf(a,b,x)/a : 1-bt*betacf(b,a,1-x)/b;
+}
+const tTail2=(t,df)=>betai(df/2, 0.5, df/(df+t*t));
+/* P(chi2_df > x): gamma incompleta regularizada superior */
+function chi2Sf(x, df){
+  const a=df/2, xx=x/2;
+  if(xx<=0) return 1;
+  const gln=lgamma(a);
+  if(xx<a+1){
+    let ap=a, sum=1/a, del=sum;
+    for(let n=0;n<300;n++){ ap++; del*=xx/ap; sum+=del; if(Math.abs(del)<Math.abs(sum)*1e-14) break; }
+    return 1-sum*Math.exp(-xx+a*Math.log(xx)-gln);
+  }
+  let b=xx+1-a, c=1e300, d=1/b, h=d;
+  for(let i=1;i<300;i++){
+    const an=-i*(i-a); b+=2;
+    d=an*d+b; if(Math.abs(d)<1e-300) d=1e-300;
+    c=b+an/c; if(Math.abs(c)<1e-300) c=1e-300;
+    d=1/d; const del=d*c; h*=del;
+    if(Math.abs(del-1)<1e-14) break;
+  }
+  return Math.exp(-xx+a*Math.log(xx)-gln)*h;
+}
+
+function mulberry32(a){
+  return function(){
+    a|=0; a=a+0x6D2B79F5|0;
+    let t=Math.imul(a^a>>>15, 1|a);
+    t=t+Math.imul(t^t>>>7, 61|t)^t;
+    return ((t^t>>>14)>>>0)/4294967296;
+  };
+}
+
+/* ══════════ Estimadores ══════════ */
+function fitOLS(X,y){
+  const n=X.length, k=X[0].length;
+  const XtX=zeros2(k), Xty=zeros(k);
+  for(let i=0;i<n;i++){
+    const xi=X[i];
+    for(let a=0;a<k;a++){ Xty[a]+=xi[a]*y[i]; for(let b=0;b<k;b++) XtX[a][b]+=xi[a]*xi[b]; }
+  }
+  const inv=matInv(XtX);
+  if(!inv) return null;
+  const b=zeros(k);
+  for(let a=0;a<k;a++) for(let j=0;j<k;j++) b[a]+=inv[a][j]*Xty[j];
+  const fit=X.map(r=>dot(r,b));
+  const res=y.map((v,i)=>v-fit[i]);
+  const SSR=res.reduce((s,v)=>s+v*v,0);
+  const ybar=mean(y);
+  const SST=y.reduce((s,v)=>s+(v-ybar)**2,0);
+  const df=n-k, s2=SSR/df;
+  const se=b.map((_,i)=>Math.sqrt(s2*inv[i][i]));
+  // White HC1
+  const meat=zeros2(k);
+  for(let i=0;i<n;i++){
+    const e2=res[i]*res[i], xi=X[i];
+    for(let a=0;a<k;a++) for(let c=0;c<k;c++) meat[a][c]+=e2*xi[a]*xi[c];
+  }
+  const seR=b.map((_,j)=>{
+    let v=0;
+    for(let a=0;a<k;a++) for(let c=0;c<k;c++) v+=inv[j][a]*meat[a][c]*inv[c][j];
+    return Math.sqrt(v*n/df);
+  });
+  return {b, se, seR, fit, res, n, k, df, SSR, SST, R2:SST>0?1-SSR/SST:0};
+}
+
+/* Puntaje de Fisher (= Newton-Raphson en el Logit) */
+function fitBin(X, y, link, maxIt){
+  const n=X.length, k=X[0].length, L=LINK[link];
+  let b=zeros(k), ll=-Infinity, it=0, H=null;
+  for(it=1; it<=(maxIt||100); it++){
+    const I=zeros2(k), u=zeros(k);
+    for(let i=0;i<n;i++){
+      const xi=X[i], eta=dot(xi,b), p=clampP(L.G(eta)), d=Math.max(L.g(eta),1e-300);
+      const w=d*d/(p*(1-p)), s=(y[i]-p)*d/(p*(1-p));
+      for(let a=0;a<k;a++){ u[a]+=s*xi[a]; for(let c=0;c<k;c++) I[a][c]+=w*xi[a]*xi[c]; }
+    }
+    H=matInv(I);
+    if(!H) break;
+    let step=zeros(k);
+    for(let a=0;a<k;a++) for(let c=0;c<k;c++) step[a]+=H[a][c]*u[c];
+    // Paso con amortiguación si la log-verosimilitud baja
+    let t=1, bNew, llNew;
+    for(let h=0;h<30;h++){
+      bNew=b.map((v,j)=>v+t*step[j]);
+      llNew=logLik(X,y,bNew,link);
+      if(llNew>=ll-1e-10) break;
+      t/=2;
+    }
+    const mx=Math.max(...bNew.map((v,j)=>Math.abs(v-b[j])));
+    b=bNew; ll=llNew;
+    if(mx<1e-10) break;
+  }
+  // matriz de información en el óptimo
+  const I=zeros2(k);
+  for(let i=0;i<n;i++){
+    const xi=X[i], eta=dot(xi,b), p=clampP(L.G(eta)), d=L.g(eta);
+    const w=d*d/(p*(1-p));
+    for(let a=0;a<k;a++) for(let c=0;c<k;c++) I[a][c]+=w*xi[a]*xi[c];
+  }
+  H=matInv(I);
+  const se=b.map((_,j)=>H?Math.sqrt(H[j][j]):NaN);
+  const xb=X.map(r=>dot(r,b));
+  const fit=xb.map(v=>L.G(v));
+  return {b, se, ll, it, xb, fit, link};
+}
+function logLik(X,y,b,link){
+  const G=LINK[link].G;
+  let s=0;
+  for(let i=0;i<X.length;i++){
+    const p=clampP(G(dot(X[i],b)));
+    s+= y[i]===1 ? Math.log(p) : Math.log(1-p);
+  }
+  return s;
+}
+
+/* ══════════ Formato ══════════ */
+const fmt=(v,d=3)=>{ if(!isFinite(v)) return '—'; const s=v.toFixed(d); return Number(s)===0?(0).toFixed(d):s; };
+const fmtS=(v,d)=>{ if(!isFinite(v)) return '—'; const s=fmt(v,d); return (Number(s)>0?'+':'')+s; };
+function fmtCoef(v){
+  if(!isFinite(v)) return '—';
+  const a=Math.abs(v);
+  if(a!==0 && a<0.01) return v.toFixed(5);
+  return v.toFixed(4);
+}
+const pp=v=>(isFinite(v)?(v*100).toFixed(1):'—');
+const fmtP=p=>p<0.0005?'&lt;0.001':fmt(p,3);
+const stars=p=>p<0.01?'***':(p<0.05?'**':(p<0.10?'*':''));
+function statCards(items){
+  return items.map(s=>`<div class="stat-card"><div class="stat-label">${s.l}</div><div class="stat-value ${s.c||''} ${s.sm?'sm':''}">${s.v}</div>${s.note?`<div class="stat-note">${s.note}</div>`:''}</div>`).join('');
+}
+function noteBox(cls, title, html){
+  return `<div class="${cls}" style="margin-bottom:0">${title?`<div class="${cls}-title">${title}</div>`:''}${html}</div>`;
+}
+
+/* ══════════ Canvas ══════════ */
+function setupCanvas(id, ratio, maxH, minH){
+  const canvas=document.getElementById(id);
+  const dpr=window.devicePixelRatio||1;
+  const cw=canvas.parentElement.clientWidth||760;
+  const ch=Math.min(maxH||420, Math.max(minH||(cw<520?250:200), cw*ratio));
+  canvas.width=Math.round(cw*dpr);
+  canvas.height=Math.round(ch*dpr);
+  canvas.style.width=cw+'px';
+  canvas.style.height=ch+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {canvas, ctx, cw, ch};
+}
+function tickFmt(lo, hi, n){
+  const step=(hi-lo)/n;
+  if(!isFinite(step)||step<=0) return v=>String(v);
+  const d=Math.min(6, Math.max(0, Math.ceil(-Math.log10(step))+1));
+  return v=>{ const s=(Math.abs(v)<step/1e6?0:v).toFixed(d); return s==='-0'?'0':s; };
+}
+function niceTicks(lo, hi, n){
+  const raw=(hi-lo)/n, mag=Math.pow(10, Math.floor(Math.log10(raw)));
+  const f=raw/mag, step=(f<1.5?1:f<3?2:f<7?5:10)*mag;
+  const out=[];
+  for(let v=Math.ceil(lo/step-1e-9)*step; v<=hi+step*1e-9; v+=step) out.push(Math.abs(v)<step*1e-9?0:v);
+  return out;
+}
+function frame(ctx, cw, ch, pad, xr, yr, opts){
+  opts=opts||{};
+  const pw=cw-pad.l-pad.r, ph=ch-pad.t-pad.b;
+  const [x0,x1]=xr, [y0,y1]=yr;
+  const sx=v=>pad.l+(v-x0)/(x1-x0)*pw;
+  const sy=v=>pad.t+ph-(v-y0)/(y1-y0)*ph;
+  const ix=px=>x0+(px-pad.l)/pw*(x1-x0);
+  const iy=py=>y0+(pad.t+ph-py)/ph*(y1-y0);
+  ctx.fillStyle=col('--bg-canvas'); ctx.fillRect(0,0,cw,ch);
+  const nx=opts.nx||6, ny=opts.ny||5;
+  const yt=opts.yticks||niceTicks(y0,y1,ny);
+  const xt=opts.xticks||niceTicks(x0,x1,nx);
+  const fx=opts.fx||tickFmt(x0,x1,Math.max(1,(x1-x0)/((xt[1]-xt[0])||1)));
+  const fy=opts.fy||tickFmt(y0,y1,Math.max(1,(y1-y0)/((yt[1]-yt[0])||1)));
+  ctx.strokeStyle=col('--border'); ctx.lineWidth=0.5; ctx.font='11px sans-serif';
+  xt.forEach(v=>{
+    const px=sx(v);
+    ctx.beginPath(); ctx.moveTo(px,pad.t); ctx.lineTo(px,pad.t+ph); ctx.stroke();
+    ctx.fillStyle=col('--text-sec'); ctx.textAlign='center';
+    ctx.fillText(fx(v), px, pad.t+ph+16);
+  });
+  yt.forEach(v=>{
+    const py=sy(v);
+    ctx.beginPath(); ctx.moveTo(pad.l,py); ctx.lineTo(pad.l+pw,py); ctx.stroke();
+    ctx.fillStyle=col('--text-sec'); ctx.textAlign='right';
+    ctx.fillText(fy(v), pad.l-8, py+4);
+  });
+  ctx.strokeStyle=col('--text-sec'); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t+ph); ctx.lineTo(pad.l+pw,pad.t+ph); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+ph); ctx.stroke();
+  ctx.fillStyle=col('--heading'); ctx.font='bold 12px sans-serif'; ctx.textAlign='center';
+  if(opts.xlab) ctx.fillText(opts.xlab, pad.l+pw/2, ch-4);
+  if(opts.ylab){
+    ctx.save(); ctx.translate(13, pad.t+ph/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText(opts.ylab, 0, 0); ctx.restore();
+  }
+  return {sx, sy, ix, iy, pw, ph, x0, x1, y0, y1, pad};
+}
+function clipTo(ctx, sc){
+  ctx.save();
+  ctx.beginPath(); ctx.rect(sc.pad.l, sc.pad.t, sc.pw, sc.ph); ctx.clip();
+}
+function curve(ctx, sc, f, x0, x1, color, width, dash, steps){
+  ctx.save();
+  ctx.strokeStyle=col(color); ctx.lineWidth=width||2.4;
+  if(dash) ctx.setLineDash(dash);
+  ctx.beginPath();
+  steps=steps||160;
+  let started=false;
+  for(let i=0;i<=steps;i++){
+    const x=x0+(x1-x0)*i/steps, y=f(x);
+    if(!isFinite(y)){ started=false; continue; }
+    const px=sc.sx(x), py=sc.sy(y);
+    if(!started){ ctx.moveTo(px,py); started=true; } else ctx.lineTo(px,py);
+  }
+  ctx.stroke(); ctx.restore();
+}
+function hband(ctx, sc, ya, yb, color, alpha){
+  const a=Math.max(sc.y0, Math.min(ya,yb)), b=Math.min(sc.y1, Math.max(ya,yb));
+  if(b<=a) return;
+  ctx.save(); ctx.globalAlpha=alpha; ctx.fillStyle=col(color);
+  ctx.fillRect(sc.pad.l, sc.sy(b), sc.pw, sc.sy(a)-sc.sy(b));
+  ctx.restore();
+}
+function hline(ctx, sc, y, color, dash, w){
+  ctx.save(); ctx.strokeStyle=col(color); ctx.lineWidth=w||1; if(dash) ctx.setLineDash(dash);
+  ctx.beginPath(); ctx.moveTo(sc.pad.l, sc.sy(y)); ctx.lineTo(sc.pad.l+sc.pw, sc.sy(y)); ctx.stroke(); ctx.restore();
+}
+function vline(ctx, sc, x, color, dash, w){
+  ctx.save(); ctx.strokeStyle=col(color); ctx.lineWidth=w||1; if(dash) ctx.setLineDash(dash);
+  ctx.beginPath(); ctx.moveTo(sc.sx(x), sc.pad.t); ctx.lineTo(sc.sx(x), sc.pad.t+sc.ph); ctx.stroke(); ctx.restore();
+}
+function dotAt(ctx, sc, x, y, color, r){
+  ctx.save(); ctx.fillStyle=col(color); ctx.strokeStyle=col('--bg-canvas'); ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(sc.sx(x), sc.sy(y), r||5, 0, 2*Math.PI); ctx.fill(); ctx.stroke(); ctx.restore();
+}
+function hex2rgb(h){
+  h=h.replace('#','');
+  if(h.length===3) h=h.split('').map(c=>c+c).join('');
+  const n=parseInt(h,16);
+  return [n>>16&255, n>>8&255, n&255];
+}
+function setActive(ids, on){ ids.forEach(id=>$('#'+id).classList.toggle('active', id===on)); }
+const isNarrow=()=>window.innerWidth<600;
+
+/* ══════════════════════════════════════════════════════
+   DATOS: Mroz (1975), 753 mujeres casadas
+   ══════════════════════════════════════════════════════ */
+const N=MROZ.inlf.length;
+const Y=MROZ.inlf;
+const ROWS=Array.from({length:N},(_,i)=>({
+  nwifeinc:MROZ.nwifeinc[i], educ:MROZ.educ[i], exper:MROZ.exper[i], age:MROZ.age[i],
+  kidslt6:MROZ.kidslt6[i], kidsge6:MROZ.kidsge6[i], city:MROZ.city[i]
+}));
+const VARS=[
+  {k:'nwifeinc', d:'Ingreso familiar no propio (miles de US$)', min:0, max:100, step:1, u:'mil US$'},
+  {k:'educ',     d:'Años de educación',                         min:5, max:17,  step:1, u:'años'},
+  {k:'exper',    d:'Años de experiencia laboral',               min:0, max:45,  step:1, u:'años'},
+  {k:'age',      d:'Edad',                                      min:30,max:60,  step:1, u:'años'},
+  {k:'kidslt6',  d:'Hijos menores de 6 años',                   min:0, max:3,   step:1, u:'hijos'},
+  {k:'kidsge6',  d:'Hijos de 6 a 18 años',                      min:0, max:8,   step:1, u:'hijos'},
+  {k:'city',     d:'Vive en zona metropolitana (dummy)',        min:0, max:1,   step:1, u:''}
+];
+const VMEAN={}; VARS.forEach(v=>VMEAN[v.k]=mean(ROWS.map(r=>r[v.k])));
+const YBAR=mean(Y);
+
+/* Especificación global */
+let SPEC={nwifeinc:true, educ:true, exper:true, expersq:true, age:true, kidslt6:true, kidsge6:true, city:true};
+let M=null;   // modelos estimados
+
+function terms(){
+  const t=[{name:'(Intercepto)', f:()=>1}];
+  VARS.forEach(v=>{
+    if(!SPEC[v.k]) return;
+    t.push({name:v.k, v:v.k, f:r=>r[v.k]});
+    if(v.k==='exper' && SPEC.expersq) t.push({name:'exper²', v:'expersq', f:r=>r.exper*r.exper});
+  });
+  return t;
+}
+function xrow(T, r){ return T.map(t=>t.f(r)); }
+/* Derivada del índice respecto de la variable v, en el punto r */
+function dIndex(T, b, v, r){
+  let s=0;
+  T.forEach((t,j)=>{
+    if(t.v===v) s+=b[j];
+    if(v==='exper' && t.v==='expersq') s+=2*b[j]*r.exper;
+  });
+  return s;
+}
+function refit(){
+  const T=terms();
+  const X=ROWS.map(r=>xrow(T,r));
+  M={T, X,
+     mpl:fitOLS(X,Y),
+     logit:fitBin(X,Y,'logit'),
+     probit:fitBin(X,Y,'probit')};
+  // Modelo nulo
+  M.ll0=N*(YBAR*Math.log(YBAR)+(1-YBAR)*Math.log(1-YBAR));
+  // Breusch-Pagan (versión de Koenker: n·R² de û² sobre X)
+  const u2=M.mpl.res.map(e=>e*e);
+  const aux=fitOLS(X,u2);
+  M.bp={stat:N*aux.R2, df:M.T.length-1};
+  M.bp.p=M.bp.df>0?chi2Sf(M.bp.stat, M.bp.df):NaN;
+}
+function specText(){
+  const T=M.T.slice(1).map(t=>t.v==='expersq'?'exper²':t.name);
+  return 'inlf ~ '+(T.length?T.join(' + '):'1');
+}
+
+/* ── Panel de especificación ── */
+function renderSpec(){
+  const items=[...VARS.map(v=>({k:v.k, lab:v.k})), {k:'expersq', lab:'exper²'}];
+  $('#specChk').innerHTML=items.map(it=>{
+    const dis=(it.k==='expersq' && !SPEC.exper);
+    return `<label class="chk ${SPEC[it.k]&&!dis?'on':''} ${dis?'dis':''}"><input type="checkbox" ${SPEC[it.k]&&!dis?'checked':''} ${dis?'disabled':''} onchange="toggleSpec('${it.k}',this.checked)">${it.lab}</label>`;
+  }).join('');
+  $('#specEq').innerHTML=specText();
+}
+function toggleSpec(k, on){
+  SPEC[k]=on;
+  const nVars=VARS.filter(v=>SPEC[v.k]).length;
+  if(nVars===0){ SPEC[k]=true; }
+  updateAllModels();
+}
+function setSpec(which){
+  VARS.forEach(v=>SPEC[v.k]=false);
+  SPEC.expersq=false;
+  if(which==='all'){ VARS.forEach(v=>SPEC[v.k]=true); SPEC.expersq=true; }
+  if(which==='educ'){ SPEC.educ=true; }
+  if(which==='kids'){ SPEC.educ=true; SPEC.kidslt6=true; SPEC.kidsge6=true; }
+  updateAllModels();
+}
+function updateAllModels(){
+  refit();
+  renderSpec();
+  ['#chip3','#chip4','#chip7','#chip8'].forEach(id=>$(id).innerHTML='Modelo actual: '+specText());
+  render2(); render3(); render4(); render7(); render8();
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 1 — Recta contra curva en S
+   ══════════════════════════════════════════════════════ */
+const S1={seed:11, show:{ols:true, log:true, true:false, bin:true}, d:null};
+function tog1(k){
+  S1.show[k]=!S1.show[k];
+  $({ols:'#m1sOls',log:'#m1sLog',true:'#m1sTrue',bin:'#m1sBin'}[k]).classList.toggle('active', S1.show[k]);
+  draw1();
+}
+function newSample1(){ S1.seed=Math.floor(Math.random()*1e9); run1(); }
+function run1(){
+  const b=+$('#m1b').value, c=+$('#m1c').value, n=+$('#m1n').value;
+  $('#m1bV').textContent=b.toFixed(2); $('#m1cV').textContent=c.toFixed(1); $('#m1nV').textContent=n;
+  const rng=mulberry32(S1.seed);
+  const x=[], y=[], jit=[];
+  for(let i=0;i<n;i++){
+    const xi=rng()*20;
+    x.push(xi); y.push(rng()<Lam(b*(xi-c))?1:0); jit.push(rng()*2-1);
+  }
+  const X=x.map(v=>[1,v]);
+  const ols=fitOLS(X,y);
+  const allSame=y.every(v=>v===y[0]);
+  const lg=allSame?null:fitBin(X,y,'logit',60);
+  S1.d={x,y,jit,b,c,n,ols,lg};
+  draw1();
+
+  const [a0,a1]=ols.b;
+  const outLo=ols.fit.filter(v=>v<0).length, outHi=ols.fit.filter(v=>v>1).length;
+  // Rango de X (0 a 20) donde la recta sale de [0,1]
+  let fuera=0; for(let k=0;k<=400;k++){ const xv=k/20, p=a0+a1*xv; if(p<0||p>1) fuera++; }
+  const fueraPct=fuera/401*100;
+  const lgMax=lg?lg.b[1]/4:NaN;
+  $('#st1').innerHTML=statCards([
+    {l:'Pendiente MPL', v:fmtS(a1*100,1)+' pp', c:'orange', note:'Constante para todo X'},
+    {l:'Pendiente Logit en el centro', v:lg?fmtS(lgMax*100,1)+' pp':'—', c:'logit', note:'Efecto máximo: β̂/4, donde P = 0.5'},
+    {l:'Predicciones fuera de [0,1]', v:`${outLo+outHi} <span style="font-size:.8rem">de ${n}</span>`, c:(outLo+outHi)>0?'orange':'green', note:`${outLo} negativas · ${outHi} mayores que 1`},
+    {l:'Rango de X con P̂ imposible', v:fmt(fueraPct,0)+'%', c:fueraPct>0?'orange':'green', note:'Del intervalo 0 a 20'}
+  ]);
+  let msg;
+  if(fueraPct===0) msg=noteBox('tip','', 'Con esta pendiente la curva verdadera es casi recta en el rango de los datos: el MPL y el Logit cuentan prácticamente la misma historia. <strong>Subí la pendiente verdadera</strong> para ver dónde se separan.');
+  else msg=noteBox('callout','La recta se sale del intervalo', `En el ${fmt(fueraPct,0)}% del rango de X la recta OLS predice probabilidades <strong>negativas o mayores que 1</strong>. La curva logística, en cambio, se aplana cerca de 0 y de 1 y nunca cruza esos límites.`);
+  $('#nt1').innerHTML=msg;
+}
+function draw1(){
+  const d=S1.d; if(!d) return;
+  const {ctx,cw,ch}=setupCanvas('cv1', 0.48, 380);
+  const pad={l:48,r:14,t:14,b:38};
+  const sc=frame(ctx,cw,ch,pad,[0,20],[-0.35,1.35],{xlab:'X', ylab:'Y   /   P(Y = 1)', nx:10, yticks:[-0.25,0,0.25,0.5,0.75,1,1.25], fy:v=>v.toFixed(2)});
+  hband(ctx,sc,-1,0,'--red',0.10); hband(ctx,sc,1,2,'--red',0.10);
+  hline(ctx,sc,0,'--text-sec',[3,3]); hline(ctx,sc,1,'--text-sec',[3,3]);
+  clipTo(ctx,sc);
+  ctx.fillStyle=col('--blue'); ctx.globalAlpha=0.45;
+  for(let i=0;i<d.n;i++){
+    ctx.beginPath(); ctx.arc(sc.sx(d.x[i]), sc.sy(d.y[i]+d.jit[i]*0.045), 2.4, 0, 2*Math.PI); ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  if(S1.show.bin){
+    for(let k=0;k<10;k++){
+      const lo=k*2, hi=lo+2;
+      const ys=d.y.filter((_,i)=>d.x[i]>=lo && d.x[i]<hi);
+      if(ys.length<3) continue;
+      const pr=mean(ys);
+      ctx.fillStyle=col('--green'); ctx.globalAlpha=0.85;
+      ctx.fillRect(sc.sx(lo+1)-5, sc.sy(pr)-5, 10, 10);
+      ctx.globalAlpha=1;
+    }
+  }
+  if(S1.show.true) curve(ctx,sc,x=>Lam(d.b*(x-d.c)),0,20,'--text-sec',1.8,[5,4]);
+  if(S1.show.ols) curve(ctx,sc,x=>d.ols.b[0]+d.ols.b[1]*x,0,20,'--red',2.6);
+  if(S1.show.log && d.lg) curve(ctx,sc,x=>Lam(d.lg.b[0]+d.lg.b[1]*x),0,20,'--orange',2.6);
+  ctx.restore();
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 2 — Output del MPL
+   ══════════════════════════════════════════════════════ */
+let SEMODE='clas', OPEN2=null;
+function setSE(m){ SEMODE=m; setActive(['seClas','seRob'], m==='clas'?'seClas':'seRob'); render2(); }
+function interp2(name, b){
+  const a=Math.abs(b*100).toFixed(2);
+  const sube=b>0?'aumenta':'reduce';
+  switch(name){
+    case '(Intercepto)': return `Es la probabilidad predicha cuando todas las regresoras valen cero (sin ingreso, sin educación, edad cero...). No tiene una lectura económica útil: está fuera del rango de los datos. Notá además que <strong>nada impide que sea negativa o mayor que 1</strong>.`;
+    case 'nwifeinc': return `Cada US$ 1.000 adicionales de ingreso familiar no proveniente de la mujer <strong>${sube}</strong> la probabilidad de participar en <strong>${a} pp</strong>, manteniendo lo demás constante. Con US$ 10.000 más, el efecto es 10 veces mayor: ${(Math.abs(b)*1000).toFixed(1)} pp. Es el efecto ingreso de la teoría de la oferta laboral.`;
+    case 'educ': return `Un año más de educación se asocia con un cambio de <strong>${fmtS(b*100,2)} pp</strong> en la probabilidad de participar, ceteris paribus. Con un título universitario (4 años más) el cambio sería de ${fmtS(b*400,1)} pp.`;
+    case 'exper': return `Como la experiencia entra también al cuadrado, este coeficiente sólo es el efecto parcial <strong>cuando exper = 0</strong>. Para otros niveles hay que sumar 2&sdot;&beta;<sub>exper²</sub>&sdot;exper: usá el control de abajo.`;
+    case 'exper²': return `Un coeficiente negativo indica que el efecto de la experiencia <strong>se atenúa</strong> a medida que se acumulan años (rendimientos decrecientes). No se interpreta por separado: va siempre junto con el de exper.`;
+    case 'age': return `Un año más de edad se asocia con un cambio de <strong>${fmtS(b*100,2)} pp</strong> en la probabilidad de participar, manteniendo constantes la educación, la experiencia, los hijos y el ingreso. Diez años más: ${fmtS(b*1000,1)} pp.`;
+    case 'kidslt6': return `Cada hijo menor de 6 años adicional <strong>${sube}</strong> la probabilidad de participar en <strong>${Math.abs(b*100).toFixed(1)} pp</strong>. Es el efecto más grande del modelo. Ojo: con 3 hijos chicos el MPL resta ${(Math.abs(b)*300).toFixed(0)} pp, aunque la persona ya tenga una probabilidad baja. Eso es lo que lleva a predicciones negativas.`;
+    case 'kidsge6': return `Cada hijo de 6 a 18 años se asocia con un cambio de <strong>${fmtS(b*100,2)} pp</strong>. Fijate en el p-valor antes de contar una historia: con este tamaño de efecto y este error estándar, no podemos distinguirlo de cero.`;
+    case 'city': return `Vivir en una zona metropolitana se asocia con una probabilidad de participar ${b>0?'mayor':'menor'} en <strong>${a} pp</strong>, <strong>respecto de</strong> no vivir en una, ceteris paribus. Es la lectura de una dummy como regresora, igual que en la Clase 7. Revisá la significancia.`;
+  }
+  return '';
+}
+function render2(){
+  const m=M.mpl, se=SEMODE==='rob'?m.seR:m.se;
+  let h=`<div class="reg-out-head">MPL estimado por OLS · inlf · n = ${m.n}</div>`;
+  M.T.forEach((t,j)=>{
+    const tt=m.b[j]/se[j], p=tTail2(tt, m.df);
+    const open=OPEN2===t.name;
+    h+=`<div class="reg-row ${open?'open':''}" onclick="open2('${t.name}')">
+      <span class="reg-var">${t.name}</span>
+      <span class="reg-coef">${fmtCoef(m.b[j])} <b style="color:var(--accent)">${stars(p)}</b><span class="reg-se">(${fmtCoef(se[j])}) · t = ${fmt(tt,2)} · p = ${fmtP(p)}</span></span>
+    </div>
+    <div class="reg-explain ${open?'open':''}">${interp2(t.name, m.b[j])}</div>`;
+  });
+  h+=`<div class="reg-foot"><span>R² = ${fmt(m.R2,4)}</span><span>EE ${SEMODE==='rob'?'robustos (HC1)':'clásicos'}</span><span>Breusch-Pagan = ${fmt(M.bp.stat,2)} (p = ${fmtP(M.bp.p)})</span></div>`;
+  $('#mplOut').innerHTML=h;
+  render2exp();
+}
+function open2(n){ OPEN2=OPEN2===n?null:n; render2(); }
+function render2exp(){
+  const x=+$('#m2x').value; $('#m2xV').textContent=x;
+  const jE=M.T.findIndex(t=>t.v==='exper'), jQ=M.T.findIndex(t=>t.v==='expersq');
+  if(jE<0){
+    $('#st2').innerHTML=statCards([{l:'Efecto de exper', v:'—', note:'La experiencia no está en el modelo. Activala en la especificación.'}]);
+    return;
+  }
+  const b=M.mpl.b, bE=b[jE], bQ=jQ>=0?b[jQ]:0;
+  const ef=bE+2*bQ*x;
+  const tp=jQ>=0 && bQ<0 ? -bE/(2*bQ) : NaN;
+  $('#st2').innerHTML=statCards([
+    {l:`Efecto con exper = ${x}`, v:fmtS(ef*100,2)+' pp', c:ef>=0?'green':'orange', note:'Un año más de experiencia'},
+    {l:'Efecto con exper = 0', v:fmtS(bE*100,2)+' pp', note:'Es el coeficiente de exper'},
+    {l:'Punto de giro', v:isFinite(tp)?fmt(tp,1)+' años':'—', c:'accent', note:jQ>=0?'Donde el efecto se anula: −β̂ₑ / (2β̂ₑ²)':'Sin exper² el efecto es constante'}
+  ]);
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 3 — Simulador de predicción
+   ══════════════════════════════════════════════════════ */
+const P3={nwifeinc:20, educ:12, exper:10, age:35, kidslt6:1, kidsge6:1, city:1};
+let TAN3=false;
+const PRESETS={
+  clase:{nwifeinc:20, educ:12, exper:10, age:35, kidslt6:1, kidsge6:1, city:1},
+  prom:{nwifeinc:20, educ:12, exper:11, age:43, kidslt6:0, kidsge6:1, city:1},
+  neg:{nwifeinc:60, educ:8, exper:0, age:58, kidslt6:2, kidsge6:0, city:1},
+  alta:{nwifeinc:0, educ:17, exper:25, age:35, kidslt6:0, kidsge6:0, city:0}
+};
+function build3(){
+  $('#sl3').innerHTML=VARS.map(v=>`
+    <div class="sim-control" id="sc3_${v.k}">
+      <label for="s3_${v.k}">${v.k} <span class="sim-val" id="s3v_${v.k}"></span></label>
+      <input type="range" id="s3_${v.k}" min="${v.min}" max="${v.max}" step="${v.step}" value="${P3[v.k]}" oninput="P3['${v.k}']=+this.value;render3()">
+      <span class="stat-note">${v.d}</span>
+    </div>`).join('');
+  $('#m3var').innerHTML=VARS.filter(v=>v.k!=='city').map(v=>`<option value="${v.k}" ${v.k==='educ'?'selected':''}>${v.k} · ${v.d}</option>`).join('');
+}
+function preset3(k){
+  Object.assign(P3, PRESETS[k]);
+  VARS.forEach(v=>$('#s3_'+v.k).value=P3[v.k]);
+  render3();
+}
+function tog3tan(){ TAN3=!TAN3; $('#m3tan').classList.toggle('active',TAN3); draw3(); }
+function pred3(r){
+  const x=xrow(M.T, r);
+  const zl=dot(x,M.logit.b), zp=dot(x,M.probit.b);
+  return {mpl:dot(x,M.mpl.b), logit:Lam(zl), probit:Phi(zp), zl, zp};
+}
+function render3(){
+  VARS.forEach(v=>{
+    $('#s3v_'+v.k).textContent=v.k==='city'?(P3.city?'sí (1)':'no (0)'):P3[v.k];
+    $('#sc3_'+v.k).classList.toggle('off', !SPEC[v.k]);
+  });
+  const p=pred3(P3);
+  const lo=-0.4, hi=1.4, pos=v=>(Math.max(lo,Math.min(hi,v))-lo)/(hi-lo)*100;
+  const bar=(name,cls,colv,v,extra)=>{
+    const bad=v<0||v>1;
+    const a=pos(Math.min(0,v)), b=pos(Math.max(0,v));
+    return `<div class="pbar-row">
+      <span class="pbar-name ${cls}">${name}</span>
+      <div class="pbar-track">
+        <div class="pbar-zone" style="left:0;width:${pos(0)}%"></div>
+        <div class="pbar-zone" style="left:${pos(1)}%;right:0"></div>
+        <div class="pbar-fill" style="left:${a}%;width:${b-a}%;background:var(${colv})"></div>
+        <div class="pbar-tick" style="left:${pos(0)}%"></div><div class="pbar-tick" style="left:${pos(0.5)}%;opacity:.25"></div><div class="pbar-tick" style="left:${pos(1)}%"></div>
+      </div>
+      <span class="pbar-val ${bad?'bad':''}" title="${extra||''}">${fmt(v,3)}</span>
+    </div>`;
+  };
+  $('#pbar3').innerHTML=
+    bar('MPL','c-mpl','--red',p.mpl)+
+    bar('Logit','c-logit','--orange',p.logit,'índice z = '+fmt(p.zl,3))+
+    bar('Probit','c-probit','--accent',p.probit,'índice z = '+fmt(p.zp,3))+
+    `<div class="hint" style="margin-top:.2rem">P̂(inlf = 1). Las zonas rojas son probabilidades imposibles (menores que 0 o mayores que 1). Índices lineales: Logit z = ${fmt(p.zl,3)} · Probit z = ${fmt(p.zp,3)}.</div>`;
+
+  // Tabla de efectos marginales en el punto
+  let h=`<thead><tr><th>Variable</th><th class="mpl">MPL</th><th class="logit">Logit</th><th class="probit">Probit</th></tr></thead><tbody>`;
+  VARS.forEach(v=>{
+    if(!SPEC[v.k]){ h+=`<tr><td class="lbl" style="opacity:.5">${v.k}</td><td colspan="3" style="opacity:.5;font-family:var(--font-b)">no está en el modelo</td></tr>`; return; }
+    const mm=dIndex(M.T,M.mpl.b,v.k,P3);
+    const ml=lam(p.zl)*dIndex(M.T,M.logit.b,v.k,P3);
+    const mp=phi(p.zp)*dIndex(M.T,M.probit.b,v.k,P3);
+    const c=x=>x<0?'neg':'';
+    h+=`<tr><td class="lbl">${v.k}</td><td class="${c(mm)}">${fmtS(mm*100,2)}</td><td class="${c(ml)}">${fmtS(ml*100,2)}</td><td class="${c(mp)}">${fmtS(mp*100,2)}</td></tr>`;
+  });
+  h+=`<tr class="hi"><td class="lbl">Densidad g(xβ̂)</td><td>—</td><td>${fmt(lam(p.zl),3)}</td><td>${fmt(phi(p.zp),3)}</td></tr>`;
+  $('#me3').innerHTML=h+'</tbody>';
+
+  let msg='';
+  if(p.mpl<0) msg=noteBox('callout','Probabilidad negativa', `El MPL predice <strong>${fmt(p.mpl,3)}</strong>: una probabilidad imposible. Logit (${fmt(p.logit,3)}) y Probit (${fmt(p.probit,3)}) se quedan cerca de 0 pero nunca lo cruzan.`);
+  else if(p.mpl>1) msg=noteBox('callout','Probabilidad mayor que 1', `El MPL predice <strong>${fmt(p.mpl,3)}</strong>. Logit (${fmt(p.logit,3)}) y Probit (${fmt(p.probit,3)}) se acercan a 1 sin pasarlo.`);
+  else if(Math.abs(p.mpl-p.logit)<0.05 && Math.abs(p.logit-p.probit)<0.03) msg=noteBox('tip','', `Para esta persona los tres modelos predicen casi lo mismo (diferencias de menos de 5 pp). Pasa en el centro de la distribución; las diferencias aparecen en los extremos.`);
+  $('#nt3').innerHTML=msg;
+  draw3();
+}
+function draw3(){
+  if(!M) return;
+  const vk=$('#m3var').value, V=VARS.find(v=>v.k===vk);
+  const {ctx,cw,ch}=setupCanvas('cv3', 0.46, 370);
+  const pad={l:48,r:14,t:14,b:38};
+  const at=x=>Object.assign({},P3,{[vk]:x});
+  // rango vertical: ajusta a MPL si sale mucho
+  let mn=0, mx=1;
+  for(let i=0;i<=40;i++){ const x=V.min+(V.max-V.min)*i/40; const v=dot(xrow(M.T,at(x)),M.mpl.b); mn=Math.min(mn,v); mx=Math.max(mx,v); }
+  const y0=Math.max(-1, Math.min(-0.15, mn-0.08)), y1=Math.min(2, Math.max(1.15, mx+0.08));
+  const sc=frame(ctx,cw,ch,pad,[V.min,V.max],[y0,y1],{xlab:V.d, ylab:'P̂(inlf = 1)', nx:Math.min(8,V.max-V.min), yticks:niceTicks(y0,y1,6).filter(v=>Math.abs(v*4-Math.round(v*4))<1e-9), fy:v=>v.toFixed(2)});
+  hband(ctx,sc,y0-1,0,'--red',0.10); hband(ctx,sc,1,y1+1,'--red',0.10);
+  hline(ctx,sc,0,'--text-sec',[3,3]); hline(ctx,sc,1,'--text-sec',[3,3]);
+  clipTo(ctx,sc);
+  const fM=x=>dot(xrow(M.T,at(x)),M.mpl.b);
+  const fL=x=>Lam(dot(xrow(M.T,at(x)),M.logit.b));
+  const fP=x=>Phi(dot(xrow(M.T,at(x)),M.probit.b));
+  curve(ctx,sc,fM,V.min,V.max,'--red',2.4);
+  curve(ctx,sc,fL,V.min,V.max,'--orange',2.4);
+  curve(ctx,sc,fP,V.min,V.max,'--accent',2.4,[7,4]);
+  const x0=P3[vk];
+  vline(ctx,sc,x0,'--text-sec',[2,3]);
+  if(TAN3){
+    const p=pred3(P3), span=(V.max-V.min)*0.18;
+    const sl={mpl:dIndex(M.T,M.mpl.b,vk,P3), logit:lam(p.zl)*dIndex(M.T,M.logit.b,vk,P3), probit:phi(p.zp)*dIndex(M.T,M.probit.b,vk,P3)};
+    [['mpl','--red',p.mpl],['logit','--orange',p.logit],['probit','--accent',p.probit]].forEach(([k,c,y])=>{
+      ctx.save(); ctx.strokeStyle=col(c); ctx.lineWidth=1.6; ctx.setLineDash([2,3]);
+      ctx.beginPath(); ctx.moveTo(sc.sx(x0-span),sc.sy(y-sl[k]*span)); ctx.lineTo(sc.sx(x0+span),sc.sy(y+sl[k]*span)); ctx.stroke(); ctx.restore();
+    });
+  }
+  ctx.restore();
+  dotAt(ctx,sc,x0,fM(x0),'--red'); dotAt(ctx,sc,x0,fL(x0),'--orange'); dotAt(ctx,sc,x0,fP(x0),'--accent');
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 4 — Problemas del MPL
+   ══════════════════════════════════════════════════════ */
+let MODE4='hist';
+function set4(m){ MODE4=m; setActive(['m4a','m4b'], m==='hist'?'m4a':'m4b'); render4(); }
+function render4(){
+  if(MODE4==='hist') draw4hist(); else draw4res();
+  const f=M.mpl.fit;
+  const neg=f.filter(v=>v<0).length, big=f.filter(v=>v>1).length;
+  if(MODE4==='hist'){
+    const minF=Math.min(...f), maxF=Math.max(...f);
+    $('#st4').innerHTML=statCards([
+      {l:'MPL: <span class="nt">P̂ &lt; 0</span>', v:neg, c:neg?'orange':'green', note:`Mínimo: ${fmt(minF,3)}`},
+      {l:'MPL: <span class="nt">P̂ &gt; 1</span>', v:big, c:big?'orange':'green', note:`Máximo: ${fmt(maxF,3)}`},
+      {l:'Logit fuera de [0,1]', v:0, c:'green', note:`Rango: ${fmt(Math.min(...M.logit.fit),3)} a ${fmt(Math.max(...M.logit.fit),3)}`},
+      {l:'Probit fuera de [0,1]', v:0, c:'green', note:`Rango: ${fmt(Math.min(...M.probit.fit),3)} a ${fmt(Math.max(...M.probit.fit),3)}`}
+    ]);
+    $('#nt4').innerHTML=noteBox('note','Problema 1', `De las ${N} predicciones del MPL, <strong>${neg+big}</strong> caen fuera de [0, 1] (${neg} negativas y ${big} mayores que 1). Logit y Probit, por construcción, no pueden hacerlo. Con menos regresoras (por ejemplo "Sólo educ") el rango de predicciones se achica y el problema puede desaparecer: aparece sobre todo cuando las regresoras toman valores extremos.`);
+  } else {
+    const ratio=M.T.map((t,j)=>({n:t.name, r:M.mpl.seR[j]/M.mpl.se[j], c:M.mpl.se[j], rb:M.mpl.seR[j]}));
+    $('#st4').innerHTML=statCards([
+      {l:'Breusch-Pagan', v:fmt(M.bp.stat,2), c:'accent', note:`χ² con ${M.bp.df} gl`},
+      {l:'p-valor', v:fmtP(M.bp.p), c:M.bp.p<0.05?'orange':'green', note:M.bp.p<0.05?'Rechazamos homoscedasticidad':'No rechazamos al 5%'},
+      {l:'Mayor cambio en el EE', v:fmtS((Math.max(...ratio.map(r=>Math.abs(r.r-1)))*100),0)+'%', note:'Robusto vs. clásico, en valor absoluto'}
+    ]);
+    let tb=`<div class="results-wrap"><table class="results-table"><thead><tr><th>Variable</th><th>EE clásico</th><th>EE robusto</th><th>Robusto / clásico</th></tr></thead><tbody>`;
+    ratio.forEach(r=>tb+=`<tr><td class="lbl">${r.n}</td><td>${fmtCoef(r.c)}</td><td>${fmtCoef(r.rb)}</td><td>${fmt(r.r,3)}</td></tr>`);
+    tb+='</tbody></table></div>';
+    $('#nt4').innerHTML=noteBox('note','Problemas 2 y 4', `Cada observación está sobre una de las dos rectas: si <span class="math">Y = 1</span>, el residuo es <span class="math">1 − Ŷ</span>; si <span class="math">Y = 0</span>, es <span class="math">−Ŷ</span>. Los residuos no pueden ser normales. Y la varianza <span class="math">p(1 − p)</span> (curva violeta, eje derecho) cambia con la probabilidad predicha: es máxima en 0.5 y cae hacia los extremos. La solución estándar es reportar <strong>errores estándar robustos</strong>.`)+tb;
+  }
+}
+function draw4hist(){
+  const {ctx,cw,ch}=setupCanvas('cv4', 0.42, 330, isNarrow()?420:200);
+  ctx.fillStyle=col('--bg-canvas'); ctx.fillRect(0,0,cw,ch);
+  const mods=[['MPL','mpl','--red'],['Logit','logit','--orange'],['Probit','probit','--accent']];
+  const lo=-0.4, hi=1.4, bw=0.05, nb=Math.round((hi-lo)/bw);
+  const counts=mods.map(([,k])=>{
+    const c=zeros(nb);
+    M[k].fit.forEach(v=>{ const i=Math.min(nb-1,Math.max(0,Math.floor((v-lo)/bw))); c[i]++; });
+    return c;
+  });
+  const ymax=Math.max(...counts.flat())*1.1;
+  const stacked=isNarrow();
+  const gap=12;
+  const W=stacked?cw:(cw-2*gap)/3, H=stacked?(ch-2*gap)/3:ch;
+  mods.forEach(([name,k,c],m)=>{
+    const ox=stacked?0:m*(W+gap), oy=stacked?m*(H+gap):0;
+    ctx.save(); ctx.translate(ox,oy);
+    const sc=frame(ctx,W,H,{l:m===0||stacked?40:28,r:6,t:20,b:stacked?22:34},[lo,hi],[0,ymax],{nx:4, ny:4, xticks:[-0.25,0,0.5,1,1.25], fy:v=>v.toFixed(0), xlab:stacked?'':'P̂'});
+    ctx.save(); ctx.globalAlpha=0.1; ctx.fillStyle=col('--red');
+    ctx.fillRect(sc.sx(lo),sc.pad.t,sc.sx(0)-sc.sx(lo),sc.ph); ctx.fillRect(sc.sx(1),sc.pad.t,sc.sx(hi)-sc.sx(1),sc.ph); ctx.restore();
+    counts[m].forEach((n,i)=>{
+      if(!n) return;
+      const a=lo+i*bw;
+      ctx.fillStyle=col(c); ctx.globalAlpha=0.85;
+      ctx.fillRect(sc.sx(a)+0.5, sc.sy(n), sc.sx(a+bw)-sc.sx(a)-1, sc.sy(0)-sc.sy(n));
+      ctx.globalAlpha=1;
+    });
+    vline(ctx,sc,0,'--text-sec',[3,3]); vline(ctx,sc,1,'--text-sec',[3,3]);
+    ctx.fillStyle=col(c); ctx.font='bold 12px sans-serif'; ctx.textAlign='left';
+    ctx.fillText(name, sc.pad.l+6, 14);
+    ctx.restore();
+  });
+}
+function draw4res(){
+  const {ctx,cw,ch}=setupCanvas('cv4', 0.45, 360);
+  const f=M.mpl.fit, r=M.mpl.res;
+  const x0=Math.min(-0.2, Math.min(...f)-0.05), x1=Math.max(1.2, Math.max(...f)+0.05);
+  const pad={l:48,r:44,t:14,b:38};
+  const sc=frame(ctx,cw,ch,pad,[x0,x1],[-1.4,1.4],{xlab:'Probabilidad predicha por el MPL (Ŷ)', ylab:'Residuo û', ny:7});
+  clipTo(ctx,sc);
+  hline(ctx,sc,0,'--text-sec',[3,3]);
+  curve(ctx,sc,x=>1-x,x0,x1,'--border',1.2);
+  curve(ctx,sc,x=>-x,x0,x1,'--border',1.2);
+  for(let i=0;i<N;i++){
+    ctx.fillStyle=col(Y[i]?'--accent':'--red'); ctx.globalAlpha=0.5;
+    ctx.beginPath(); ctx.arc(sc.sx(f[i]), sc.sy(r[i]), 2.3, 0, 2*Math.PI); ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  // varianza p(1-p) en eje derecho (0 a 0.35 mapeado a 0..1.4)
+  const vs=v=>v/0.35*1.4;
+  curve(ctx,sc,x=>(x>0&&x<1)?vs(x*(1-x)):NaN,0,1,'--purple',2.4);
+  ctx.restore();
+  ctx.fillStyle=col('--purple'); ctx.font='11px sans-serif'; ctx.textAlign='left';
+  [0,0.1,0.2,0.3].forEach(v=>ctx.fillText(v.toFixed(1), sc.pad.l+sc.pw+6, sc.sy(vs(v))+4));
+  ctx.save(); ctx.translate(cw-8, sc.pad.t+sc.ph/2); ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center'; ctx.font='bold 11px sans-serif'; ctx.fillText('var(u) = p(1 − p)',0,0); ctx.restore();
+  ctx.font='11px sans-serif'; ctx.textAlign='left';
+  ctx.fillStyle=col('--accent'); ctx.fillText('● Y = 1  (û = 1 − Ŷ)', sc.pad.l+8, sc.pad.t+14);
+  ctx.fillStyle=col('--red'); ctx.fillText('● Y = 0  (û = −Ŷ)', sc.pad.l+8, sc.pad.t+30);
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 5 — G(z) y g(z)
+   ══════════════════════════════════════════════════════ */
+const S5={mode:'cdf', mpl:false, sc:false};
+function set5(m){ S5.mode=m; setActive(['m5cdf','m5pdf'], m==='cdf'?'m5cdf':'m5pdf'); render5(); }
+function tog5(k){ S5[k]=!S5[k]; $(k==='mpl'?'#m5mpl':'#m5sc').classList.toggle('active',S5[k]); render5(); }
+function render5(){
+  const z=+$('#m5z').value, b=+$('#m5b').value;
+  $('#m5zV').textContent=z.toFixed(2); $('#m5bV').textContent=b.toFixed(2);
+  const {ctx,cw,ch}=setupCanvas('cv5', 0.45, 360);
+  const pad={l:48,r:14,t:14,b:38};
+  const cdf=S5.mode==='cdf';
+  const sc=frame(ctx,cw,ch,pad,[-5,5],cdf?[-0.1,1.1]:[0,0.45],{xlab:'z = xβ', ylab:cdf?'G(z)':'g(z)', nx:10, ny:cdf?6:5, yticks:cdf?[0,0.25,0.5,0.75,1]:undefined});
+  clipTo(ctx,sc);
+  if(cdf){
+    hline(ctx,sc,0,'--text-sec',[3,3]); hline(ctx,sc,1,'--text-sec',[3,3]);
+    if(S5.mpl) curve(ctx,sc,x=>0.5+0.1*x,-5,5,'--red',2.2);
+    curve(ctx,sc,Lam,-5,5,'--orange',2.6);
+    curve(ctx,sc,Phi,-5,5,'--accent',2.6);
+    if(S5.sc) curve(ctx,sc,x=>Phi(x/1.6),-5,5,'--accent',1.8,[6,4]);
+  } else {
+    if(S5.mpl) curve(ctx,sc,()=>0.1,-5,5,'--red',2.2);
+    curve(ctx,sc,lam,-5,5,'--orange',2.6);
+    curve(ctx,sc,phi,-5,5,'--accent',2.6);
+    if(S5.sc) curve(ctx,sc,x=>phi(x/1.6)/1.6,-5,5,'--accent',1.8,[6,4]);
+  }
+  vline(ctx,sc,z,'--text-sec',[2,3]);
+  ctx.restore();
+  if(cdf){ dotAt(ctx,sc,z,Lam(z),'--orange'); dotAt(ctx,sc,z,Phi(z),'--accent'); if(S5.mpl) dotAt(ctx,sc,z,0.5+0.1*z,'--red',4); }
+  else { dotAt(ctx,sc,z,lam(z),'--orange'); dotAt(ctx,sc,z,phi(z),'--accent'); }
+
+  $('#lg5').innerHTML=`<span class="legend-item"><span class="legend-dot" style="background:var(--orange)"></span>Logit ${cdf?'Λ(z)':'λ(z)'}</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--accent)"></span>Probit ${cdf?'Φ(z)':'φ(z)'}</span>
+    ${S5.sc?`<span class="legend-item"><span class="legend-dot" style="background:var(--accent);opacity:.6"></span>Probit reescalado</span>`:''}
+    ${S5.mpl?`<span class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>MPL: 0.5 + 0.1z</span>`:''}`;
+  const odds=Math.exp(z);
+  $('#st5').innerHTML=statCards([
+    {l:'Logit <span class="nt">Λ(z)</span>', v:fmt(Lam(z),3), c:'logit', note:'Probabilidad predicha'},
+    {l:'Probit <span class="nt">Φ(z)</span>', v:fmt(Phi(z),3), c:'accent', note:'Probabilidad predicha'},
+    {l:'Efecto Logit <span class="nt">λ(z)·β</span>', v:fmtS(lam(z)*b*100,2)+' pp', c:'logit', note:`λ(z) = ${fmt(lam(z),3)}`},
+    {l:'Efecto Probit <span class="nt">φ(z)·β</span>', v:fmtS(phi(z)*b*100,2)+' pp', c:'accent', note:`φ(z) = ${fmt(phi(z),3)}`},
+    {l:'Chances (Logit)', v:odds>=100?odds.toFixed(0):fmt(odds,2), sm:true, note:`ln(chances) = z = ${z.toFixed(2)}`}
+  ]);
+  let msg;
+  if(Math.abs(z)>=3) msg=noteBox('tip','', `Con |z| = ${Math.abs(z).toFixed(1)} estamos en la cola: la probabilidad es casi ${z>0?'1':'0'} y la densidad es chiquita, así que el efecto marginal de cualquier variable es casi nulo. Fijate que acá el Logit tiene <strong>colas más anchas</strong>: λ(z) es ${fmt(lam(z)/phi(z),1)} veces φ(z).`);
+  else if(Math.abs(z)<=0.3) msg=noteBox('tip','', `Cerca de z = 0 la probabilidad es 0.5 y la densidad es máxima: es donde un cambio en X mueve más la probabilidad. La densidad normal (0.399) es 1.6 veces la logística (0.25). Por eso, para obtener el mismo efecto, <strong>los coeficientes del Logit son ≈ 1.6 veces los del Probit</strong>. Activá "Probit reescalado" para ver que con esa corrección las dos curvas casi se superponen.`);
+  else msg='';
+  $('#nt5').innerHTML=msg;
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 6 — Máxima verosimilitud
+   ══════════════════════════════════════════════════════ */
+const ED=ROWS.map(r=>r.educ-12);
+const X6=ED.map(e=>[1,e]);
+const S6={link:'logit', a:-0.6, b:0, mle:{}, grid:{}, anim:null, it:0, path:[]};
+['logit','probit'].forEach(l=>{ const f=fitBin(X6,Y,l); S6.mle[l]={a:f.b[0], b:f.b[1], ll:f.ll, se:f.se}; });
+const R6={logit:{a:[-1,1.5], b:[-0.1,0.45]}, probit:{a:[-0.65,0.95], b:[-0.06,0.28]}};
+const START6={logit:{a:-0.6,b:0}, probit:{a:-0.4,b:0}};
+const ll6=(a,b,link)=>{
+  const G=LINK[link].G; let s=0;
+  for(let i=0;i<N;i++){ const p=clampP(G(a+b*ED[i])); s+=Y[i]?Math.log(p):Math.log(1-p); }
+  return s;
+};
+// Precalculamos log-verosimilitud por nivel de educación (más rápido para la grilla)
+const EDLEV=(()=>{ const m={}; ED.forEach((e,i)=>{ m[e]=m[e]||{e,n1:0,n0:0}; Y[i]?m[e].n1++:m[e].n0++; }); return Object.values(m); })();
+const ll6fast=(a,b,link)=>{
+  const G=LINK[link].G; let s=0;
+  for(const L of EDLEV){ const p=clampP(G(a+b*L.e)); s+=L.n1*Math.log(p)+L.n0*Math.log(1-p); }
+  return s;
+};
+function grid6(link){
+  if(S6.grid[link]) return S6.grid[link];
+  const R=R6[link], nx=90, ny=70, v=new Float64Array(nx*ny);
+  for(let j=0;j<ny;j++) for(let i=0;i<nx;i++){
+    const a=R.a[0]+(R.a[1]-R.a[0])*(i+0.5)/nx, b=R.b[1]-(R.b[1]-R.b[0])*(j+0.5)/ny;
+    v[j*nx+i]=ll6fast(a,b,link);
+  }
+  return S6.grid[link]={nx,ny,v};
+}
+function set6link(l){
+  stop6();
+  S6.link=l; setActive(['m6lo','m6pr'], l==='logit'?'m6lo':'m6pr');
+  const R=R6[l];
+  const ia=$('#m6a'), ib=$('#m6b');
+  ia.min=R.a[0]; ia.max=R.a[1]; ib.min=R.b[0]; ib.max=R.b[1];
+  ib.step=l==='logit'?0.002:0.001;
+  reset6();
+}
+function reset6(){
+  stop6();
+  S6.a=START6[S6.link].a; S6.b=START6[S6.link].b; S6.path=[]; S6.it=0;
+  $('#m6a').value=S6.a; $('#m6b').value=S6.b;
+  render6();
+}
+function stop6(){ if(S6.anim){ clearTimeout(S6.anim); S6.anim=null; } $('#m6go').disabled=false; }
+function fisherStep6(a,b,link){
+  const L=LINK[link];
+  let u0=0,u1=0,i00=0,i01=0,i11=0;
+  for(const E of EDLEV){
+    const eta=a+b*E.e, p=clampP(L.G(eta)), d=Math.max(L.g(eta),1e-300), n=E.n0+E.n1;
+    const w=n*d*d/(p*(1-p)), s=(E.n1-n*p)*d/(p*(1-p));
+    u0+=s; u1+=s*E.e; i00+=w; i01+=w*E.e; i11+=w*E.e*E.e;
+  }
+  const det=i00*i11-i01*i01;
+  let da=( i11*u0-i01*u1)/det, db=(-i01*u0+i00*u1)/det;
+  const ll=ll6fast(a,b,link);
+  let t=1;
+  for(let h=0;h<30;h++){ if(ll6fast(a+t*da,b+t*db,link)>=ll) break; t/=2; }
+  return {a:a+t*da, b:b+t*db};
+}
+function run6(){
+  stop6();
+  $('#m6go').disabled=true;
+  S6.path=[{a:S6.a,b:S6.b}]; S6.it=0;
+  const step=()=>{
+    const nx=fisherStep6(S6.a,S6.b,S6.link);
+    const moved=Math.hypot(nx.a-S6.a, (nx.b-S6.b)*5);
+    S6.a=nx.a; S6.b=nx.b; S6.it++;
+    S6.path.push({a:S6.a,b:S6.b});
+    $('#m6a').value=S6.a; $('#m6b').value=S6.b;
+    render6(true);
+    if(moved>1e-6 && S6.it<25) S6.anim=setTimeout(step, 650);
+    else { S6.anim=null; $('#m6go').disabled=false; render6(true); }
+  };
+  S6.anim=setTimeout(step, 250);
+}
+function render6(keepPath){
+  if(!keepPath){ S6.path=[]; S6.it=0; }
+  const L=S6.link, G=LINK[L].G, mle=S6.mle[L];
+  $('#m6aV').textContent=S6.a.toFixed(3); $('#m6bV').textContent=S6.b.toFixed(4);
+  draw6a(); draw6b();
+  const ll=ll6fast(S6.a,S6.b,L), diff=ll-mle.ll;
+  const close=diff>-0.5;
+  $('#st6').innerHTML=statCards([
+    {l:'<span class="nt">ln L</span> con tus valores', v:fmt(ll,2), c:close?'green':'orange'},
+    {l:'<span class="nt">ln L</span> máxima', v:fmt(mle.ll,2), c:'accent', note:`a = ${fmt(mle.a,3)} · b = ${fmt(mle.b,4)}`},
+    {l:'Distancia al máximo', v:fmt(diff,2), c:close?'green':'orange', note:close?'¡Llegaste!':'Seguí buscando'},
+    {l:'Iteraciones del algoritmo', v:S6.path.length?S6.it:'—', note:S6.path.length?'Puntaje de Fisher':'Tocá "Maximizar"'}
+  ]);
+  const bEd=fmt(mle.b,4), seB=fmt(mle.se[1],4);
+  $('#nt6').innerHTML = close ? noteBox('tip','',
+    `En el máximo, <span class="math">b&#770; = ${bEd}</span> (EE = ${seB}). En la escala original, <span class="math">&beta;&#770;<sub>0</sub> = a&#770; − 12&sdot;b&#770; = ${fmt(mle.a-12*mle.b,3)}</span>: es exactamente lo que devuelve <code>glm(inlf ~ educ, family = binomial(link = "${L}"))</code>. Para una mujer con 12 años de educación, <span class="math">P&#770; = G(a&#770;) = ${fmt(G(mle.a),3)}</span>.`) : '';
+}
+function draw6a(){
+  const {ctx,cw,ch}=setupCanvas('cv6a', 0.8, 330, 240);
+  const pad={l:42,r:10,t:12,b:36};
+  const sc=frame(ctx,cw,ch,pad,[4.5,17.5],[-0.08,1.08],{xlab:'educ (años)', ylab:'P(inlf = 1)', xticks:[5,8,11,14,17], fx:v=>v.toFixed(0), yticks:[0,0.25,0.5,0.75,1]});
+  clipTo(ctx,sc);
+  const rng=mulberry32(5);
+  ctx.fillStyle=col('--blue'); ctx.globalAlpha=0.25;
+  for(let i=0;i<N;i++){ const jx=(rng()-0.5)*0.5, jy=(rng()-0.5)*0.07;
+    ctx.beginPath(); ctx.arc(sc.sx(ROWS[i].educ+jx), sc.sy(Y[i]+jy), 1.8, 0, 2*Math.PI); ctx.fill(); }
+  ctx.globalAlpha=1;
+  EDLEV.forEach(E=>{ const n=E.n0+E.n1; if(n<5) return;
+    const s=Math.max(4,Math.min(11,Math.sqrt(n)*0.9));
+    ctx.fillStyle=col('--green'); ctx.globalAlpha=0.8;
+    ctx.fillRect(sc.sx(E.e+12)-s/2, sc.sy(E.n1/n)-s/2, s, s); ctx.globalAlpha=1; });
+  const G=LINK[S6.link].G, m=S6.mle[S6.link];
+  curve(ctx,sc,x=>G(m.a+m.b*(x-12)),4.5,17.5,'--text-sec',1.8,[6,4]);
+  curve(ctx,sc,x=>G(S6.a+S6.b*(x-12)),4.5,17.5,'--purple',2.8);
+  ctx.restore();
+}
+function draw6b(){
+  const {ctx,cw,ch}=setupCanvas('cv6b', 0.8, 330, 240);
+  const L=S6.link, R=R6[L], g=grid6(L), mle=S6.mle[L];
+  const pad={l:52,r:10,t:12,b:36};
+  const sc=frame(ctx,cw,ch,pad,R.a,R.b,{xlab:'a', ylab:'b', nx:5, ny:5});
+  // mapa de calor por bandas de Δ ln L
+  const levels=[1,3,10,30,100,300];
+  const cA=hex2rgb(col('--accent')), cB=hex2rgb(col('--bg-canvas'));
+  const off=document.createElement('canvas'); off.width=g.nx; off.height=g.ny;
+  const octx=off.getContext('2d'), img=octx.createImageData(g.nx,g.ny);
+  for(let k=0;k<g.nx*g.ny;k++){
+    const d=mle.ll-g.v[k];
+    let lv=levels.findIndex(t=>d<t); if(lv<0) lv=levels.length;
+    const t=1-lv/levels.length*0.92;
+    const mix=t*0.75;
+    img.data[4*k]  =Math.round(cB[0]+(cA[0]-cB[0])*mix);
+    img.data[4*k+1]=Math.round(cB[1]+(cA[1]-cB[1])*mix);
+    img.data[4*k+2]=Math.round(cB[2]+(cA[2]-cB[2])*mix);
+    img.data[4*k+3]=255;
+  }
+  octx.putImageData(img,0,0);
+  ctx.save(); ctx.imageSmoothingEnabled=false;
+  ctx.drawImage(off, sc.pad.l, sc.pad.t, sc.pw, sc.ph); ctx.restore();
+  // ejes por encima
+  ctx.strokeStyle=col('--text-sec'); ctx.lineWidth=1;
+  ctx.strokeRect(sc.pad.l, sc.pad.t, sc.pw, sc.ph);
+  clipTo(ctx,sc);
+  // máximo
+  ctx.strokeStyle=col('--heading'); ctx.lineWidth=2;
+  const mx=sc.sx(mle.a), my=sc.sy(mle.b);
+  ctx.beginPath(); ctx.moveTo(mx-6,my-6); ctx.lineTo(mx+6,my+6); ctx.moveTo(mx+6,my-6); ctx.lineTo(mx-6,my+6); ctx.stroke();
+  // camino del algoritmo
+  if(S6.path.length>1){
+    ctx.strokeStyle=col('--purple'); ctx.lineWidth=1.6; ctx.setLineDash([4,3]);
+    ctx.beginPath(); S6.path.forEach((p,i)=>{ const x=sc.sx(p.a), y=sc.sy(p.b); i?ctx.lineTo(x,y):ctx.moveTo(x,y); }); ctx.stroke();
+    ctx.setLineDash([]);
+    S6.path.forEach(p=>{ ctx.fillStyle=col('--purple'); ctx.beginPath(); ctx.arc(sc.sx(p.a),sc.sy(p.b),3,0,2*Math.PI); ctx.fill(); });
+  }
+  ctx.restore();
+  dotAt(ctx,sc,S6.a,S6.b,'--purple',6);
+  ctx.fillStyle=col('--text-sec'); ctx.font='10px sans-serif'; ctx.textAlign='right';
+  ctx.fillText('Más oscuro = mayor ln L · clic para moverte', sc.pad.l+sc.pw-4, sc.pad.t+12);
+  S6.sc=sc;
+}
+function click6(ev){
+  const sc=S6.sc; if(!sc) return;
+  const rect=ev.target.getBoundingClientRect();
+  const px=ev.clientX-rect.left, py=ev.clientY-rect.top;
+  if(px<sc.pad.l||px>sc.pad.l+sc.pw||py<sc.pad.t||py>sc.pad.t+sc.ph) return;
+  stop6();
+  S6.a=sc.ix(px); S6.b=sc.iy(py);
+  $('#m6a').value=S6.a; $('#m6b').value=S6.b;
+  render6();
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 7 — Coeficientes vs efectos marginales
+   ══════════════════════════════════════════════════════ */
+let MODE7='coef', MOD7='logit';
+function set7(m){ MODE7=m; setActive(['m7c','m7m'], m==='coef'?'m7c':'m7m'); render7(); }
+function set7mod(m){ MOD7=m; setActive(['m7lo','m7pr'], m==='logit'?'m7lo':'m7pr'); draw7(); }
+function meIndiv(mod, v){
+  const fit=M[mod], g=LINK[mod].g;
+  return ROWS.map((r,i)=>g(fit.xb[i])*dIndex(M.T,fit.b,v,r));
+}
+function meMean(mod, v){
+  const fit=M[mod], g=LINK[mod].g;
+  const xm={}; VARS.forEach(w=>xm[w.k]=VMEAN[w.k]);
+  // La mujer "promedio" tiene exper = media, así que exper² = (media de exper)²
+  const x=xrow(M.T, xm);
+  return g(dot(x,fit.b))*dIndex(M.T,fit.b,v,xm);
+}
+function render7(){
+  const vars=VARS.filter(v=>SPEC[v.k]);
+  let h;
+  if(MODE7==='coef'){
+    h=`<thead><tr><th>Variable</th><th class="mpl">MPL</th><th class="logit">Logit</th><th class="probit">Probit</th><th>Logit / Probit</th></tr></thead><tbody>`;
+    M.T.forEach((t,j)=>{
+      const cell=(fit,isT)=>{
+        const se=isT?fit.seR[j]:fit.se[j], z=fit.b[j]/se;
+        const p=isT?tTail2(z,fit.df):pNorm2(z);
+        return `<td class="${fit.b[j]<0?'neg':''}">${fmtCoef(fit.b[j])}<b style="color:var(--accent)">${stars(p)}</b><br><span style="color:var(--text-sec);font-size:.72rem">(${fmtCoef(se)})</span></td>`;
+      };
+      h+=`<tr><td class="lbl">${t.name}</td>${cell(M.mpl,true)}${cell(M.logit)}${cell(M.probit)}<td>${t.v?fmt(M.logit.b[j]/M.probit.b[j],2):'—'}</td></tr>`;
+    });
+    h+=`<tr class="hi"><td class="lbl">ln L</td><td>—</td><td>${fmt(M.logit.ll,2)}</td><td>${fmt(M.probit.ll,2)}</td><td></td></tr></tbody>`;
+    $('#nt7a').innerHTML=noteBox('note','Cómo leer esta tabla', `Entre paréntesis, errores estándar (robustos en el MPL). <strong>Los signos y la significancia coinciden</strong> en los tres modelos. Las magnitudes no son comparables: los del MPL son cambios en probabilidad, los de Logit y Probit son cambios en el índice <span class="math">z</span>. La última columna muestra que los coeficientes Logit son sistemáticamente ≈ 1.6 a 1.8 veces los Probit, como anticipaba el laboratorio 5. La excepción son los coeficientes muy imprecisos (como el de <span class="math">city</span>), donde el cociente es puro ruido.`);
+  } else {
+    h=`<thead><tr><th>Variable</th><th class="mpl">MPL (coef.)</th><th class="logit">AME Logit</th><th class="logit">MEM Logit</th><th class="probit">AME Probit</th><th class="probit">MEM Probit</th></tr></thead><tbody>`;
+    vars.forEach(v=>{
+      const jm=dIndex(M.T,M.mpl.b,v.k,{exper:VMEAN.exper});
+      const mplV=v.k==='exper'?mean(ROWS.map(r=>dIndex(M.T,M.mpl.b,'exper',r))):jm;
+      const c=x=>`<td class="${x<0?'neg':''}">${fmtCoef(x)}</td>`;
+      h+=`<tr><td class="lbl">${v.k}${v.k==='exper'&&SPEC.expersq?' *':''}</td>${c(mplV)}${c(mean(meIndiv('logit',v.k)))}${c(meMean('logit',v.k))}${c(mean(meIndiv('probit',v.k)))}${c(meMean('probit',v.k))}</tr>`;
+    });
+    h+='</tbody>';
+    $('#nt7a').innerHTML=noteBox('tip','Ahora sí son comparables', `Los efectos marginales se leen como cambios en probabilidad (multiplicá por 100 para tener pp). El AME del Logit y el del Probit son <strong>casi idénticos</strong> entre sí, y en general parecidos al coeficiente del MPL. El MEM suele ser algo mayor en valor absoluto: la mujer "promedio" está más cerca del centro de la curva, donde la densidad es más alta.${SPEC.exper&&SPEC.expersq?' <br>* Para exper, la columna MPL muestra el promedio de β̂ₑ + 2β̂ₑ²·exper en la muestra.':''}`);
+  }
+  $('#tb7').innerHTML=h;
+  const sel=$('#m7var'), cur=sel.value;
+  sel.innerHTML=vars.map(v=>`<option value="${v.k}">${v.k}</option>`).join('');
+  sel.value=vars.some(v=>v.k===cur)?cur:(vars.some(v=>v.k==='educ')?'educ':vars[0].k);
+  draw7();
+}
+function draw7(){
+  if(!M) return;
+  const v=$('#m7var').value;
+  const me=meIndiv(MOD7, v), ame=mean(me), mem=meMean(MOD7,v);
+  const mplV=v==='exper'?mean(ROWS.map(r=>dIndex(M.T,M.mpl.b,'exper',r))):dIndex(M.T,M.mpl.b,v,{});
+  let lo=Math.min(...me, mplV, mem, 0), hi=Math.max(...me, mplV, mem, 0);
+  [lo,hi]=[lo-(hi-lo)*0.05, hi+(hi-lo)*0.05];
+  const nb=36, bw=(hi-lo)/nb, cnt=zeros(nb);
+  me.forEach(x=>cnt[Math.min(nb-1,Math.floor((x-lo)/bw))]++);
+  const {ctx,cw,ch}=setupCanvas('cv7', 0.38, 300);
+  const pad={l:48,r:14,t:22,b:38};
+  const sc=frame(ctx,cw,ch,pad,[lo*100,hi*100],[0,Math.max(...cnt)*1.12],{xlab:`Efecto marginal individual de ${v} (pp)`, ylab:'Mujeres', fy:v=>v.toFixed(0)});
+  const cM=MOD7==='logit'?'--orange':'--accent';
+  cnt.forEach((n,i)=>{ if(!n) return; const a=(lo+i*bw)*100, b=(lo+(i+1)*bw)*100;
+    ctx.fillStyle=col(cM); ctx.globalAlpha=0.75;
+    ctx.fillRect(sc.sx(a)+0.5, sc.sy(n), sc.sx(b)-sc.sx(a)-1, sc.sy(0)-sc.sy(n)); ctx.globalAlpha=1; });
+  vline(ctx,sc,0,'--text-sec',[2,3]);
+  vline(ctx,sc,mplV*100,'--red',[6,4],2);
+  vline(ctx,sc,mem*100,'--purple',null,2.2);
+  vline(ctx,sc,ame*100,'--heading',null,2.6);
+  const sd=Math.sqrt(mean(me.map(x=>(x-ame)**2)));
+  $('#st7').innerHTML=statCards([
+    {l:'AME', v:fmtS(ame*100,2)+' pp', c:MOD7==='logit'?'logit':'accent', note:'Promedio de los 753 efectos'},
+    {l:'MEM', v:fmtS(mem*100,2)+' pp', c:'purple', note:'Efecto en la mujer promedio'},
+    {l:'Coeficiente MPL', v:fmtS(mplV*100,2)+' pp', note:'Igual para todas'},
+    {l:'Rango individual', v:`${fmt(Math.min(...me)*100,1)} a ${fmt(Math.max(...me)*100,1)}`, sm:true, note:`Desvío: ${fmt(sd*100,2)} pp`}
+  ]);
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 8 — Bondad de ajuste
+   ══════════════════════════════════════════════════════ */
+let MOD8='logit';
+function set8mod(m){ MOD8=m; setActive(['m8mpl','m8lo','m8pr'], {mpl:'m8mpl',logit:'m8lo',probit:'m8pr'}[m]); render8(); }
+function confusion(fit, c){
+  let tp=0,tn=0,fp=0,fn=0;
+  for(let i=0;i<N;i++){ const yh=fit[i]>c?1:0; if(yh&&Y[i]) tp++; else if(yh&&!Y[i]) fp++; else if(!yh&&Y[i]) fn++; else tn++; }
+  return {tp,tn,fp,fn, acc:(tp+tn)/N, sens:tp/(tp+fn), spec:tn/(tn+fp)};
+}
+function render8(){
+  const c=+$('#m8c').value; $('#m8cV').textContent=c.toFixed(2);
+  const fit=M[MOD8].fit, k=confusion(fit,c);
+  const naive=Math.max(YBAR,1-YBAR);
+  $('#conf8').innerHTML=`
+    <div class="hd"></div><div class="hd">Real: Y = 0</div><div class="hd">Real: Y = 1</div><div class="hd">Total</div>
+    <div class="hd">Ŷ = 0</div><div class="ok"><span class="cv">${k.tn}</span><span class="cl">verdaderos negativos</span></div><div class="no"><span class="cv">${k.fn}</span><span class="cl">falsos negativos</span></div><div><span class="cv">${k.tn+k.fn}</span></div>
+    <div class="hd">Ŷ = 1</div><div class="no"><span class="cv">${k.fp}</span><span class="cl">falsos positivos</span></div><div class="ok"><span class="cv">${k.tp}</span><span class="cl">verdaderos positivos</span></div><div><span class="cv">${k.fp+k.tp}</span></div>
+    <div class="hd">Total</div><div><span class="cv">${k.tn+k.fp}</span></div><div><span class="cv">${k.fn+k.tp}</span></div><div><span class="cv">${N}</span></div>`;
+  $('#st8a').innerHTML=statCards([
+    {l:'Tasa de acierto', v:pp(k.acc)+'%', c:k.acc>naive?'green':'orange', note:`Naive: ${pp(naive)}%`},
+    {l:'Sensitividad', v:pp(k.sens)+'%', c:'green', note:'TP / (TP + FN)'},
+    {l:'Especificidad', v:pp(k.spec)+'%', c:'purple', note:'TN / (TN + FP)'}
+  ]);
+  draw8(c);
+  // tabla de ajuste
+  const r=m=>confusion(M[m].fit,0.5).acc;
+  const pr2=m=>1-M[m].ll/M.ll0;
+  $('#tb8').innerHTML=`<thead><tr><th>Medida</th><th class="mpl">MPL</th><th class="logit">Logit</th><th class="probit">Probit</th><th>Naive</th></tr></thead><tbody>
+    <tr><td class="lbl">Tasa de acierto (c = 0.5)</td><td>${pp(r('mpl'))}%</td><td>${pp(r('logit'))}%</td><td>${pp(r('probit'))}%</td><td>${pp(naive)}%</td></tr>
+    <tr><td class="lbl">R² (OLS)</td><td>${fmt(M.mpl.R2,3)}</td><td>—</td><td>—</td><td>0</td></tr>
+    <tr><td class="lbl">Pseudo R² de McFadden</td><td>—</td><td>${fmt(pr2('logit'),3)}</td><td>${fmt(pr2('probit'),3)}</td><td>0</td></tr>
+    <tr><td class="lbl">ln L</td><td>—</td><td>${fmt(M.logit.ll,2)}</td><td>${fmt(M.probit.ll,2)}</td><td>${fmt(M.ll0,2)}</td></tr>
+    </tbody>`;
+  let msg;
+  if(c<0.3||c>0.7) msg=noteBox('note','Mover el umbral es un trade-off', `Con c = ${c.toFixed(2)} el modelo ${c<0.5?'clasifica a casi todas como "trabaja": acierta mucho entre las que trabajan (sensitividad alta) y poco entre las que no':'sólo clasifica como "trabaja" a quienes tienen probabilidad muy alta: gana especificidad y pierde sensitividad'}. La tasa de acierto total suele ser máxima cerca de 0.5. Elegir otro umbral tiene sentido cuando un tipo de error es más caro que el otro (por ejemplo, aprobar un crédito que después cae en default).`);
+  else msg=noteBox('note','Contra qué comparar', `Un modelo "naive" que predice siempre la categoría más frecuente ya acierta el <strong>${pp(naive)}%</strong> (el ${pp(YBAR)}% de las mujeres participa). La pregunta relevante es cuánto mejora el modelo sobre eso. Con c = 0.5, el ${MOD8==='mpl'?'MPL':MOD8==='logit'?'Logit':'Probit'} acierta mejor entre las que trabajan (${pp(k.sens)}%) que entre las que no (${pp(k.spec)}%).`);
+  $('#nt8').innerHTML=msg;
+}
+function draw8(c){
+  const {ctx,cw,ch}=setupCanvas('cv8', 0.85, 300, 220);
+  const pad={l:54,r:10,t:12,b:36};
+  const sc=frame(ctx,cw,ch,pad,[0,1],[0,1],{xlab:'Umbral c', ylab:'Proporción', nx:5, ny:5});
+  const fit=M[MOD8].fit, ts=[], A=[], S=[], E=[];
+  for(let i=1;i<=99;i++){ const t=i/100, k=confusion(fit,t); ts.push(t); A.push(k.acc); S.push(k.sens); E.push(k.spec); }
+  clipTo(ctx,sc);
+  hline(ctx,sc,Math.max(YBAR,1-YBAR),'--text-sec',[4,4],1.2);
+  const plot=(arr,cl,w)=>{ ctx.strokeStyle=col(cl); ctx.lineWidth=w; ctx.beginPath(); ts.forEach((t,i)=>{ const x=sc.sx(t), y=sc.sy(arr[i]); i?ctx.lineTo(x,y):ctx.moveTo(x,y); }); ctx.stroke(); };
+  plot(S,'--green',2); plot(E,'--purple',2); plot(A,'--heading',2.6);
+  vline(ctx,sc,c,'--accent',[3,3],1.5);
+  ctx.restore();
+}
+
+/* ══════════════════════════════════════════════════════
+   Autoevaluación
+   ══════════════════════════════════════════════════════ */
+const QUIZ=[
+  {id:'a', q:'En el MPL, β̂_educ = 0.038 significa que un año más de educación aumenta la probabilidad de participar un 3.8%.',
+   ans:false, why:'El coeficiente del MPL se lee en <strong>puntos porcentuales</strong>: +3.8 pp. Si la probabilidad era 0.50 pasa a 0.538, que es un aumento <em>relativo</em> del 7.6%, no del 3.8%.'},
+  {id:'b', q:'Como el MPL se estima por OLS, sus predicciones siempre quedan entre 0 y 1.',
+   ans:false, why:'Nada en OLS impone esa restricción. En Mroz, con la especificación completa, 16 predicciones son negativas y 16 son mayores que 1. Lo ves en el Laboratorio 4 y en los casos extremos del Laboratorio 3.'},
+  {id:'c', q:'En el MPL la heteroscedasticidad no es un accidente de la muestra: aparece por construcción, porque var(u | X) = p(1 − p).',
+   ans:true, why:'Exacto. Como <span class="math">p</span> depende de las <span class="math">X</span>, la varianza también. Por eso el MPL se reporta siempre con errores estándar robustos.'},
+  {id:'d', q:'En un Logit, β̂_kidslt6 = −1.44 significa que cada hijo menor de 6 años reduce la probabilidad de participar en 144 pp.',
+   ans:false, why:'Ese número ni siquiera puede ser un cambio en probabilidad. Los coeficientes del Logit son cambios en el <strong>índice</strong> (el log de las chances). El efecto en probabilidad es <span class="math">λ(xβ)·β</span>; el AME de kidslt6 ronda −26 pp, muy parecido al MPL.'},
+  {id:'e', q:'El signo de un coeficiente Logit o Probit indica la dirección del efecto de esa variable sobre la probabilidad.',
+   ans:true, why:'Sí, porque el efecto marginal es <span class="math">g(xβ)·β<sub>j</sub></span> y la densidad <span class="math">g</span> es siempre positiva. Signo y significancia son lo único que se lee directo del output. (Si la variable entra también al cuadrado, hay que mirar los dos coeficientes juntos.)'},
+  {id:'f', q:'En un Probit, el efecto marginal de un año más de educación es el mismo para todas las mujeres de la muestra.',
+   ans:false, why:'Depende de dónde esté cada una en la curva: <span class="math">φ(x<sub>i</sub>β)</span> es grande para quien tiene probabilidad cercana a 0.5 y chico para quien está cerca de 0 o de 1. El histograma del Laboratorio 7 muestra los 753 efectos distintos.'},
+  {id:'g', q:'Como los coeficientes del Logit son ≈ 1.6 veces los del Probit, el Logit estima efectos mucho más fuertes.',
+   ans:false, why:'Es sólo una diferencia de escala: la densidad logística en el centro (0.25) es 1.6 veces menor que la normal (0.399). Al multiplicar por la densidad, los efectos marginales de ambos modelos quedan casi idénticos.'},
+  {id:'h', q:'El AME y el MEM coinciden siempre.',
+   ans:false, why:'El AME promedia <span class="math">g(x<sub>i</sub>β)</span> sobre todas las personas; el MEM evalúa <span class="math">g</span> en el promedio de las <span class="math">X</span>. Como <span class="math">g</span> no es lineal, el promedio de <span class="math">g</span> no es <span class="math">g</span> del promedio. En Mroz el MEM es algo más grande en valor absoluto.'},
+  {id:'i', q:'Un modelo con 73% de tasa de acierto predice bien: acierta casi tres de cada cuatro casos.',
+   ans:false, why:'Hay que compararlo con el modelo naive. En Mroz el 56.8% de las mujeres participa, así que prediciendo "participa" para todas ya se acierta el 56.8%. La mejora real es de unos 16 puntos, y además el modelo acierta mucho mejor entre las que trabajan que entre las que no.'},
+  {id:'j', q:'Si el pseudo R² del Logit es 0.22 y el R² del MPL es 0.26, el MPL ajusta mejor.',
+   ans:false, why:'No son comparables. El pseudo R² de McFadden compara log-verosimilitudes, no varianzas explicadas, y sus valores suelen ser más bajos que un R² de OLS. Para comparar modelos binarios conviene mirar tasa de acierto, log-verosimilitud o, mejor, los efectos marginales.'}
+];
+let quizAnswers={};
+function renderQuiz(){
+  $('#quizWrap').innerHTML=QUIZ.map((q,i)=>
+    `<div class="quiz-item">
+      <div class="quiz-q"><span class="qid">${q.id})</span>${q.q}</div>
+      <div class="quiz-btns">
+        <button class="btn btn-sm" onclick="answerQuiz(${i},true)">Verdadero</button>
+        <button class="btn btn-sm" onclick="answerQuiz(${i},false)">Falso</button>
+      </div>
+      <div class="quiz-fb" id="qfb-${i}"></div>
+    </div>`).join('');
+  updateQuizScore();
+}
+function answerQuiz(i, val){
+  const q=QUIZ[i], ok=(val===q.ans);
+  quizAnswers[i]=ok;
+  const fb=$('#qfb-'+i);
+  fb.className='quiz-fb show '+(ok?'ok':'no');
+  fb.innerHTML=`<span class="quiz-verdict" style="color:var(${ok?'--green':'--red'})">${ok?'Correcto':'Incorrecto'}: la afirmación es ${q.ans?'VERDADERA':'FALSA'}</span>${q.why}`;
+  updateQuizScore();
+}
+function updateQuizScore(){
+  const done=Object.keys(quizAnswers).length, right=Object.values(quizAnswers).filter(Boolean).length;
+  $('#quizScore').textContent=done===0?'':`Respondidas: ${done} de ${QUIZ.length} · Correctas: ${right}`;
+}
+function resetQuiz(){ quizAnswers={}; renderQuiz(); }
+
+/* ══════════════════════════════════════════════════════
+   Init y listeners
+   ══════════════════════════════════════════════════════ */
+['m1b','m1c','m1n'].forEach(id=>$('#'+id).addEventListener('input', run1));
+$('#m2x').addEventListener('input', render2exp);
+['m5z','m5b'].forEach(id=>$('#'+id).addEventListener('input', render5));
+$('#m6a').addEventListener('input', e=>{ stop6(); S6.a=+e.target.value; render6(); });
+$('#m6b').addEventListener('input', e=>{ stop6(); S6.b=+e.target.value; render6(); });
+$('#cv6b').addEventListener('click', click6);
+$('#m8c').addEventListener('input', ()=>render8());
+
+function redrawAll(){
+  draw1(); draw3(); render4(); render5(); draw6a(); draw6b(); draw7(); draw8(+$('#m8c').value);
+}
+let rzTimer=null, lastW=window.innerWidth;
+window.addEventListener('resize', ()=>{
+  if(window.innerWidth===lastW) return;
+  lastW=window.innerWidth;
+  clearTimeout(rzTimer); rzTimer=setTimeout(redrawAll, 120);
+});
+const mqDark=window.matchMedia('(prefers-color-scheme:dark)');
+if(mqDark.addEventListener) mqDark.addEventListener('change', ()=>{ S6.grid={}; redrawAll(); });
+
+build3();
+run1();
+updateAllModels();
+render5();
+set6link('logit');
+renderQuiz();
+</script>
+</body>
+</html>
