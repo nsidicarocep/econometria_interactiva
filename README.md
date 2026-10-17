@@ -27,7 +27,7 @@ La siguiente tabla se ira actualizando a lo largo del cuatrimestre con los links
 | 10 | 29/09 | Multicolinealidad perfecta e imperfecta. VIF. Estrategias de deteccion. | Nº 6 | | |
 | 11 | 06/10 | Heterocedasticidad. Tests de Breusch-Pagan y White. Errores estandar robustos. | Nº 7 | [Heteroscedasticidad](heteroscedasticidad/tablero_heteroscedasticidad.html) | |
 | 12 | 13/10 | Variable dependiente dicotomica. MPL, Logit y Probit. Maxima verosimilitud. Efectos marginales. | Nº 8 | [Modelos de probabilidad (MPL, Logit, Probit)](modelos_probabilidad/tablero_modelos_probabilidad.html) | |
-| 13 | 20/10 | Endogeneidad I. Variable omitida, simultaneidad, error de medicion. Concepto de instrumento. | Nº 9 | | |
+| 13 | 20/10 | Endogeneidad I. Variable omitida, simultaneidad, error de medicion. Concepto de instrumento. | Nº 9 | [Endogeneidad (I)](endogeneidad/tablero_endogeneidad.html) | |
 | 14 | 27/10 | Variables instrumentales y MC2E. Relevancia, exogeneidad, instrumentos debiles. Sobreidentificacion. | Nº 9 | | |
 | 15 | 03/11 | Datos de panel I. Pooled OLS. Efectos fijos: estimador within y primera diferencia. | Nº 10 | | |
 | 16 | 10/11 | Datos de panel II. Efectos aleatorios. Test de Hausman. Errores clusterizados. Repaso pre-parcial. | Nº 10 | | |

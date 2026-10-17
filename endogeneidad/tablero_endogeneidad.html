@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Endogeneidad (I) — Laboratorio Interactivo</title>
+<style>
+:root {
+  --bg: #F7F5F0;
+  --bg-alt: #EDEAE3;
+  --bg-canvas: #FFFFFF;
+  --text: #2C2C2E;
+  --text-sec: #636366;
+  --heading: #1A2744;
+  --accent: #3170A2;
+  --accent-light: #E3EEF6;
+  --green: #2D8659;
+  --green-light: #D4EDDF;
+  --red: #D45A3A;
+  --red-light: #FBEAE5;
+  --orange: #C87A1A;
+  --orange-light: #FDF0DB;
+  --purple: #7B5EA7;
+  --purple-light: #EDE7F6;
+  --blue: #5B9BD5;
+  --border: #DCDAD4;
+  --shadow: rgba(28,28,30,.07);
+  --font-d: Georgia,"Palatino Linotype","Book Antiqua",Palatino,serif;
+  --font-b: "Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-m: "Cascadia Code","Fira Code",Consolas,monospace;
+  --cw: 780px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --green:#4DBB7F;--green-light:#1A3329;
+  --red:#F07A5A;--red-light:#3D2219;
+  --orange:#E8A84C;--orange-light:#3D2E14;
+  --purple:#A78BDB;--purple-light:#2A2040;
+  --blue:#7FC4F5;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  --bg:#151820;--bg-alt:#1C2028;--bg-canvas:#1E2430;
+  --text:#D4D2CC;--text-sec:#8E8E93;--heading:#B8C8E0;
+  --accent:#6AADE8;--accent-light:#1A2A3A;
+  --green:#4DBB7F;--green-light:#1A3329;
+  --red:#F07A5A;--red-light:#3D2219;
+  --orange:#E8A84C;--orange-light:#3D2E14;
+  --purple:#A78BDB;--purple-light:#2A2040;
+  --blue:#7FC4F5;
+  --border:#2A2E36;--shadow:rgba(0,0,0,.25);
+}
+:root[data-theme="light"]{
+  --bg:#F7F5F0;--bg-alt:#EDEAE3;--bg-canvas:#FFFFFF;
+  --text:#2C2C2E;--text-sec:#636366;--heading:#1A2744;
+  --accent:#3170A2;--accent-light:#E3EEF6;
+  --green:#2D8659;--green-light:#D4EDDF;
+  --red:#D45A3A;--red-light:#FBEAE5;
+  --orange:#C87A1A;--orange-light:#FDF0DB;
+  --purple:#7B5EA7;--purple-light:#EDE7F6;
+  --blue:#5B9BD5;
+  --border:#DCDAD4;--shadow:rgba(28,28,30,.07);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:17px;line-height:1.72;-webkit-font-smoothing:antialiased}
+article{max-width:var(--cw);margin:0 auto;padding:3.5rem 1.5rem 6rem}
+
+h1{font-family:var(--font-d);font-size:clamp(2rem,5vw,2.8rem);color:var(--heading);line-height:1.12;text-wrap:balance;letter-spacing:-.025em;margin-bottom:.4rem}
+h2{font-family:var(--font-d);font-size:1.55rem;color:var(--heading);line-height:1.3;text-wrap:balance;margin-top:3.5rem;margin-bottom:.75rem;padding-bottom:.45rem;border-bottom:2px solid var(--accent)}
+h3{font-family:var(--font-d);font-size:1.15rem;color:var(--heading);margin-top:1.5rem;margin-bottom:.5rem}
+p{margin-bottom:1.15rem;max-width:65ch}
+strong{color:var(--heading);font-weight:600}
+ul,ol{margin:0 0 1.15rem 1.3rem;max-width:65ch}
+li{margin-bottom:.3rem}
+
+.eyebrow{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:600;margin-bottom:.5rem}
+.subtitle{font-family:var(--font-d);font-size:1.15rem;color:var(--text-sec);font-style:italic;margin-bottom:2rem;max-width:55ch}
+.lead{font-size:1.05rem;color:var(--text-sec);max-width:60ch}
+
+.formula-block{background:var(--bg-alt);border-left:3px solid var(--accent);padding:1rem 1.25rem;margin:1.25rem 0;border-radius:0 6px 6px 0;overflow-x:auto}
+.math{font-family:var(--font-d);font-style:italic;font-size:1.05em}
+.math .n{font-style:normal}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 2px}
+.frac .num{border-bottom:1.5px solid currentColor;padding:0 5px 3px;line-height:1.3;text-align:center}
+.frac .den{padding:3px 5px 0;line-height:1.3;text-align:center}
+
+.callout{background:var(--red-light);border-left:3px solid var(--red);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.callout-title{font-weight:700;color:var(--red);margin-bottom:.25rem}
+.tip{background:var(--green-light);border-left:3px solid var(--green);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.note{background:var(--orange-light);border-left:3px solid var(--orange);padding:.9rem 1.1rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.note-title{font-weight:700;color:var(--orange);margin-bottom:.25rem}
+
+/* Lab */
+.lab{background:var(--bg-canvas);border:1px solid var(--border);border-radius:8px;padding:1.25rem;margin:1.5rem -1rem;box-shadow:0 2px 12px var(--shadow)}
+@media(min-width:800px){.lab{margin:1.5rem -3rem;padding:1.5rem}}
+.lab-title{font-family:var(--font-d);font-size:1.1rem;color:var(--heading);font-weight:700;margin-bottom:.75rem}
+.lab-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:1rem}
+.lab-sub{font-size:.85rem;color:var(--text-sec);margin:-.4rem 0 .9rem;max-width:70ch}
+
+.lab-canvas-wrap{position:relative;width:100%;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--bg-canvas)}
+.lab-canvas-wrap canvas{display:block;width:100%}
+.lab-canvas-wrap.clickable canvas{cursor:crosshair}
+
+.lab-btns{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem}
+.btn{font-family:var(--font-b);font-size:.82rem;padding:.4rem .85rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);cursor:pointer;transition:all .15s;font-weight:500}
+.btn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.btn:active{transform:scale(.97)}
+.btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;font-size:.88rem;padding:.5rem 1.2rem}
+.btn-primary:hover{background:var(--heading);border-color:var(--heading);color:#fff}
+.btn-sm{font-size:.78rem;padding:.3rem .6rem}
+
+.lab-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.6rem;margin-top:1rem}
+.stat-card{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.6rem .8rem}
+.stat-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-sec);margin-bottom:.15rem}
+.stat-value{font-family:var(--font-d);font-size:1.3rem;color:var(--heading);font-variant-numeric:tabular-nums}
+.stat-value.accent{color:var(--accent)}
+.stat-value.green{color:var(--green)}
+.stat-value.orange{color:var(--red)}
+.stat-value.purple{color:var(--purple)}
+.stat-value.sm{font-size:1.05rem}
+.stat-note{font-size:.7rem;color:var(--text-sec);margin-top:.15rem;line-height:1.35}
+
+.lab-equation{background:var(--accent-light);border-radius:6px;padding:.75rem 1rem;margin-top:.75rem;text-align:center;font-family:var(--font-d);font-size:1.15rem;color:var(--heading);font-style:italic}
+
+/* Simulation controls */
+.sim-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem;margin-bottom:1rem}
+.sim-control{display:flex;flex-direction:column;gap:.2rem}
+.sim-control label{font-size:.78rem;font-weight:600;color:var(--text-sec);text-transform:uppercase;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:baseline;gap:.4rem}
+.sim-control input[type="range"]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:var(--border);outline:none;transition:background .15s}
+.sim-control input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg-canvas);box-shadow:0 1px 4px var(--shadow)}
+.sim-control input[type="range"]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg-canvas);box-shadow:0 1px 4px var(--shadow)}
+.sim-control select,.sim-control input[type="number"]{font-family:var(--font-b);font-size:.88rem;padding:.35rem .5rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);outline:none}
+.sim-control select:focus,.sim-control input[type="number"]:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-light)}
+.sim-val{font-family:var(--font-m);font-size:.88rem;color:var(--accent);font-variant-numeric:tabular-nums}
+.sim-canvas-wrap{position:relative;width:100%;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--bg-canvas)}
+.sim-canvas-wrap canvas{display:block;width:100%}
+.sim-result-row{display:flex;flex-wrap:wrap;gap:1rem;margin-top:.75rem;padding:.75rem;background:var(--bg-alt);border-radius:6px;font-size:.9rem;align-items:center}
+
+/* Segmented toggles */
+.seg{display:flex;flex-wrap:wrap;gap:.35rem;margin:.25rem 0 .75rem}
+.legend{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:.5rem;font-size:.8rem;color:var(--text-sec)}
+.legend-item{display:flex;align-items:center;gap:.35rem}
+.legend-dot{width:14px;height:3px;border-radius:2px;display:inline-block}
+.legend-box{width:13px;height:11px;border-radius:2px;display:inline-block;opacity:.35}
+
+/* Tables */
+.results-wrap{overflow-x:auto;margin-top:1rem;border:1px solid var(--border);border-radius:6px}
+.results-table{width:100%;border-collapse:collapse;font-size:.82rem;white-space:nowrap}
+.results-table th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-sec);font-weight:600;padding:.5rem .6rem;text-align:center;border-bottom:2px solid var(--border);background:var(--bg-alt);position:sticky;top:0}
+.results-table td{padding:.4rem .6rem;text-align:center;border-bottom:1px solid var(--border);font-family:var(--font-m);font-size:.8rem}
+.results-table td.lbl{font-family:var(--font-b);text-align:left;font-weight:600;color:var(--heading)}
+.results-table tr:hover td{background:var(--bg-alt)}
+.results-table tr.hi td{background:var(--accent-light)}
+.results-table td.txt{font-family:var(--font-b);text-align:left;white-space:normal;font-size:.82rem;color:var(--text-sec);line-height:1.5}
+
+/* Regression output table (Bloque 4) */
+.reg-out{border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-top:1rem;background:var(--bg)}
+.reg-out-head{background:var(--bg-alt);padding:.6rem 1rem;font-family:var(--font-d);font-weight:700;color:var(--heading);font-size:.95rem;border-bottom:1px solid var(--border);text-align:center}
+.reg-row{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:.55rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.reg-row:hover{background:var(--accent-light)}
+.reg-row.open{background:var(--accent-light)}
+.reg-var{font-family:var(--font-m);font-size:.85rem;color:var(--heading)}
+.reg-coef{font-family:var(--font-m);font-size:.85rem;text-align:right;white-space:nowrap}
+.reg-se{display:block;color:var(--text-sec);font-size:.78rem}
+.reg-foot{padding:.5rem 1rem;font-size:.78rem;color:var(--text-sec);display:flex;flex-wrap:wrap;gap:1.2rem}
+.reg-explain{display:none;padding:.75rem 1rem;background:var(--bg-alt);border-bottom:1px solid var(--border);font-size:.88rem;line-height:1.6}
+.reg-explain.open{display:block}
+.reg-hint{font-size:.78rem;color:var(--text-sec);font-style:italic;margin-top:.4rem}
+
+/* Quiz */
+.quiz-item{border:1px solid var(--border);border-radius:6px;margin-bottom:.6rem;background:var(--bg);overflow:hidden}
+.quiz-q{padding:.75rem 1rem;font-size:.92rem;line-height:1.6}
+.quiz-q .qid{font-family:var(--font-m);font-weight:700;color:var(--accent);margin-right:.4rem}
+.quiz-btns{display:flex;gap:.4rem;padding:0 1rem .75rem}
+.quiz-fb{display:none;padding:.75rem 1rem;font-size:.88rem;line-height:1.6;border-top:1px solid var(--border)}
+.quiz-fb.show{display:block}
+.quiz-fb.ok{background:var(--green-light)}
+.quiz-fb.no{background:var(--red-light)}
+.quiz-verdict{font-weight:700;display:block;margin-bottom:.2rem}
+.quiz-score{font-size:.88rem;color:var(--text-sec);margin-top:.5rem}
+
+/* Bars */
+.bar-cmp{margin-top:.75rem}
+.bar-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.45rem;font-size:.85rem}
+.bar-name{width:130px;flex-shrink:0;color:var(--text-sec);font-size:.8rem}
+.bar-track{flex:1;height:22px;background:var(--bg-alt);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .35s ease}
+.bar-val{width:90px;text-align:right;font-family:var(--font-m);font-size:.82rem;color:var(--heading)}
+
+@media(max-width:600px){
+  .lab{margin:1rem -.5rem;padding:1rem}
+  .lab-stats{grid-template-columns:repeat(auto-fit,minmax(115px,1fr))}
+  .stat-value{font-size:1.1rem}
+  .bar-name{width:90px}
+  .bar-val{width:70px}
+}
+
+/* Extras de esta página */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-top:1rem}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}}
+.panel{border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--bg)}
+.panel-head{background:var(--bg-alt);padding:.5rem .8rem;font-size:.8rem;font-weight:700;color:var(--heading);border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.06em}
+.panel-body{padding:.7rem .8rem;font-size:.85rem}
+.badge{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.12rem .45rem;border-radius:3px;margin-left:.35rem;vertical-align:middle}
+.badge.ok{background:var(--green-light);color:var(--green)}
+.badge.no{background:var(--red-light);color:var(--red)}
+.toc{background:var(--bg-alt);border-radius:8px;padding:1rem 1.25rem;margin:1.5rem 0;font-size:.9rem}
+.toc ol{margin:.4rem 0 0 1.2rem}
+.toc a{color:var(--accent);text-decoration:none}
+.toc a:hover{text-decoration:underline}
+.c-mpl{color:var(--red)} .c-logit{color:var(--orange)} .c-probit{color:var(--accent)}
+.spec{background:var(--bg-alt);border:1px solid var(--border);border-radius:8px;padding:.9rem 1rem;margin:1.25rem 0}
+.spec-title{font-weight:700;color:var(--heading);font-size:.92rem;margin-bottom:.15rem}
+.spec-sub{font-size:.8rem;color:var(--text-sec);margin-bottom:.6rem}
+.chk-row{display:flex;flex-wrap:wrap;gap:.4rem .5rem}
+.chk{display:inline-flex;align-items:center;gap:.35rem;font-family:var(--font-m);font-size:.8rem;padding:.3rem .6rem;border:1px solid var(--border);border-radius:14px;background:var(--bg);cursor:pointer;user-select:none}
+.chk input{accent-color:var(--accent);margin:0}
+.chk.on{border-color:var(--accent);background:var(--accent-light);color:var(--heading)}
+.chk.dis{opacity:.45;cursor:not-allowed}
+.spec-eq{font-family:var(--font-m);font-size:.78rem;color:var(--text-sec);margin-top:.6rem;line-height:1.5;word-break:break-word}
+.model-chip{font-family:var(--font-m);font-size:.74rem;color:var(--text-sec);background:var(--bg-alt);border-radius:4px;padding:.3rem .55rem;margin-bottom:.8rem;word-break:break-word}
+.sim-control.off{opacity:.4}
+.sim-control.off input{pointer-events:none}
+.pbar{margin-top:.6rem}
+.pbar-row{display:grid;grid-template-columns:70px 1fr 76px;align-items:center;gap:.6rem;margin-bottom:.5rem;font-size:.85rem}
+.pbar-name{font-weight:700;font-size:.82rem}
+.pbar-track{position:relative;height:24px;background:var(--bg-alt);border-radius:4px;overflow:hidden}
+.pbar-zone{position:absolute;top:0;bottom:0;background:var(--red-light)}
+.pbar-fill{position:absolute;top:3px;bottom:3px;border-radius:3px;transition:left .2s,width .2s}
+.pbar-tick{position:absolute;top:0;bottom:0;width:1px;background:var(--text-sec);opacity:.6}
+.pbar-tlab{position:absolute;bottom:-15px;font-size:.65rem;color:var(--text-sec);transform:translateX(-50%)}
+.pbar-val{text-align:right;font-family:var(--font-m);font-size:.88rem;color:var(--heading);font-variant-numeric:tabular-nums}
+.pbar-val.bad{color:var(--red);font-weight:700}
+.conf{display:grid;grid-template-columns:auto 1fr 1fr auto;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:6px;overflow:hidden;font-size:.85rem;margin-top:.75rem}
+.conf>div{background:var(--bg);padding:.5rem .6rem;text-align:center}
+.conf .hd{background:var(--bg-alt);font-weight:700;color:var(--heading);font-size:.74rem;text-transform:uppercase;letter-spacing:.04em}
+.conf .ok{background:var(--green-light)}
+.conf .no{background:var(--red-light)}
+.conf .cv{font-family:var(--font-m);font-size:1.05rem;color:var(--heading);display:block}
+.conf .cl{font-size:.68rem;color:var(--text-sec);display:block}
+.results-table td.sig{color:var(--accent);font-weight:700;text-align:left}
+.results-table td.neg{color:var(--red)}
+.results-table th.mpl{color:var(--red)} .results-table th.logit{color:var(--orange)} .results-table th.probit{color:var(--accent)}
+.nt{text-transform:none}
+@media(max-width:600px){.reg-coef{white-space:normal}.reg-se{font-size:.72rem}}
+.stat-value.logit{color:var(--orange)}
+.hint{font-size:.78rem;color:var(--text-sec);font-style:italic;margin-top:.45rem}
+.row-inline{display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end}
+/* Extras de la clase 13 */
+.sign-tbl{display:grid;grid-template-columns:auto 1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:6px;overflow:hidden;font-size:.85rem;margin-top:.9rem}
+.sign-tbl>div{background:var(--bg);padding:.55rem .6rem;text-align:center;transition:background .2s}
+.sign-tbl .hd{background:var(--bg-alt);font-weight:700;color:var(--heading);font-size:.74rem;letter-spacing:.03em}
+.sign-tbl .pos{color:var(--green);font-weight:600}
+.sign-tbl .neg{color:var(--red);font-weight:600}
+.sign-tbl .on{background:var(--accent-light);box-shadow:inset 0 0 0 2px var(--accent)}
+.results-table td.selcol,.results-table th.selcol{background:var(--accent-light)}
+.results-table td .se{display:block;color:var(--text-sec);font-size:.72rem}
+.ctl-group.hidden{display:none}
+.src-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.6rem;margin:1rem 0 1.25rem}
+.src-card{background:var(--bg-canvas);border:1px solid var(--border);border-radius:6px;padding:.7rem .85rem;font-size:.85rem;line-height:1.5}
+.src-card b{display:block;font-family:var(--font-d);color:var(--heading);font-size:.95rem;margin-bottom:.15rem}
+.src-card .when{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700}
+.infl{font-size:.82rem;margin-top:.6rem}
+.infl li{margin-bottom:.15rem}
+.grid2>*{min-width:0}
+@media(max-width:600px){.reg-se{white-space:normal}}
+</style>
+</head>
+<body>
+<article>
+
+<p class="eyebrow">Econometría I — Clase 13</p>
+<h1>Endogeneidad (I)</h1>
+<p class="subtitle">Forma funcional, variables omitidas, proxies, error de medición y otros problemas de datos</p>
+
+<p class="lead">Todo lo que hicimos hasta acá descansó sobre un supuesto: <span class="math">E(u | X) = 0</span>. Hoy lo rompemos a propósito. Cuando alguna regresora está correlacionada con el error, MCO deja de ser insesgado y consistente, y el problema no se arregla juntando más datos. Esta página te deja ver con tus ojos de dónde sale ese sesgo, hacia dónde empuja y qué se puede hacer sin salir de MCO.</p>
+
+<div class="tip">
+  <strong>Cómo usar esta página.</strong> Todo se recalcula al instante en tu navegador. Los laboratorios combinan simulaciones (donde conocemos el verdadero <span class="math">&beta;</span> y podemos medir el sesgo) con las bases de Wooldridge que usamos en las diapositivas: <span class="math">hprice1</span>, <span class="math">wage2</span>, <span class="math">crime2</span> y <span class="math">rdchem</span>. Con esas bases, los números coinciden con los de la clase.
+</div>
+
+<div class="toc">
+  <strong>Recorrido</strong>
+  <ol>
+    <li><a href="#s1">¿Qué es la endogeneidad?</a></li>
+    <li><a href="#s2">Forma funcional incorrecta: RESET y Davidson-MacKinnon</a></li>
+    <li><a href="#s3">Variables omitidas (y variables de más)</a></li>
+    <li><a href="#s4">Variables proxy y variable dependiente rezagada</a></li>
+    <li><a href="#s5">Errores de medición</a></li>
+    <li><a href="#s6">Otros problemas de datos: faltantes, selección y outliers</a></li>
+    <li><a href="#s7">Autoevaluación</a></li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s1">1. ¿Qué es la endogeneidad?</h2>
+
+<p>Una variable explicativa <span class="math">X<sub>j</sub></span> es <strong>endógena</strong> si está correlacionada con el término de error:</p>
+
+<div class="formula-block">
+  <span class="math">Cov(X<sub>j</sub>, u) &ne; 0 &nbsp;&nbsp;&hArr;&nbsp;&nbsp; E(u | X) &ne; 0</span>
+</div>
+
+<p>En ese caso el estimador de MCO de <span class="math">&beta;<sub>j</sub></span> es <strong>sesgado e inconsistente</strong>: aunque tuviéramos infinitos datos, <span class="math">&beta;&#770;<sub>j</sub></span> no se acercaría al verdadero <span class="math">&beta;<sub>j</sub></span>. El signo puede salir invertido, la magnitud equivocada, y los tests <span class="math">t</span> y <span class="math">F</span> dejan de ser confiables.</p>
+
+<div class="src-grid">
+  <div class="src-card"><span class="when">Hoy</span><b>Forma funcional</b>Usamos los datos correctos de manera inadecuada (faltan logs, cuadrados o interacciones).</div>
+  <div class="src-card"><span class="when">Hoy</span><b>Variables omitidas</b>La fuente más frecuente: algo que afecta a <span class="math">Y</span> y se mueve con <span class="math">X</span> quedó en el error.</div>
+  <div class="src-card"><span class="when">Hoy</span><b>Error de medición</b>La variable que registramos no es la que importa económicamente.</div>
+  <div class="src-card"><span class="when">Clase 14</span><b>Simultaneidad</b>Causalidad en las dos direcciones. Ahí MCO no alcanza y vamos a necesitar variables instrumentales.</div>
+</div>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 1 · Una intuición visual</span></div>
+  <p class="lab-sub">200 personas simuladas. El verdadero efecto de un año de educación sobre el salario es <strong>0.5</strong>. Pero la habilidad, que no observamos, sube el salario <em>y</em> también se mueve con la educación. Cada punto está coloreado según su habilidad: azul baja, rojo alta.</p>
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label for="m1r">Corr(educación, habilidad) <span class="sim-val" id="m1rV"></span></label>
+      <input type="range" id="m1r" min="-0.9" max="0.9" step="0.05" value="0.7">
+    </div>
+    <div class="sim-control">
+      <label for="m1g">Efecto de la habilidad en el salario <span class="sim-val" id="m1gV"></span></label>
+      <input type="range" id="m1g" min="-2" max="3" step="0.1" value="1.5">
+    </div>
+  </div>
+  <div class="seg">
+    <button class="btn btn-sm active" id="m1T" onclick="tog1('showTrue')">Efecto verdadero</button>
+    <button class="btn btn-sm" id="m1L" onclick="tog1('showLong')">MCO controlando por habilidad</button>
+  </div>
+  <div class="sim-canvas-wrap"><canvas id="cv1"></canvas></div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--heading)"></span>MCO sin habilidad</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--text-sec)"></span>Efecto verdadero (habilidad promedio)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>MCO con habilidad</span>
+  </div>
+  <div class="lab-stats" id="st1"></div>
+  <div class="lab-btns"><button class="btn btn-primary" onclick="newSample1()">Nueva muestra</button></div>
+  <div id="nt1"></div>
+</div>
+
+<div class="note">
+  <div class="note-title">Probá esto</div>
+  Llevá la correlación a 0: aunque la habilidad siga afectando al salario, la pendiente vuelve a 0.5. Después dejá la correlación alta y poné el efecto de la habilidad en 0: tampoco hay sesgo. <strong>Hacen falta las dos cosas a la vez</strong> para que la variable omitida contamine el coeficiente. Esa es la idea de la sección 3.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s2">2. Forma funcional incorrecta: RESET y Davidson-MacKinnon</h2>
+
+<p>Un modelo tiene la <strong>forma funcional mal especificada</strong> cuando tenemos los datos correctos pero los usamos de manera inadecuada: estimamos <span class="math">wage</span> en niveles cuando correspondía <span class="math">log(wage)</span>, incluimos <span class="math">exper</span> pero no <span class="math">exper²</span>, u olvidamos una interacción como <span class="math">educ &times; female</span>.</p>
+
+<div class="callout">
+  <div class="callout-title">¿Por qué es endogeneidad?</div>
+  Si el modelo correcto es <span class="math">Y = &beta;<sub>0</sub> + &beta;<sub>1</sub>X + &beta;<sub>2</sub>X² + u</span> y estimamos sólo con <span class="math">X</span>, el término <span class="math">X²</span> cae al error y queda correlacionado con <span class="math">X</span>. Es exactamente el problema de una variable omitida.
+</div>
+
+<p>La herramienta más directa es una vieja conocida: agregar cuadrados (o logs, o interacciones) y hacer un <strong>test <span class="math">F</span> de exclusión conjunta</strong>. El <strong>test RESET de Ramsey</strong> generaliza la idea con un truco: en lugar de agregar el cuadrado de cada regresora, agrega potencias del valor ajustado, que es una combinación lineal de todas.</p>
+
+<div class="formula-block">
+  <span class="math">Y = &beta;<sub>0</sub> + &beta;<sub>1</sub>X<sub>1</sub> + &hellip; + &beta;<sub>k</sub>X<sub>k</sub> + &delta;<sub>1</sub>Y&#770;² + &delta;<sub>2</sub>Y&#770;³ + error
+  &nbsp;&nbsp;&rArr;&nbsp;&nbsp; H<sub>0</sub>: &delta;<sub>1</sub> = &delta;<sub>2</sub> = 0, &nbsp; F ~ F<sub>2, n−k−3</sub></span>
+</div>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 2 · Cuando falta el cuadrado</span></div>
+  <p class="lab-sub">La verdadera relación es <span class="math">Y = 10 + 1.5X + c&sdot;(X − 5)² + u</span>, pero estimamos una recta. Mové la curvatura <span class="math">c</span> y mirá qué detectan el RESET y el test de agregar <span class="math">X²</span>.</p>
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label for="m2c">Curvatura c <span class="sim-val" id="m2cV"></span></label>
+      <input type="range" id="m2c" min="-0.5" max="0.5" step="0.02" value="0.2">
+    </div>
+    <div class="sim-control">
+      <label for="m2n">Tamaño de muestra <span class="sim-val" id="m2nV"></span></label>
+      <input type="range" id="m2n" min="40" max="600" step="20" value="120">
+    </div>
+  </div>
+  <div class="seg">
+    <button class="btn btn-sm active" id="m2vF" onclick="set2view('fit')">Datos y recta estimada</button>
+    <button class="btn btn-sm" id="m2vR" onclick="set2view('res')">Residuos vs. valores ajustados</button>
+  </div>
+  <div class="sim-canvas-wrap"><canvas id="cv2"></canvas></div>
+  <div class="legend" id="lg2"></div>
+  <div class="lab-stats" id="st2"></div>
+  <div class="lab-btns"><button class="btn btn-primary" onclick="newSample2()">Nueva muestra</button></div>
+  <div id="nt2"></div>
+</div>
+
+<div class="note">
+  <div class="note-title">Probá esto</div>
+  Con <span class="math">c</span> cerca de 0 el RESET casi nunca rechaza (y cuando lo hace, es el 5% de falsos positivos que aceptamos). Con <span class="math">c = 0.1</span> y muestra chica, el test suele no detectar nada; subí la muestra a 600 y la misma curvatura pasa a ser detectada. Un <span class="math">p</span>-valor grande <strong>no prueba</strong> que la forma sea correcta: puede ser que el test no tenga potencia suficiente.
+</div>
+
+<h3>Ejemplo con datos reales: precios de viviendas</h3>
+
+<p>La base <span class="math">hprice1</span> tiene 88 viviendas con su precio (en miles de US$), el tamaño del terreno y de la casa (en pies cuadrados) y la cantidad de dormitorios. Comparamos la especificación en niveles con la log-log.</p>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 3 · RESET sobre hprice1</span></div>
+  <div class="row-inline">
+    <div class="seg" style="margin:0">
+      <button class="btn btn-sm active" id="m3lin" onclick="set3mod('lin')">Modelo lineal (niveles)</button>
+      <button class="btn btn-sm" id="m3log" onclick="set3mod('log')">Modelo log-log</button>
+    </div>
+    <div class="seg" style="margin:0">
+      <button class="btn btn-sm active" id="m3p23" onclick="set3pow(3)">Agregar Ŷ² y Ŷ³</button>
+      <button class="btn btn-sm" id="m3p2" onclick="set3pow(2)">Sólo Ŷ²</button>
+    </div>
+  </div>
+  <div class="model-chip" id="chip3" style="margin-top:.8rem"></div>
+  <div class="grid2" style="margin-top:0">
+    <div>
+      <div class="reg-out" id="out3" style="margin-top:0"></div>
+      <p class="reg-hint">Hacé clic en una fila para leer el coeficiente. *** p &lt; 0.01, ** p &lt; 0.05, * p &lt; 0.10</p>
+    </div>
+    <div>
+      <div class="sim-canvas-wrap"><canvas id="cv3"></canvas></div>
+      <p class="hint">Residuos contra valores ajustados. Los cuadrados verdes son el promedio de los residuos por tramo: si la forma es correcta, deberían quedar cerca de cero.</p>
+    </div>
+  </div>
+  <div class="lab-stats" id="st3"></div>
+  <div id="nt3"></div>
+</div>
+
+<div class="callout">
+  <div class="callout-title">Lo que el RESET no hace</div>
+  Detecta forma funcional incorrecta y nada más. <strong>No</strong> detecta variables omitidas cuando su esperanza es lineal en las regresoras incluidas, <strong>no</strong> detecta heteroscedasticidad y <strong>no</strong> dice cómo corregir el problema, sólo si existe.
+</div>
+
+<h3>Modelos no anidados: Davidson-MacKinnon</h3>
+
+<p>Los modelos lineal y log-log no se pueden comparar con el RESET de uno contra el otro, porque tienen distinta variable dependiente. Pero a veces queremos elegir entre dos modelos con la misma <span class="math">Y</span> que <strong>no están anidados</strong>, es decir, ninguno es un caso particular del otro. Por ejemplo, con <span class="math">price</span> como dependiente:</p>
+<ul>
+  <li><strong>Modelo A</strong>: <span class="math">price = &beta;<sub>0</sub> + &beta;<sub>1</sub>lotsize + &beta;<sub>2</sub>sqrft + &beta;<sub>3</sub>bdrms + u</span></li>
+  <li><strong>Modelo B</strong>: <span class="math">price = &beta;<sub>0</sub> + &beta;<sub>1</sub>log(lotsize) + &beta;<sub>2</sub>log(sqrft) + &beta;<sub>3</sub>bdrms + u</span></li>
+</ul>
+<p>La prueba de <strong>Davidson y MacKinnon</strong> estima B, guarda sus valores ajustados <span class="math">Y&#770;<sub>B</sub></span> y los agrega como regresora extra en A. Si su coeficiente es significativo, se rechaza A. Después se repite intercambiando los roles.</p>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 3b · Davidson-MacKinnon sobre hprice1</span></div>
+  <div class="seg">
+    <button class="btn btn-sm active" id="m3a05" onclick="set3alpha(0.05)">Nivel de significación 5%</button>
+    <button class="btn btn-sm" id="m3a10" onclick="set3alpha(0.10)">Nivel 10%</button>
+  </div>
+  <div class="results-wrap"><table class="results-table" id="tb3dm"></table></div>
+  <div id="nt3dm"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s3">3. Variables omitidas (y variables de más)</h2>
+
+<p>Supongamos que el modelo verdadero es <span class="math">Y = &beta;<sub>0</sub> + &beta;<sub>1</sub>X<sub>1</sub> + &beta;<sub>2</sub>X<sub>2</sub> + u</span>, pero estimamos <span class="math">Y = &beta;&#771;<sub>0</sub> + &beta;&#771;<sub>1</sub>X<sub>1</sub> + v</span>, con <span class="math">v = &beta;<sub>2</sub>X<sub>2</sub> + u</span>. Entonces</p>
+
+<div class="formula-block">
+  <span class="math">plim(&beta;&#771;<sub>1</sub>) = &beta;<sub>1</sub> + &beta;<sub>2</sub>&sdot;&delta;<sub>1</sub></span>
+  &nbsp;&nbsp;donde <span class="math">&delta;<sub>1</sub></span> es la pendiente de regresar <span class="math">X<sub>2</sub></span> sobre <span class="math">X<sub>1</sub></span>.
+</div>
+
+<p>Hay sesgo salvo que <span class="math">&beta;<sub>2</sub> = 0</span> (la omitida no importa para <span class="math">Y</span>) o <span class="math">&delta;<sub>1</sub> = 0</span> (no se mueve con <span class="math">X<sub>1</sub></span>). El signo del sesgo es el signo del producto, y eso da la famosa tabla de dos por dos.</p>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 4 · 400 muestras, dos estimadores</span></div>
+  <p class="lab-sub">Cada vez que movés un control se generan 400 muestras del mismo modelo y en cada una se estima la regresión <strong>corta</strong> y la <strong>larga</strong>. El histograma muestra cómo se distribuyen los 400 estimadores de <span class="math">&beta;<sub>1</sub></span>, cuyo valor verdadero es <strong>1</strong>.</p>
+  <div class="seg">
+    <button class="btn btn-sm active" id="m4om" onclick="set4mode('omit')">Omitir una variable relevante</button>
+    <button class="btn btn-sm" id="m4ir" onclick="set4mode('irr')">Incluir una variable irrelevante</button>
+  </div>
+  <div class="sim-controls">
+    <div class="sim-control ctl-group" id="g4b2">
+      <label for="m4b2"><span>Efecto de X<sub>2</sub> sobre Y <span class="nt">(&beta;<sub>2</sub>)</span></span> <span class="sim-val" id="m4b2V"></span></label>
+      <input type="range" id="m4b2" min="-2" max="2" step="0.1" value="1">
+    </div>
+    <div class="sim-control">
+      <label for="m4r"><span id="m4rLab">Corr(X<sub>1</sub>, X<sub>2</sub>)</span> <span class="sim-val" id="m4rV"></span></label>
+      <input type="range" id="m4r" min="-0.9" max="0.9" step="0.05" value="0.5">
+    </div>
+    <div class="sim-control">
+      <label for="m4n">Tamaño de cada muestra <span class="sim-val" id="m4nV"></span></label>
+      <input type="range" id="m4n" min="30" max="1000" step="10" value="100">
+    </div>
+  </div>
+  <div class="sim-canvas-wrap"><canvas id="cv4"></canvas></div>
+  <div class="legend" id="lg4"></div>
+  <div class="lab-stats" id="st4"></div>
+  <div id="sign4"></div>
+  <div class="lab-btns"><button class="btn btn-primary" onclick="newSample4()">Otras 400 muestras</button></div>
+  <div id="nt4"></div>
+</div>
+
+<div class="note">
+  <div class="note-title">Probá esto</div>
+  En el modo "omitir", subí el tamaño de muestra a 1000. El histograma rojo se angosta, pero <strong>alrededor del valor equivocado</strong>: eso es la inconsistencia. En el modo "irrelevante", llevá la correlación a 0.9 y fijate que los dos histogramas siguen centrados en 1, pero el que incluye <span class="math">X<sub>3</sub></span> es mucho más ancho.
+</div>
+
+<p><strong>El caso paradigmático</strong> es el retorno de la educación con la habilidad omitida: esperamos <span class="math">&beta;<sub>2</sub> &gt; 0</span> (más habilidad, más salario) y <span class="math">Corr(educ, abil) &gt; 0</span>, así que el sesgo es positivo y la regresión sin habilidad <strong>sobreestima</strong> el retorno de la educación. Lo vamos a comprobar con datos en la sección 4.</p>
+
+<div class="grid2">
+  <div class="panel">
+    <div class="panel-head">Señales de alarma</div>
+    <div class="panel-body">
+      <ol style="margin-bottom:0">
+        <li>El coeficiente de interés <strong>cambia mucho</strong> al agregar controles.</li>
+        <li>Su signo <strong>no coincide</strong> con la teoría.</li>
+        <li>El <span class="math">R²</span> es muy bajo (pueden faltar muchas cosas).</li>
+        <li>La teoría sugiere un factor relevante para <span class="math">Y</span>, correlacionado con <span class="math">X</span>, que no está en el modelo.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-head">Qué se puede hacer</div>
+    <div class="panel-body">
+      No existe un test formal simple: si no observamos la variable, no podemos testear su efecto. Sí podemos:
+      <ul style="margin:.4rem 0 0 1.1rem">
+        <li>pensar el modelo desde la teoría,</li>
+        <li>hacer análisis de sensibilidad con y sin controles,</li>
+        <li>buscar una <strong>variable proxy</strong> (sección 4),</li>
+        <li>usar <strong>variables instrumentales</strong> (clase 14).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<h3>El trade-off: omitir o incluir de más</h3>
+
+<div class="grid2" style="margin-top:.5rem">
+  <div class="panel">
+    <div class="panel-head" style="color:var(--red)">Si omitís una variable relevante</div>
+    <div class="panel-body">Sesgo en los coeficientes (grave). Inconsistencia: no se arregla con más datos.</div>
+  </div>
+  <div class="panel">
+    <div class="panel-head" style="color:var(--orange)">Si incluís una variable irrelevante</div>
+    <div class="panel-body">Sin sesgo. Sólo más varianza: errores estándar más grandes, <span class="math">t</span> más chicos, intervalos más anchos, menos potencia.</div>
+  </div>
+</div>
+
+<div class="tip">
+  <strong>Regla práctica.</strong> Ante la duda, más vale incluir un control que dejarlo afuera: el costo de la varianza extra es mucho menor que el de un sesgo. <strong>Excepción</strong>: no incluyas variables que sean <em>consecuencia</em> de tu variable de interés (los "malos controles"). Si querés el retorno de la educación, controlar por la ocupación le saca justamente uno de los canales por los que la educación sube el salario.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s4">4. Variables proxy y variable dependiente rezagada</h2>
+
+<p>Sospechamos que una variable importante <span class="math">X<sub>3</sub>*</span> está omitida (la habilidad), pero observamos otra <span class="math">X<sub>3</sub></span> que se le parece (el IQ). Esa es una <strong>variable proxy</strong>. Otros ejemplos: la evaluación de los alumnos como proxy de la calidad docente, la educación de los padres como proxy del nivel socioeconómico.</p>
+
+<div class="formula-block">
+  <span class="math">Y = &beta;<sub>0</sub> + &beta;<sub>1</sub>X<sub>1</sub> + &beta;<sub>2</sub>X<sub>2</sub> + &beta;<sub>3</sub>X<sub>3</sub>* + u
+  &nbsp;&nbsp;&rArr;&nbsp;&nbsp; estimamos &nbsp; Y = &gamma;<sub>0</sub> + &beta;<sub>1</sub>X<sub>1</sub> + &beta;<sub>2</sub>X<sub>2</sub> + &gamma;<sub>3</sub>X<sub>3</sub> + error</span>
+</div>
+
+<p>Lo que buscamos son estimaciones consistentes de <span class="math">&beta;<sub>1</sub></span> y <span class="math">&beta;<sub>2</sub></span>. A cambio <strong>renunciamos</strong> a estimar <span class="math">&beta;<sub>3</sub></span>: el coeficiente <span class="math">&gamma;<sub>3</sub></span> mide el efecto de la proxy, no de la habilidad "pura". Para que funcione hacen falta dos condiciones:</p>
+
+<div class="grid2">
+  <div class="panel">
+    <div class="panel-head">1. Relevancia</div>
+    <div class="panel-body">La proxy tiene que estar correlacionada con la variable no observada. Si el IQ no tuviera relación con la habilidad, no serviría de nada.</div>
+  </div>
+  <div class="panel">
+    <div class="panel-head">2. Redundancia</div>
+    <div class="panel-body">Una vez que controlamos por <span class="math">X<sub>3</sub>*</span>, la proxy no tiene efecto propio sobre <span class="math">Y</span>: la afecta sólo a través de la habilidad.</div>
+  </div>
+</div>
+
+<p>Ninguna de las dos se puede testear (la habilidad no se observa); se justifican con la teoría.</p>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 5 · IQ y KWW como proxies de la habilidad (wage2)</span></div>
+  <p class="lab-sub">935 hombres de EE.UU. (Blackburn y Neumark, 1992). Dependiente: <span class="math">log(wage)</span>. Todos los modelos controlan por experiencia, antigüedad, estado civil, región, zona urbana y raza. KWW es un puntaje de conocimiento del mundo del trabajo. Elegí un modelo para ver los detalles.</p>
+  <div class="seg" id="seg5"></div>
+  <div class="results-wrap"><table class="results-table" id="tb5"></table></div>
+  <p class="reg-hint">Error estándar debajo de cada coeficiente. *** p &lt; 0.01, ** p &lt; 0.05, * p &lt; 0.10</p>
+  <h3>El retorno de la educación en cada modelo</h3>
+  <div class="sim-canvas-wrap"><canvas id="cv5"></canvas></div>
+  <p class="hint">Punto: retorno estimado de un año de educación (en %). Barras: intervalo de confianza del 95%.</p>
+  <div class="lab-stats" id="st5"></div>
+  <div id="nt5"></div>
+</div>
+
+<div class="note">
+  <div class="note-title">¿Y si la proxy es mala?</div>
+  Si la proxy es una medida ruidosa de la habilidad, parte de la habilidad sigue en el error y el sesgo se achica pero no desaparece. Si además la proxy está correlacionada con la educación por otras vías, tampoco obtenemos estimaciones consistentes. Aun así, <strong>una proxy razonable suele dejar menos sesgo que omitir directamente la variable</strong>. El laboratorio siguiente lo muestra con datos simulados, donde sí conocemos el verdadero retorno.
+</div>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 6 · ¿Qué tan buena es la proxy?</span></div>
+  <p class="lab-sub">Simulamos 5.000 personas con un retorno verdadero de la educación del <strong>6%</strong> y habilidad no observada que sube el salario y se mueve con la educación. La proxy es una medida de la habilidad con ruido. Mové su calidad y, si querés, hacé que viole la redundancia.</p>
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label for="m6q">Corr(proxy, habilidad) <span class="sim-val" id="m6qV"></span></label>
+      <input type="range" id="m6q" min="0" max="1" step="0.05" value="0.7">
+    </div>
+    <div class="sim-control">
+      <label for="m6k">Vínculo directo proxy–educación <span class="sim-val" id="m6kV"></span></label>
+      <input type="range" id="m6k" min="0" max="1" step="0.05" value="0">
+    </div>
+  </div>
+  <div class="bar-cmp" id="bars6"></div>
+  <div class="lab-stats" id="st6"></div>
+  <div id="nt6"></div>
+</div>
+
+<h3>La variable dependiente rezagada como proxy</h3>
+
+<p>A veces no se nos ocurre qué proxy usar. Un truco es controlar por el <strong>valor pasado de la propia <span class="math">Y</span></strong>. Si dos ciudades tenían el mismo nivel de delito hace cinco años, probablemente comparten buena parte de los factores no observados (geografía, demografía, instituciones) que explican el delito de hoy.</p>
+
+<p>Queremos el efecto del gasto en seguridad sobre la criminalidad: <span class="math">log(crmrte<sub>87</sub>) = &beta;<sub>0</sub> + &beta;<sub>1</sub>unem<sub>87</sub> + &beta;<sub>2</sub>log(lawexpc<sub>87</sub>) + u</span>. El problema es que las ciudades con más delito <em>históricamente</em> tienden a gastar más en seguridad.</p>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 7 · Criminalidad y gasto en seguridad (crime2)</span></div>
+  <p class="lab-sub">46 ciudades de EE.UU. Cada punto está coloreado según su tasa de delito en 1982: más oscuro, más delito. Los gráficos "controlando por..." muestran la relación una vez descontado el efecto de los controles (la pendiente es exactamente el coeficiente de la tabla).</p>
+  <div class="seg">
+    <button class="btn btn-sm" id="m7q" onclick="set7view('quien')">¿Quién gasta más?</button>
+    <button class="btn btn-sm active" id="m7s" onclick="set7view('sin')">Sin rezago</button>
+    <button class="btn btn-sm" id="m7c" onclick="set7view('con')">Con el delito de 1982</button>
+  </div>
+  <div class="sim-canvas-wrap"><canvas id="cv7"></canvas></div>
+  <div class="results-wrap"><table class="results-table" id="tb7"></table></div>
+  <div id="nt7"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s5">5. Errores de medición</h2>
+
+<p>Hay <strong>error de medición</strong> cuando la variable que afecta el comportamiento económico no es la que registramos: ingreso o ahorro declarados en lugar de los reales, tasa de impuesto promedio en lugar de la marginal, años de educación autorreportados. La pregunta clave es <strong>dónde está el error</strong>, porque las consecuencias son muy distintas.</p>
+
+<div class="grid2">
+  <div class="panel">
+    <div class="panel-head">Error en Y</div>
+    <div class="panel-body">Observamos <span class="math">Y = Y* + e<sub>0</sub></span>. Estimamos <span class="math">Y = &beta;<sub>0</sub> + &beta;<sub>1</sub>X<sub>1</sub> + &hellip; + (u + e<sub>0</sub>)</span>. Si <span class="math">e<sub>0</sub></span> no se correlaciona con las <span class="math">X</span>, MCO sigue siendo <strong>insesgado</strong>; sólo crece la varianza del error.</div>
+  </div>
+  <div class="panel">
+    <div class="panel-head">Error en X</div>
+    <div class="panel-body">Observamos <span class="math">X<sub>1</sub> = X<sub>1</sub>* + e<sub>1</sub></span>. Estimamos <span class="math">Y = &beta;<sub>0</sub> + &beta;<sub>1</sub>X<sub>1</sub> + (u − &beta;<sub>1</sub>e<sub>1</sub>)</span>. El error contiene a <span class="math">e<sub>1</sub></span>, que está en <span class="math">X<sub>1</sub></span>: <strong><span class="math">X<sub>1</sub></span> es endógena</strong>.</div>
+  </div>
+</div>
+
+<p>Bajo <strong>errores clásicos en las variables</strong> (el error <span class="math">e<sub>1</sub></span> es independiente del valor verdadero), el sesgo tiene una forma muy precisa:</p>
+
+<div class="formula-block">
+  <span class="math">plim(&beta;&#770;<sub>1</sub>) = &beta;<sub>1</sub> &sdot;
+  <span class="frac"><span class="num">&sigma;²<sub>X*</sub></span><span class="den">&sigma;²<sub>X*</sub> + &sigma;²<sub>e</sub></span></span></span>
+  &nbsp;&nbsp;con un factor siempre entre 0 y 1: el <strong>sesgo de atenuación</strong>.
+</div>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 8 · Medir con ruido</span></div>
+  <p class="lab-sub">El modelo verdadero es <span class="math">Y = 2 + 1.5X* + u</span>, con <span class="math">X* ~ N(10, 2²)</span>, así que <span class="math">&sigma;²<sub>X*</sub> = 4</span>. Elegí dónde está el error y cuánto ruido tiene.</p>
+  <div class="seg">
+    <button class="btn btn-sm active" id="m8x" onclick="set8mode('x')">Error en X</button>
+    <button class="btn btn-sm" id="m8y" onclick="set8mode('y')">Error en Y (aleatorio)</button>
+    <button class="btn btn-sm" id="m8yc" onclick="set8mode('yc')">Error en Y correlacionado con X</button>
+  </div>
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label for="m8s"><span>Desvío del error de medición <span class="nt">&sigma;<sub>e</sub></span></span> <span class="sim-val" id="m8sV"></span></label>
+      <input type="range" id="m8s" min="0" max="4" step="0.1" value="1.5">
+    </div>
+    <div class="sim-control">
+      <label for="m8n">Tamaño de muestra <span class="sim-val" id="m8nV"></span></label>
+      <input type="range" id="m8n" min="50" max="1000" step="50" value="300">
+    </div>
+  </div>
+  <div class="grid2" style="margin-top:0">
+    <div class="sim-canvas-wrap"><canvas id="cv8a"></canvas></div>
+    <div class="sim-canvas-wrap"><canvas id="cv8b"></canvas></div>
+  </div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--text-sec)"></span>Recta verdadera (pendiente 1.5)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>MCO con los datos observados</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--accent)"></span>plim teórico según &sigma;<sub>e</sub> (derecha)</span>
+  </div>
+  <div class="lab-stats" id="st8"></div>
+  <div class="lab-btns"><button class="btn btn-primary" onclick="newSample8()">Nueva muestra</button></div>
+  <div id="nt8"></div>
+</div>
+
+<div class="note">
+  <div class="note-title">Probá esto</div>
+  Con error en X y <span class="math">&sigma;<sub>e</sub> = 2</span>, la varianza del ruido iguala a la de la señal: el factor es 4/(4+4) = 0.5 y la pendiente estimada ronda la mitad de la verdadera. Pasá a "Error en Y": con el mismo ruido la pendiente vuelve a 1.5, pero mirá cómo crece el error estándar. Las consecuencias prácticas de la atenuación son subestimar el efecto y tener <strong>más chances de no rechazar <span class="math">H<sub>0</sub>: &beta;<sub>1</sub> = 0</span></strong> cuando es falsa (error tipo II).
+</div>
+
+<h3>Proxy vs. error de medición</h3>
+<p>Los dos casos involucran una variable observada que "no es la que importa", pero no son lo mismo:</p>
+<div class="results-wrap"><table class="results-table">
+  <tr><th></th><th>Variable proxy</th><th>Error de medición</th></tr>
+  <tr><td class="lbl">La variable verdadera</td><td class="txt">Un concepto vago ("habilidad")</td><td class="txt">Tiene un significado cuantitativo claro (ingreso real)</td></tr>
+  <tr><td class="lbl">La observada</td><td class="txt">Una variable distinta, correlacionada con <span class="math">X*</span></td><td class="txt">Una medida ruidosa de la misma <span class="math">X*</span></td></tr>
+  <tr><td class="lbl">Qué coeficiente interesa</td><td class="txt">El de los <em>otros</em> regresores</td><td class="txt">El de la propia variable mal medida</td></tr>
+  <tr><td class="lbl">El problema</td><td class="txt">Sesgo en otros coeficientes</td><td class="txt">Atenuación del coeficiente de interés</td></tr>
+</table></div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s6">6. Otros problemas de datos: faltantes, selección y outliers</h2>
+
+<p>R y Stata descartan por defecto las observaciones a las que les falta algún dato. Si la falta es <strong>aleatoria</strong>, sólo se achica la muestra y MCO sigue siendo insesgado. El problema aparece cuando quién queda en la muestra depende sistemáticamente de las variables del modelo:</p>
+<ul>
+  <li><strong>Selección exógena</strong>: la probabilidad de estar en la muestra depende de las <span class="math">X</span> (encuestamos sólo a mayores de 35, y la edad es una regresora). MCO sigue funcionando bien.</li>
+  <li><strong>Selección endógena</strong>: depende de la <span class="math">Y</span> o del error (los de ingresos altos no contestan; sólo vemos el salario de quienes trabajan). MCO es sesgado e inconsistente: es el sesgo de selección que estudió Heckman.</li>
+</ul>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 9 · ¿Quién queda en la muestra?</span></div>
+  <p class="lab-sub">Una población de 1.000 personas con <span class="math">wage = 2 + 0.8&sdot;educ + u</span>. Elegí la regla que decide quién queda afuera y qué porcentaje se pierde. Los puntos grises son los que no vemos.</p>
+  <div class="seg">
+    <button class="btn btn-sm active" id="m9r" onclick="set9mode('rand')">Al azar</button>
+    <button class="btn btn-sm" id="m9x" onclick="set9mode('x')">Según X: faltan los de menos educación</button>
+    <button class="btn btn-sm" id="m9h" onclick="set9mode('yhi')">Según Y: no contestan los de salario alto</button>
+    <button class="btn btn-sm" id="m9l" onclick="set9mode('ylo')">Según Y: sólo vemos a quienes trabajan</button>
+  </div>
+  <div class="sim-controls">
+    <div class="sim-control">
+      <label for="m9p">Porcentaje de la población que queda afuera <span class="sim-val" id="m9pV"></span></label>
+      <input type="range" id="m9p" min="0" max="80" step="5" value="40">
+    </div>
+  </div>
+  <div class="sim-canvas-wrap"><canvas id="cv9"></canvas></div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--text-sec)"></span>Recta de la población</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>MCO con la muestra observada</span>
+  </div>
+  <div class="lab-stats" id="st9"></div>
+  <div id="nt9"></div>
+</div>
+
+<h3>Outliers y observaciones influyentes</h3>
+
+<p>Un <strong>outlier</strong> es una observación con valores extremos; una <strong>observación influyente</strong> es una cuya inclusión cambia mucho las estimaciones. No son lo mismo. MCO es muy sensible a ellas porque minimiza la suma de los residuos <em>al cuadrado</em>: a los residuos grandes les da un peso enorme. Pueden ser errores de carga (una coma mal puesta, ceros de más), unidades genuinamente atípicas o conceptos mal medidos.</p>
+
+<div class="lab">
+  <div class="lab-header"><span class="lab-title">Laboratorio 10 · I+D y tamaño de la empresa (rdchem)</span></div>
+  <p class="lab-sub">32 empresas químicas: <span class="math">rdintens = &beta;<sub>0</sub> + &beta;<sub>1</sub>sales + &beta;<sub>2</sub>profmarg + u</span>, con la intensidad de I+D en % de las ventas y las ventas en millones de US$. <strong>Hacé clic sobre cualquier punto</strong> para sacarlo de la muestra (y otra vez para devolverlo).</p>
+  <div class="lab-btns" style="margin-top:0;margin-bottom:.75rem">
+    <button class="btn btn-sm" onclick="drop10big()">Sacar la empresa más grande</button>
+    <button class="btn btn-sm" id="m10inf" onclick="tog10inf()">Colorear por influencia</button>
+    <button class="btn btn-sm" onclick="reset10()">Restaurar todas</button>
+  </div>
+  <div class="sim-canvas-wrap clickable"><canvas id="cv10"></canvas></div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>Ajuste con tu muestra</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--text-sec)"></span>Ajuste con las 32 empresas</span>
+  </div>
+  <p class="hint">Las rectas evalúan el modelo en el margen de beneficio promedio.</p>
+  <div class="results-wrap"><table class="results-table" id="tb10"></table></div>
+  <div class="infl" id="inf10"></div>
+  <div id="nt10"></div>
+</div>
+
+<div class="tip">
+  <strong>Buena práctica con outliers.</strong> (1) Mirá siempre estadísticos de resumen y gráficos antes de estimar. (2) Calculá mínimo, máximo y desvío de cada variable: así se detectan los errores de carga. (3) Ante observaciones sospechosas, estimá con y sin ellas y <strong>reportá ambos resultados</strong>. (4) Discutí con la teoría si es razonable que esa observación pertenezca a la población que estudiás.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2 id="s7">7. Autoevaluación</h2>
+
+<p>Elegí una respuesta y la página devuelve la justificación. Varias se pueden comprobar en los laboratorios de arriba.</p>
+
+<div id="quizWrap"></div>
+<div class="quiz-score" id="quizScore"></div>
+<div class="lab-btns"><button class="btn btn-sm" onclick="resetQuiz()">Reiniciar</button></div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>Para llevarse</h2>
+
+<ul>
+  <li><strong>Endogeneidad es <span class="math">Cov(X, u) &ne; 0</span>.</strong> MCO queda sesgado e inconsistente: más datos no lo arreglan.</li>
+  <li><strong>Forma funcional:</strong> probá al menos dos especificaciones. El RESET es un primer filtro útil y Davidson-MacKinnon sirve para modelos no anidados, pero la decisión final también depende de la teoría y de la interpretación.</li>
+  <li><strong>Variable omitida:</strong> el sesgo es <span class="math">&beta;<sub>2</sub>&sdot;&delta;<sub>1</sub></span>. Hace falta que la omitida afecte a <span class="math">Y</span> y que se mueva con <span class="math">X<sub>1</sub></span>. La tabla de signos te dice hacia dónde va.</li>
+  <li><strong>Variable irrelevante:</strong> no sesga, sólo infla la varianza. Ante la duda, incluí el control, salvo que sea consecuencia de tu variable de interés.</li>
+  <li><strong>Proxy:</strong> reemplazá la no observada por algo correlacionado con ella. Reportá el modelo con y sin proxy: si el coeficiente cambia mucho, el sesgo era importante. La <span class="math">Y</span> rezagada es una proxy de emergencia para los no observables persistentes.</li>
+  <li><strong>Error de medición:</strong> en <span class="math">Y</span> (aleatorio) sólo cuesta precisión; en <span class="math">X</span> atenúa el coeficiente hacia cero.</li>
+  <li><strong>Datos:</strong> faltantes al azar o selección según las <span class="math">X</span> no sesgan; selección según la <span class="math">Y</span> sí. Una sola observación puede cambiar la conclusión: estimá con y sin las sospechosas.</li>
+  <li><strong>Próxima clase:</strong> cuando no hay proxy y la endogeneidad persiste, necesitamos una <strong>variable instrumental</strong> y Mínimos Cuadrados en Dos Etapas.</li>
+</ul>
+
+</article>
+<script>
+"use strict";
+/* Datos: wooldridge::hprice1 (price, lotsize, sqrft, bdrms) */
+const HP={price:[300,370,191,195,373,466.275,332.5,315,206,240,285,300,405,212,265,227.4,240,285,268,310,266,270,225,150,247,275,230,343,477.5,350,230,335,251,235,361,190,360,575,209.001,225,246,713.5,248,230,375,265,313,417.5,253,315,264,255,210,180,250,250,209,258,289,316,225,266,310,471.25,335,495,279.5,380,325,220,215,240,725,230,306,425,318,330,246,225,111,268.125,244,295,236,202.5,219,242],
+lotsize:[6126,9903,5200,4600,6095,8566,9000,6210,6000,2892,6000,7047,12237,6460,6519,3597,5922,7123,5642,8602,5494,7800,6003,5218,9425,6114,6710,8577,8400,9773,4806,15086,5763,6383,9000,3500,10892,15634,6400,8880,6314,28231,7050,5305,6637,7834,1000,8112,5850,6660,6637,15267,5146,6017,8410,5625,5600,6525,6060,5539,7566,5484,5348,15834,8022,11966,8460,15105,10859,6300,11554,6000,31000,4054,20700,5525,92681,8178,5944,18838,4315,5167,7893,6056,5828,6341,6362,4950],
+sqrft:[2438,2076,1374,1448,2514,2754,2067,1731,1767,1890,2336,2634,3375,1899,2312,1760,2000,1774,1376,1835,2048,2124,1768,1732,1440,1932,1932,2106,3529,2051,1573,2829,1630,1840,2066,1702,2750,3880,1854,1421,1662,3331,1656,1171,2293,1764,2768,3733,1536,1638,1972,1478,1408,1812,1722,1780,1674,1850,1925,2343,1567,1664,1386,2617,2321,2638,1915,2589,2709,1587,1694,1536,3662,1736,2205,1502,1696,2186,1928,1294,1535,1980,2090,1837,1715,1574,1185,1774],
+bdrms:[4,3,3,3,4,5,3,3,3,3,4,5,3,3,3,4,4,3,3,4,3,3,3,4,3,3,3,3,7,4,4,4,3,4,4,4,4,5,4,2,3,5,4,3,5,3,3,4,3,4,3,2,3,3,3,4,4,4,3,4,3,4,6,5,4,4,4,4,4,3,3,3,5,3,2,3,4,3,4,3,4,3,4,3,3,3,2,4]};
+/* Datos: wooldridge::wage2 (lwage, educ, exper, tenure, married, south, urban, black, IQ, KWW) */
+const W2={lwage:[6.645091,6.694562,6.715384,6.476973,6.331502,7.244227,6.39693,6.985642,7.05099,6.907755,6.835185,6.82546,6.802395,7.183871,7.491087,6.864848,7.21524,6.745236,6.721426,6.154858,7.150702,7.38709,6.771935,7.667158,6.959399,7.379008,7.080027,6.684612,7.256297,6.453625,6.907755,7.261225,7.889084,6.50129,7.483807,6.661855,7.360104,7.149917,6.570883,6.985642,6.539586,7.183871,7.12206,6.934397,7.466228,6.888573,6.64639,7.05099,7.051856,6.694562,7.003066,7.05099,7.466799,6.907755,6.135565,6.645091,6.774224,7.226209,7.280697,6.684612,7.466228,7.048387,6.733402,6.885509,6.870053,6.428105,6.09131,6.39693,7.219642,7.404279,7.282761,7.745003,7.427739,7.118826,6.751101,6.977282,6.946976,6.907755,6.514713,7.003066,6.903747,6.59578,7.090077,7.434848,6.530878,6.625392,6.753438,6.723833,6.361302,6.510258,7.824046,6.981006,6.620073,7.078341,6.725034,6.476973,7.130899,7.022868,6.76273,6.694562,7.16935,6.805723,6.802395,6.437752,7.36897,6.869014,7.338888,7.012115,7.156177,6.64639,6.907755,6.796824,7.094235,6.620073,6.483108,6.398595,6.39693,6.070738,7.080027,6.453625,7.110696,7.048387,6.76273,6.938284,6.955593,6.907755,7.007601,7.562161,7.204893,6.695799,7.309882,7.204893,7.090077,6.214608,7.189168,6.802395,6.684612,6.684612,6.94119,6.887553,6.784457,6.173786,6.827629,6.240276,7.007601,7.084227,7.926963,6.658011,6.856462,7.239933,7.309882,6.476973,6.507277,7.026427,6.109248,6.93537,7.784889,7.549083,6.629363,7.130899,7.057898,6.932448,7.003066,6.570883,7.183871,7.252054,7.678789,7.149132,7.038784,6.359574,6.848005,6.964136,6.620073,6.907755,6.857514,6.453625,7.130899,6.514713,5.991465,6.357842,6.380123,6.827629,7.130899,7.003066,7.029973,6.480044,6.426488,6.869014,6.270988,6.705639,6.869014,6.733402,6.763885,7.784889,7.026427,7.056175,6.583409,7.483244,7.551187,6.917706,6.878326,6.263398,6.263398,6.507277,6.214608,6.964136,6.309918,6.214608,6.588926,6.76273,6.985642,7.173192,6.35437,6.434546,6.244167,7.149132,6.897705,6.39693,7.056175,6.214608,6.678342,6.214608,6.60665,7.130899,6.921658,7.130899,6.816736,7.204893,6.098074,5.57973,7.130899,7.382124,7.280697,7.237778,6.710523,6.677083,6.214608,6.253829,7.455877,7.562161,7.051856,7.678789,6.827629,7.01661,6.107023,7.313221,6.716595,6.842683,6.885509,6.938284,7.148346,7.035269,6.684612,7.199678,6.968851,6.840547,6.694562,5.926926,6.285998,6.986567,6.835185,7.051856,6.306275,6.43294,6.734591,6.645091,6.375025,7.562161,6.964136,6.033086,7.091742,7.05099,6.975414,7.091742,6.566672,7.091742,6.745236,6.907755,6.194406,6.907755,6.76273,7.226209,7.36897,7.379008,8.032035,6.80017,6.809039,6.858565,6.347389,6.098074,5.666427,7.275172,6.869014,6.980076,6.812345,7.130899,6.429719,6.923629,6.684612,6.956545,6.98379,6.483108,6.660575,6.945051,7.562161,7.091742,6.50129,6.807935,6.791222,6.705639,6.699501,6.357842,6.628041,6.918695,7.051856,6.932448,7.20786,6.908755,6.679599,7.114769,6.625392,6.570883,6.907755,7.633853,6.81564,6.39693,6.857514,6.566672,7.048387,6.907755,6.734591,5.991465,7.069024,7.091742,7.273787,6.287858,6.660575,6.620073,6.734591,6.55108,7.204893,6.684612,7.130899,7.007601,6.163315,6.635947,6.869014,6.580639,6.684612,6.489205,7.146772,7.18007,6.71417,7.273787,7.244227,6.945051,6.504288,7.003066,6.907755,6.259582,7.013016,6.869014,6.591674,6.536692,6.917706,6.39693,6.390241,6.745236,6.507277,6.675823,7.273787,6.507277,6.775366,6.734591,6.882438,7.109062,6.813445,6.278522,6.620073,7.095064,6.613384,6.802395,7.064759,6.291569,6.309918,6.421622,6.812345,6.645091,6.891626,6.725034,6.778785,6.934397,6.907755,6.142037,7.003066,6.463029,6.942157,7.100027,6.856462,6.84375,7.130899,6.37332,6.54103,6.331502,5.926926,6.511745,6.483108,6.539586,7.013016,7.221105,7.156177,7.130899,7.204893,7.261225,6.749931,6.788972,7.057037,6.368187,7.138867,6.853299,7.522941,7.36201,6.630683,7.273787,6.192362,7.026427,6.907755,6.214608,7.090077,6.336826,7.560081,6.527958,6.651572,5.451038,6.882438,7.219642,7.667158,6.55108,7.090077,7.057037,6.591674,6.620073,6.933423,7.013016,6.437752,7.090077,7.340187,7.05099,5.736572,6.413459,7.466799,6.907755,5.857933,6.639876,6.672033,6.706862,6.167517,6.84375,7.649216,5.857933,6.84588,7.091742,6.109248,6.964136,6.907755,5.762052,6.320768,6.864848,6.902743,7.377759,6.40688,6.23637,7.252054,7.204893,7.327781,6.980076,7.090077,7.227663,6.77308,6.437752,7.130899,6.986567,6.54103,6.588926,6.421622,6.816736,6.784457,6.548219,6.684612,6.699501,6.907755,6.308098,7.17012,6.827629,7.338888,6.580639,6.703188,6.39693,7.003066,6.964136,6.869014,6.070738,6.84588,7.256297,6.907755,6.214608,6.684612,6.641182,6.620073,6.309918,6.678342,6.583409,6.946014,5.298317,5.991465,6.35437,6.745236,6.230482,7.057898,7.089243,7.146772,5.857933,6.870053,7.288244,6.687109,6.464588,6.621406,6.190315,7.244227,6.84588,6.763885,6.514713,5.926926,5.783825,5.846439,7.273787,6.327937,6.309918,6.856462,6.527958,7.186901,7.398786,6.033086,6.156979,6.50129,7.425954,6.946014,7.130899,6.633318,7.05099,7.379008,7.273787,6.76273,6.558198,6.907755,6.747587,6.64639,6.907755,7.192182,7.427739,6.357842,6.529419,6.357842,6.946976,7.130899,6.39693,6.173786,6.907755,6.895683,6.169611,6.086775,6.184149,6.558198,7.34601,6.866933,6.907755,6.437752,7.204893,6.867974,6.1717,7.09091,7.204893,7.022868,6.297109,6.109248,6.228511,6.304449,6.37332,6.135565,6.558198,7.35628,7.398786,7.156177,6.320768,7.090077,6.751101,6.959399,6.907755,6.802395,7.379008,6.230482,7.313221,7.427739,6.620073,6.736967,6.013715,6.911747,6.476973,6.694562,7.667158,6.634634,6.645091,5.843544,6.204558,6.89467,7.824046,7.001245,7.100027,6.357842,5.966147,7.313221,6.368187,6.131227,6.851185,7.273787,7.195187,7.313221,7.195187,6.55108,6.880384,7.678789,6.680855,5.991465,6.922644,7.463937,6.44572,6.098074,6.49224,6.658011,5.932245,6.327937,7.022868,6.115892,7.234177,7.338888,7.05099,6.869014,6.582025,6.173786,6.694562,7.273787,6.99485,5.857933,6.214608,6.933423,6.357842,7.195187,6.818924,7.007601,6.813445,6.907755,7.056175,6.908755,6.569481,6.834109,5.991465,7.123673,6.97073,5.998937,6.84588,6.699501,6.55108,6.35437,6.109248,6.431331,6.089045,6.437752,6.58755,6.214608,6.907755,5.97381,6.39693,6.869014,6.869014,6.76273,7.05099,7.234177,6.59578,6.76273,6.55108,6.882438,7.17012,6.802395,6.72022,6.907755,6.717805,6.214608,7.051856,6.856462,6.55108,7.444249,6.278522,7.602901,6.791222,8.032035,7.338888,6.230482,7.210818,7.041412,6.869014,7.130899,6.897705,6.807935,6.830874,7.3518,7.179308,6.827629,6.778785,6.684612,6.955593,6.309918,7.081708,6.368187,7.090077,6.680855,7.223296,5.886104,7.146772,7.513164,6.812345,7.465083,6.253829,6.694562,7.667158,6.539586,6.836259,6.699501,6.763885,7.273787,6.214608,7.232733,6.269096,6.781058,6.933423,7.100027,7.390182,7.51915,7.379008,6.907755,6.602588,7.437795,7.437795,6.932448,7.009409,6.437752,6.579251,6.751101,7.130899,7.029973,6.802395,7.562161,6.869014,7.53583,7.36074,6.84588,6.802395,6.782192,7.444249,7.138867,6.621406,7.000334,6.908755,7.05099,6.907755,7.130899,6.753438,7.099202,6.842683,6.806829,6.77079,7.090077,7.13966,6.856462,4.744932,6.511745,6.988413,6.964136,6.684612,5.910797,7.562161,6.751101,6.761573,6.995766,6.932448,6.745236,6.511745,6.684612,6.955593,6.784457,6.684612,7.090077,6.498282,7.013016,6.745236,6.907755,6.774224,7.091742,6.50129,6.827629,6.669498,6.856462,7.273787,6.763885,6.437752,6.522093,6.54103,6.774224,7.744137,7.086738,6.55108,6.580639,7.313221,6.956545,6.685861,6.461468,7.088409,5.966147,6.790097,6.981006,7.027315,6.620073,6.751101,6.263398,7.006695,6.315358,6.684612,7.232733,6.052089,6.234411,5.913503,6.390241,5.996452,6.035481,7.032624,6.523562,6.856462,6.39693,6.493754,6.829794,6.309918,6.40688,6.052089,5.828946,6.539586,6.35437,6.347389,6.705639,6.89467,6.423247,6.933423,6.694562,6.694562,6.669498,6.745236,6.802395,7.257003,5.560682,6.495265,6.331502,6.331502,5.877736,6.916715,7.273787,6.478509,6.620073,6.625392,6.55108,6.22059,6.842683,6.436151,6.620073,6.802395,6.291569,6.464588,5.991465,6.802395,6.240276,6.795706,7.156177,6.184149,5.783825,6.645091,6.426488,6.946976,6.621406,5.940171,5.703783,6.624065,6.97073,6.975414,7.36074,6.476973,6.55108,6.202536,6.791222,6.253829,6.792345,6.345636,7.275172,6.175867,6.214608,7.295056,6.688354,6.869014,6.907755,6.39693,6.109248,6.444131,6.198479,7.353722,5.877736,6.866933,6.338594,6.175867,7.273787,6.46925,6.669498,6.467699,6.167517,6.498282,6.253829,7.091742,6.287858,6.771935,6.907755],
+educ:[12,18,14,12,11,16,10,18,15,12,18,14,15,16,16,10,15,11,14,12,14,16,12,16,16,16,13,18,17,18,12,14,13,18,17,13,14,13,16,18,12,17,12,13,18,14,17,16,12,13,12,18,12,16,12,18,16,12,17,12,17,12,12,12,12,12,12,15,12,18,16,18,16,12,16,16,15,12,15,12,12,10,11,15,10,13,10,13,13,12,15,12,12,17,16,12,12,15,16,16,18,12,12,12,14,10,17,12,16,12,12,9,10,12,13,12,13,12,12,12,13,12,12,14,12,12,13,18,16,12,18,16,12,12,12,12,12,12,12,12,10,10,18,17,11,12,18,12,11,16,17,12,13,16,12,12,15,18,16,14,16,15,16,16,16,18,17,14,12,13,12,12,14,12,12,12,12,12,12,12,13,16,12,14,12,12,12,16,13,12,16,12,16,14,12,12,12,16,18,18,17,12,12,12,12,14,12,12,15,12,13,17,13,16,13,18,13,12,12,12,12,11,10,16,16,13,14,16,10,12,14,13,16,12,16,16,13,18,18,18,18,15,14,16,12,12,14,12,12,14,12,14,12,12,12,12,12,10,12,12,14,17,11,16,16,18,17,16,12,12,16,14,13,14,18,14,12,16,18,14,16,13,16,15,14,16,14,13,13,12,12,16,12,12,11,12,11,10,10,16,12,17,12,15,16,15,15,14,12,16,12,14,14,12,12,12,12,12,13,13,12,12,15,16,16,12,11,16,12,12,12,12,12,12,12,18,11,10,18,13,16,12,16,16,14,15,12,13,9,16,14,12,12,16,17,12,12,12,14,13,14,16,18,12,11,11,12,12,12,12,17,12,16,18,13,12,12,15,12,12,13,12,14,12,16,14,13,12,13,12,12,12,16,13,13,14,12,14,12,12,16,18,12,12,12,12,17,12,14,16,18,11,15,17,16,15,12,16,12,18,11,12,16,12,13,12,12,12,12,10,12,14,12,16,13,12,16,16,12,13,11,11,12,15,12,16,12,16,13,12,12,16,12,12,12,12,9,14,16,12,12,15,15,16,11,12,11,12,9,14,18,12,16,16,12,14,12,16,13,13,12,13,11,12,15,16,17,12,12,16,11,12,12,16,12,12,12,12,12,12,12,12,11,16,12,13,14,12,14,12,11,12,14,10,10,11,11,12,12,13,16,16,14,15,12,12,13,17,12,18,13,12,14,14,12,17,16,12,16,13,16,12,12,11,12,18,16,13,12,12,15,13,16,12,12,10,12,12,18,16,16,12,16,12,16,13,12,11,12,10,12,12,9,12,12,12,18,16,12,12,11,16,18,14,11,14,11,11,12,12,12,13,16,16,15,12,12,12,12,16,17,16,14,13,14,12,12,12,12,13,12,16,12,12,16,12,14,12,15,15,16,12,11,12,16,16,15,16,12,13,18,12,12,12,16,15,12,16,12,12,12,17,12,10,17,16,14,16,12,18,13,13,12,12,16,17,15,12,16,14,12,12,12,12,13,12,13,12,12,13,10,10,10,10,12,12,16,12,9,17,12,12,12,12,11,16,16,12,13,12,9,13,14,12,12,16,13,13,15,13,18,12,18,14,13,17,12,17,12,12,12,12,12,12,12,10,14,18,13,14,12,17,14,14,16,18,13,12,12,12,18,16,16,16,15,16,16,14,12,14,18,18,12,12,12,15,16,16,13,12,12,12,14,12,11,13,12,12,18,12,17,15,11,12,14,16,12,18,12,12,11,13,15,12,12,12,12,16,13,15,9,17,12,12,17,15,14,12,18,16,12,12,16,16,12,12,14,16,17,16,17,12,12,16,12,12,16,12,16,12,10,12,12,9,12,12,12,17,14,12,12,13,15,14,12,16,12,12,12,12,15,14,13,12,12,12,13,17,11,12,12,12,12,16,12,11,10,13,12,12,11,10,14,12,12,9,16,12,12,16,12,17,12,12,12,12,12,14,13,12,13,16,12,11,12,12,12,11,12,10,12,14,10,13,15,10,16,18,18,12,12,12,14,12,12,12,12,10,16,12,18,10,12,12,12,10,12,12,15,12,12,16,13,16,12,16,11,12,12,17,14,13,16,12,16,12,11,12,12,16,16,13,12,12,12],
+exper:[11,11,11,13,14,14,13,8,13,16,8,9,4,7,9,17,6,19,4,13,9,10,14,17,12,8,16,11,9,8,17,15,12,8,8,9,7,11,9,11,21,10,16,12,12,9,7,11,16,14,22,10,13,11,11,8,9,12,1,17,10,12,18,17,15,10,12,12,15,8,8,12,10,10,11,6,8,17,8,14,5,17,15,9,15,9,14,4,8,13,12,5,16,8,9,14,5,12,1,10,6,6,17,18,16,15,7,11,6,13,16,17,13,11,5,15,10,11,11,15,9,19,15,9,9,12,10,11,9,11,10,10,10,6,12,16,15,16,15,4,19,11,7,8,17,19,6,9,13,11,13,4,9,5,11,19,8,9,10,9,8,9,11,7,16,14,4,11,16,7,7,17,9,11,9,13,13,6,11,9,10,10,6,11,18,14,6,7,14,16,8,19,7,1,16,8,15,14,13,7,5,9,12,10,19,14,18,14,10,6,8,9,6,7,8,14,13,16,17,11,17,20,23,10,13,13,4,9,19,18,7,7,12,14,8,9,10,6,12,9,10,9,8,12,7,10,20,16,19,14,10,16,19,8,14,10,18,12,14,11,10,13,7,12,10,7,8,17,7,7,6,18,4,10,13,6,7,13,7,15,11,3,16,14,12,7,16,10,10,15,9,12,19,17,17,14,10,14,21,7,18,12,8,8,16,15,8,11,6,10,10,6,9,20,14,12,17,20,16,11,13,17,8,12,11,8,13,8,18,9,15,12,17,18,16,5,13,13,13,14,9,16,9,5,12,6,18,9,18,11,4,11,19,6,7,20,11,18,9,9,13,6,6,9,15,7,16,11,9,17,14,14,10,13,8,7,16,8,15,16,17,15,9,12,15,9,6,18,17,15,17,16,10,10,21,9,21,9,11,19,8,6,7,18,12,7,1,17,10,11,7,19,15,15,8,9,5,9,5,8,14,13,10,19,20,5,12,13,13,15,13,7,20,7,12,13,16,10,16,16,16,17,4,11,12,11,8,12,10,14,16,9,14,17,15,16,12,15,10,14,13,11,9,16,15,16,13,11,22,16,6,13,11,15,15,9,11,15,8,11,17,20,18,11,16,5,4,10,17,9,16,11,13,9,15,11,15,20,18,18,15,5,9,9,11,14,8,17,12,15,16,12,12,11,12,17,16,16,11,13,8,5,9,14,13,12,9,5,15,10,15,20,9,10,16,8,13,17,8,16,7,18,8,9,16,10,1,13,12,14,14,13,5,15,16,13,16,16,10,10,4,17,8,19,10,7,17,11,15,19,11,11,19,16,11,16,4,14,13,15,17,8,13,5,12,10,17,18,6,13,7,18,4,6,7,6,18,11,18,10,9,6,15,13,8,17,17,13,17,8,14,8,7,6,9,21,6,6,8,10,9,9,16,12,9,14,8,7,16,11,10,10,14,15,8,14,11,12,14,9,16,7,9,17,7,11,15,8,9,8,14,13,16,18,9,11,5,17,9,5,17,14,12,5,12,4,9,21,5,15,17,13,12,20,14,12,6,16,21,8,15,8,21,15,10,10,10,10,4,13,20,12,12,15,17,7,5,9,8,10,7,5,10,9,11,10,1,13,21,16,19,16,17,18,17,14,8,1,14,6,4,4,10,5,11,8,11,11,16,14,9,8,6,11,9,4,11,16,14,12,12,5,4,11,11,8,11,12,6,7,10,11,6,12,1,1,19,12,4,6,6,8,22,5,11,8,15,12,19,9,12,11,11,15,16,18,13,12,7,7,18,1,14,9,6,17,13,20,11,14,17,15,15,9,11,17,12,7,9,10,9,8,18,8,6,8,10,10,15,10,23,9,11,17,13,11,16,8,10,13,8,13,4,6,7,7,4,12,19,17,1,6,5,11,11,10,8,8,13,13,16,9,12,13,18,16,20,8,12,14,13,7,4,16,11,15,11,11,16,12,4,8,13,6,10,19,21,7,4,11,5,11,17,11,14,13,17,11,14,18,4,1,12,9,6,15,8,7,7,10,11,16,6,16,15,15,16,21,10,13,7,14,15,16,4,15,16,11,11,14,21,15,4,7,9,5,12,6,15,7,6,14,5,9,8,11,15,11,9,10,6,10,12,12,17],
+tenure:[2,16,9,7,5,2,0,14,1,16,13,11,3,2,9,2,9,10,7,7,1,4,3,8,7,9,5,1,4,13,2,4,2,12,9,10,5,12,2,7,11,9,4,15,12,15,11,5,5,12,14,10,9,8,1,12,3,7,7,12,7,12,13,2,15,10,0,1,15,2,13,7,11,2,4,8,15,15,2,1,14,5,3,8,3,5,15,2,1,3,9,8,3,9,7,11,16,9,11,7,12,12,15,0,1,16,8,6,6,2,0,16,0,10,16,3,11,10,7,15,14,19,11,5,11,1,11,7,16,10,3,1,4,0,5,5,3,7,16,12,12,5,14,5,16,10,7,6,6,8,9,3,5,8,1,12,0,14,9,1,11,13,12,5,17,3,4,16,15,4,10,8,9,6,7,2,1,15,6,8,7,10,2,8,2,4,2,14,11,14,9,15,4,1,2,8,5,13,5,14,11,2,13,3,4,15,15,1,5,8,2,9,1,1,10,4,9,6,2,9,18,3,13,7,9,3,13,8,0,2,1,9,15,8,2,7,1,3,12,10,2,4,7,13,2,11,3,8,15,12,1,12,12,9,12,6,13,2,8,4,1,4,0,1,1,15,5,18,3,1,6,2,9,11,3,5,3,11,8,4,4,3,12,14,13,9,2,10,1,13,0,15,21,10,5,19,5,15,14,18,9,13,10,2,14,17,2,14,8,7,2,2,2,7,1,7,12,22,15,12,1,1,3,13,5,5,1,5,9,5,10,3,14,2,17,1,10,9,1,1,4,12,10,8,1,4,19,9,13,9,16,7,15,7,3,5,12,10,7,2,13,4,13,5,7,2,17,1,2,18,7,8,8,2,0,3,5,2,11,4,1,1,14,3,1,4,2,12,18,12,10,7,1,1,12,0,14,3,6,20,8,10,6,12,5,11,13,7,1,1,13,4,7,12,5,5,10,0,3,13,15,2,8,15,4,0,5,11,9,3,2,7,4,4,10,1,3,1,11,18,15,2,16,3,8,5,1,9,0,4,17,1,1,18,2,17,1,1,4,3,0,8,4,13,15,5,9,9,13,5,5,1,12,11,16,10,11,1,2,9,2,12,3,11,15,7,10,4,18,3,14,3,15,8,15,9,14,2,7,19,1,9,2,10,9,5,5,18,10,2,4,10,8,15,1,1,5,1,4,5,4,3,9,11,12,7,2,3,5,7,16,4,3,1,17,1,2,11,10,2,1,3,0,0,1,3,9,11,15,12,1,13,3,12,1,9,14,9,5,4,0,7,8,9,11,7,3,0,15,10,2,1,0,1,9,14,5,14,13,1,16,2,8,7,4,4,5,16,4,8,1,18,1,2,8,6,7,4,5,10,2,6,9,1,7,18,15,10,9,2,21,3,8,10,3,1,1,16,1,3,12,1,1,13,3,8,5,1,4,5,8,7,1,11,9,2,4,9,7,1,11,13,2,9,9,12,2,1,3,9,8,4,0,11,13,7,1,9,10,5,8,1,3,12,5,9,10,10,3,12,13,0,6,5,10,11,9,5,13,2,16,3,12,4,7,3,11,7,9,13,10,3,3,15,13,8,2,1,3,4,6,1,0,8,4,13,1,9,8,8,20,3,4,0,10,4,16,9,1,10,1,2,6,2,5,13,1,12,1,5,10,1,7,2,3,1,3,14,9,0,2,9,14,11,12,5,2,2,1,4,1,9,5,5,1,7,10,2,13,1,7,2,3,3,7,9,13,12,15,7,12,11,12,16,3,3,3,7,1,4,0,9,2,3,4,10,14,12,1,13,15,6,13,4,2,10,12,3,11,2,9,10,18,8,12,4,2,2,11,10,5,16,12,5,9,19,2,2,4,8,8,2,9,10,3,9,2,11,20,12,1,14,1,4,10,1,7,0,4,2,14,4,2,10,15,5,7,6,9,13,11,1,1,9,9,10,9,5,18,1,3,0,5,2,19,20,0,2,1,5,2,12,17,2,5,14,9,2,15,10,10,8,10,3,10,14,10,10,5,9,5,5,8,17,4,11,3,7,11,1,8,9,7,4,8,12,16,12,1,2,12,15,1,2,5,4,2,1,2,2,3,13,2,2,10,3,6,5,3,9,1,3,10,12,18],
+married:[1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,1,1,0,0,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,0,0,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,1,1,0,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+south:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0,0,1,0,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+urban:[1,1,1,1,1,1,1,1,0,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,1,1,0,1,1,0,1,1,1,0,0,0,0,1,1,1,0,1,0,0,0,0,1,0,0,0,0,0,0,0,1,1,1,1,1,0,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,0,0,0,1,0,0,0,1,1,0,1,0,1,1,0,0,1,1,0,1,0,1,1,0,1,0,0,1,0,0,0,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,0,0,0,0,0,0,1,1,1,1,0,0,1,1,1,1,1,0,0,1,1,1,0,0,1,1,0,1,1,1,0,0,0,1,0,1,0,0,1,0,1,1,0,0,0,0,1,1,1,0,0,1,1,0,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,0,1,0,1,0,1,1,0,0,0,0,0,0,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,0,1,1,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,0,0,0,1,1,0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,0,0,1,0,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,1,1,0,0,1,0,1,1,1,1,1,1,1,1,0,0,0,0,1,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,1,1,1,1,1,0,0,0,0,0,0,1,1,1,0,0,1,1,1,1,0,0,0,1,0,1,0,0,1,0,0,0,0,1,0,1,0,0,0],
+black:[0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,1,0,0,1,0,1,1,0,0,0,0,0,1,1,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,1,1,0,0,1,0,0,0,1,1,1,0,1,0,0,0,1,0,0,0,0,1,1,0,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,0,0,1,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,1,0,1,1,1,0,1,0,0,0,1,1,1,1,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,1,0,0,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,1,1,0,1,0,0],
+IQ:[93,119,108,96,74,116,91,114,111,95,132,102,125,119,118,105,109,72,105,101,123,113,95,145,114,124,93,115,125,128,103,98,108,129,132,92,108,106,105,123,108,122,109,100,125,122,105,94,102,109,105,134,108,104,112,120,124,103,115,96,123,98,96,89,109,93,82,120,122,117,109,114,126,82,119,104,115,97,105,100,114,73,96,113,106,104,80,104,122,96,95,105,94,91,96,69,110,111,110,97,125,91,86,110,92,85,120,106,112,91,90,86,86,113,111,111,106,98,105,105,118,90,95,112,120,123,103,121,90,125,109,128,97,96,97,78,112,88,97,101,106,59,105,119,93,82,134,84,98,118,113,100,93,119,67,111,106,127,113,115,102,85,117,125,118,121,115,120,109,109,85,85,106,101,116,91,91,110,75,94,109,122,102,122,105,113,104,124,110,95,120,105,121,96,110,92,98,109,118,97,95,99,106,117,90,98,95,115,106,114,92,119,85,98,114,84,108,107,84,86,88,97,84,117,110,104,110,99,80,101,117,108,69,109,85,114,90,107,117,112,106,116,123,118,91,103,114,102,104,112,107,117,110,96,90,97,99,99,97,95,126,109,86,119,102,105,117,112,89,131,114,98,124,125,100,84,113,102,82,112,111,96,127,97,120,101,120,99,78,110,94,120,108,103,97,106,99,72,88,119,87,121,112,103,99,101,117,109,73,116,98,104,78,104,85,104,107,109,119,96,93,90,103,106,96,114,86,110,87,89,106,100,111,100,114,98,89,74,110,130,108,98,125,104,98,104,120,134,92,129,118,107,92,118,108,119,109,91,118,119,103,120,122,119,104,96,83,115,88,96,123,108,116,109,97,107,95,109,104,110,94,103,123,113,110,100,95,100,108,101,90,115,114,84,92,125,107,129,98,108,114,111,101,99,75,91,113,120,98,107,121,115,134,96,120,105,121,113,106,104,80,117,126,112,104,116,70,83,84,82,109,111,94,96,101,90,120,120,108,99,80,93,85,118,115,119,94,109,104,89,101,96,109,94,115,92,71,130,119,74,104,124,94,120,96,67,69,98,92,109,100,101,111,106,102,115,99,118,132,108,98,111,79,97,99,101,120,97,106,131,93,79,100,107,112,105,114,116,104,85,93,100,71,88,93,98,110,109,94,77,89,102,113,103,90,96,97,87,89,70,104,116,85,104,99,93,114,103,92,98,114,77,89,93,110,132,112,99,96,106,128,95,80,71,89,127,114,102,88,88,110,110,130,100,101,89,80,72,115,115,108,93,111,101,92,115,76,93,91,90,84,120,89,104,107,100,129,112,76,97,98,60,132,90,63,110,88,98,61,76,127,94,97,127,109,89,90,105,100,111,125,124,107,110,102,93,81,99,93,102,95,98,84,88,109,82,105,95,92,74,123,86,92,87,117,112,119,103,74,81,124,89,88,67,106,103,91,101,85,83,70,102,94,97,115,117,105,113,83,101,113,88,93,83,113,106,106,114,119,82,89,74,77,75,97,68,83,97,98,102,81,85,86,79,84,74,92,93,69,113,92,127,109,97,66,109,109,104,85,81,87,78,54,98,98,105,87,117,85,82,114,65,105,92,107,111,73,119,97,110,96,67,102,64,103,118,118,118,75,112,95,119,94,103,90,128,110,84,97,102,131,126,107,108,92,108,115,111,115,101,114,116,90,125,98,111,109,124,121,103,96,100,104,112,73,101,99,95,109,110,98,112,64,90,102,119,96,118,79,96,80,137,116,69,78,99,92,113,98,115,96,117,96,108,92,95,94,115,117,105,109,87,110,110,109,85,105,122,108,122,79,105,90,111,110,92,131,104,110,99,86,105,85,72,86,68,95,116,96,85,100,101,97,100,96,117,93,116,106,98,103,118,100,96,67,96,104,106,62,73,62,76,76,106,94,81,87,96,75,95,86,86,104,95,116,66,101,96,104,105,106,101,96,105,106,102,75,99,90,104,115,118,108,76,50,55,73,84,104,92,83,98,70,87,96,80,104,104,96,89,113,105,84,108,104,106,83,70,104,91,112,97,99,74,100,86,90,101,109,98,107,110,120,97,103,114,95,93,67,97,97,83,104,82,113,93,100,101,100,82,79,102,77,109,107],
+KWW:[35,41,46,32,27,43,24,50,37,44,44,45,40,24,47,37,39,36,29,34,37,49,36,50,35,32,40,39,41,35,40,41,41,40,42,24,39,35,37,46,48,47,44,40,50,41,34,37,36,47,45,46,32,36,35,49,40,34,45,33,48,34,34,47,43,20,32,45,38,48,44,55,40,45,45,37,49,45,27,32,41,28,48,30,38,37,39,30,36,38,51,24,18,41,37,37,37,44,35,37,44,39,28,32,47,41,36,42,41,39,42,39,32,27,51,30,32,28,28,29,44,38,34,24,39,41,32,40,44,32,34,46,35,35,44,21,39,32,39,41,42,28,54,30,36,38,45,29,36,41,50,18,27,30,19,28,38,49,35,36,40,29,51,34,47,40,51,44,43,28,36,50,32,30,40,24,28,34,33,17,27,38,26,38,38,37,34,43,31,37,39,39,30,42,26,32,34,43,44,42,42,40,31,33,47,45,44,43,40,26,34,36,32,34,30,42,42,32,35,22,27,34,31,45,42,32,26,33,31,43,31,41,33,38,39,36,46,30,41,47,46,38,44,40,20,29,40,36,36,43,39,36,36,42,38,27,40,29,32,40,44,49,22,48,38,45,40,40,28,39,28,35,41,30,38,21,26,46,33,47,38,24,48,47,50,41,40,34,33,23,35,50,45,31,39,36,22,18,29,37,33,49,33,36,48,40,34,41,46,27,42,43,29,43,39,25,37,48,31,33,31,32,29,41,32,39,33,38,41,31,40,43,38,40,38,45,24,23,37,29,51,31,27,29,33,37,33,38,28,34,42,37,37,33,38,42,29,41,38,37,33,25,40,35,37,22,36,37,27,43,42,43,35,45,39,34,27,31,36,37,40,38,45,33,35,31,39,34,39,47,43,41,41,33,37,44,42,33,40,41,37,37,29,25,24,29,38,34,32,31,39,40,42,47,38,36,40,29,37,41,23,28,42,42,47,33,18,20,13,30,32,25,33,32,33,35,48,38,29,43,31,45,46,43,31,28,39,42,37,21,28,34,48,38,34,41,32,39,38,24,25,23,29,44,40,35,26,42,23,44,39,25,40,38,37,28,37,48,37,26,40,44,36,29,49,33,45,33,34,44,32,23,38,30,42,22,25,36,41,48,46,40,20,36,32,26,35,31,38,36,35,44,49,38,36,31,35,35,39,28,34,36,32,47,26,18,37,40,34,41,48,42,24,44,37,39,37,42,26,45,43,48,30,24,28,45,43,30,34,32,45,40,39,44,36,36,25,20,56,48,47,27,37,38,42,40,29,26,39,35,23,43,32,47,23,42,40,39,17,45,38,34,45,31,26,36,38,41,24,32,44,39,48,44,42,21,33,39,27,40,44,20,41,45,32,26,36,36,26,35,44,37,28,30,41,41,22,36,33,26,43,24,22,41,39,50,41,30,29,33,48,38,34,31,41,30,40,34,30,32,34,54,34,38,38,38,45,36,37,44,36,31,41,39,27,43,38,36,32,26,40,18,22,25,28,35,51,40,37,30,20,27,20,23,24,24,25,32,18,41,37,44,44,42,30,46,43,36,44,26,12,40,37,33,34,29,25,25,30,35,39,21,48,20,23,41,38,49,40,34,32,23,31,22,32,39,36,41,37,45,20,38,35,27,36,50,44,40,38,34,41,23,32,45,49,40,46,44,47,31,48,40,41,33,26,42,38,36,35,37,19,40,30,38,24,39,44,23,40,35,49,46,37,28,46,39,34,40,39,42,27,36,42,31,36,41,33,23,29,30,26,41,38,46,34,38,40,38,36,42,36,38,34,30,32,21,42,39,40,38,32,30,47,38,42,32,32,32,39,20,31,42,26,34,35,38,22,42,45,36,32,38,31,30,39,39,38,37,42,45,36,41,22,39,22,27,42,34,34,31,26,28,26,44,24,29,15,25,27,34,19,17,41,21,37,20,38,23,41,34,34,34,42,34,40,44,35,27,46,30,37,37,40,30,28,23,23,14,37,40,27,36,25,26,38,34,40,35,24,24,39,29,39,36,32,28,45,34,39,42,42,27,40,30,40,28,36,43,33,26,40,48,35,34,37,36,31,32,38,28,34,25,46,27,45,39,23,38,33,30,28,32,22,25,32]};
+/* Datos: wooldridge::crime2, ciudades en 1987 con el log de la tasa de crimen de 1982 */
+const CR={lcrmrte:[4.250169,4.499501,4.346332,4.431304,4.640188,4.719322,4.439875,4.324496,3.912408,4.432519,4.283848,4.506902,5.102803,4.439674,4.662636,5.02827,5.132704,4.677343,5.151205,5.047144,4.149756,4.217191,4.530526,4.842654,4.837943,4.387472,4.777146,4.837934,4.342505,4.154169,4.584672,4.293084,4.416856,4.516095,4.685164,4.844155,5.110781,4.37282,4.787735,4.572069,5.092721,5.189714,4.872045,4.305396,4.007029,4.417721],
+unem:[3.7,5.4,5.9,5.7,7.4,5.7,5.4,5.1,5,3.7,6.2,6.2,2.4,5.5,4.6,5.8,4.6,5.5,5.5,5,6.1,6.6,10.4,8.4,5,5,6,4.4,7.7,7.7,5.1,5.9,7.3,4.8,4.9,6.4,4.9,7.7,3.9,10.2,6.9,6.9,5.9,6.3,6.3,5.9],
+llawexpc:[7.724199,6.975078,7.343167,6.743187,7.040886,6.965383,6.676579,7.348047,6.699205,7.026178,6.674107,7.337945,7.153396,6.858565,7.179514,7.223354,7.209754,6.859709,7.118316,6.814323,6.492694,6.892601,6.951274,7.448928,6.931784,6.782917,7.205101,7.166922,6.887349,6.595289,6.952576,7.112099,7.462881,6.960642,6.920119,6.509604,7.125026,7.110288,6.668787,6.703311,7.020513,6.565997,7.117198,6.659268,6.454727,7.219964],
+lcrmrte82:[4.312912,4.531899,4.426177,4.48799,4.68373,4.919195,4.267083,4.573169,4.362686,4.524785,4.25953,4.735542,5.131764,4.329047,4.636301,4.974895,4.756274,4.343065,4.880605,4.860896,4.318546,4.326488,4.447498,4.863093,4.594189,4.492714,4.613186,4.683661,4.37341,4.294744,4.701249,4.474201,4.561192,4.470909,4.838884,4.498152,4.867993,4.252046,4.565257,4.439766,4.782233,4.737996,4.690784,4.346731,3.990161,4.263544]};
+/* Datos: wooldridge::rdchem (rdintens, sales, profmarg) */
+const RD={rdintens:[9.421906,2.084806,3.937668,2.61976,4.047619,2.153846,2.662407,4.394757,5.745208,3.596162,1.542653,2.593683,1.804765,1.692708,3.042012,2.183891,2.738441,2.88134,2.466667,3.80616,5.121498,6.80378,3.736699,1.213325,2.546296,5.16129,1.867981,1.214656,6.310198,1.026694,2.506233,1.593626],
+sales:[4570.2,2830,596.8,133.6,42,390,93.9,907.9,19773,39709,2936.5,2513.8,1124.8,921.6,2432.6,6754,1066.3,3199.9,150,509.7,1452.7,8995,1212.3,906.6,2592,201.5,2617.8,502.2,2824,292.2,7621,1631.5],
+profmarg:[4.089536,16.50177,17.99598,-3.218563,19.04762,12.12821,0.9584664,8.525167,12.96212,10.4611,3.190873,14.13796,4.027382,0.4448785,5.442736,4.871187,27.18747,5.10016,21.73333,16.44104,18.66869,8.993885,17.73488,17.07479,4.475308,11.41439,2.311101,3.663879,11.08357,2.190281,8.214145,6.48483]};
+const $ = s => document.querySelector(s);
+const CS = () => getComputedStyle(document.documentElement);
+const col = v => CS().getPropertyValue(v).trim();
+
+/* ══════════ Utilidades numéricas ══════════ */
+function matInv(A){
+  const n=A.length;
+  const M=A.map((r,i)=>[...r, ...Array.from({length:n},(_,j)=>i===j?1:0)]);
+  for(let c=0;c<n;c++){
+    let p=c;
+    for(let r=c+1;r<n;r++) if(Math.abs(M[r][c])>Math.abs(M[p][c])) p=r;
+    if(Math.abs(M[p][c])<1e-12) return null;
+    const tmp=M[c]; M[c]=M[p]; M[p]=tmp;
+    const pv=M[c][c];
+    for(let j=0;j<2*n;j++) M[c][j]/=pv;
+    for(let r=0;r<n;r++){
+      if(r===c) continue;
+      const f=M[r][c];
+      if(f===0) continue;
+      for(let j=0;j<2*n;j++) M[r][j]-=f*M[c][j];
+    }
+  }
+  return M.map(r=>r.slice(n));
+}
+const dot=(a,b)=>{let s=0;for(let i=0;i<a.length;i++) s+=a[i]*b[i];return s;};
+const zeros=k=>Array(k).fill(0);
+const zeros2=k=>Array.from({length:k},()=>Array(k).fill(0));
+const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+
+/* Distribuciones */
+function erfc(x){
+  const z=Math.abs(x), t=1/(1+0.5*z);
+  const r=t*Math.exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+t*(-0.18628806+
+          t*(0.27886807+t*(-1.13520398+t*(1.48851587+t*(-0.82215223+t*0.17087277)))))))));
+  return x>=0 ? r : 2-r;
+}
+const Phi=z=>0.5*erfc(-z/Math.SQRT2);
+const phi=z=>Math.exp(-0.5*z*z)/Math.sqrt(2*Math.PI);
+const Lam=z=>z>=0 ? 1/(1+Math.exp(-z)) : Math.exp(z)/(1+Math.exp(z));
+const lam=z=>{const p=Lam(z); return p*(1-p);};
+const LINK={logit:{G:Lam,g:lam}, probit:{G:Phi,g:phi}};
+const clampP=p=>Math.min(1-1e-12, Math.max(1e-12, p));
+const pNorm2=z=>erfc(Math.abs(z)/Math.SQRT2);   // P(|Z|>|z|)
+
+function lgamma(x){
+  const g=[76.18009172947146,-86.50532032941677,24.01409824083091,
+           -1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];
+  let y=x, tmp=x+5.5;
+  tmp-=(x+0.5)*Math.log(tmp);
+  let ser=1.000000000190015;
+  for(let j=0;j<6;j++) ser+=g[j]/++y;
+  return -tmp+Math.log(2.5066282746310005*ser/x);
+}
+function betacf(a,b,x){
+  const FPMIN=1e-300, qab=a+b, qap=a+1, qam=a-1;
+  let c=1, d=1-qab*x/qap;
+  if(Math.abs(d)<FPMIN) d=FPMIN;
+  d=1/d; let h=d;
+  for(let m=1;m<=200;m++){
+    const m2=2*m;
+    let aa=m*(b-m)*x/((qam+m2)*(a+m2));
+    d=1+aa*d; if(Math.abs(d)<FPMIN) d=FPMIN;
+    c=1+aa/c; if(Math.abs(c)<FPMIN) c=FPMIN;
+    d=1/d; h*=d*c;
+    aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));
+    d=1+aa*d; if(Math.abs(d)<FPMIN) d=FPMIN;
+    c=1+aa/c; if(Math.abs(c)<FPMIN) c=FPMIN;
+    d=1/d;
+    const del=d*c; h*=del;
+    if(Math.abs(del-1)<3e-12) break;
+  }
+  return h;
+}
+function betai(a,b,x){
+  if(x<=0) return 0;
+  if(x>=1) return 1;
+  const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));
+  return x<(a+1)/(a+b+2) ? bt*betacf(a,b,x)/a : 1-bt*betacf(b,a,1-x)/b;
+}
+const tTail2=(t,df)=>betai(df/2, 0.5, df/(df+t*t));
+/* P(chi2_df > x): gamma incompleta regularizada superior */
+function chi2Sf(x, df){
+  const a=df/2, xx=x/2;
+  if(xx<=0) return 1;
+  const gln=lgamma(a);
+  if(xx<a+1){
+    let ap=a, sum=1/a, del=sum;
+    for(let n=0;n<300;n++){ ap++; del*=xx/ap; sum+=del; if(Math.abs(del)<Math.abs(sum)*1e-14) break; }
+    return 1-sum*Math.exp(-xx+a*Math.log(xx)-gln);
+  }
+  let b=xx+1-a, c=1e300, d=1/b, h=d;
+  for(let i=1;i<300;i++){
+    const an=-i*(i-a); b+=2;
+    d=an*d+b; if(Math.abs(d)<1e-300) d=1e-300;
+    c=b+an/c; if(Math.abs(c)<1e-300) c=1e-300;
+    d=1/d; const del=d*c; h*=del;
+    if(Math.abs(del-1)<1e-14) break;
+  }
+  return Math.exp(-xx+a*Math.log(xx)-gln)*h;
+}
+
+function mulberry32(a){
+  return function(){
+    a|=0; a=a+0x6D2B79F5|0;
+    let t=Math.imul(a^a>>>15, 1|a);
+    t=t+Math.imul(t^t>>>7, 61|t)^t;
+    return ((t^t>>>14)>>>0)/4294967296;
+  };
+}
+
+/* ══════════ Estimadores ══════════ */
+function fitOLS(X,y){
+  const n=X.length, k=X[0].length;
+  const XtX=zeros2(k), Xty=zeros(k);
+  for(let i=0;i<n;i++){
+    const xi=X[i];
+    for(let a=0;a<k;a++){ Xty[a]+=xi[a]*y[i]; for(let b=0;b<k;b++) XtX[a][b]+=xi[a]*xi[b]; }
+  }
+  const inv=matInv(XtX);
+  if(!inv) return null;
+  const b=zeros(k);
+  for(let a=0;a<k;a++) for(let j=0;j<k;j++) b[a]+=inv[a][j]*Xty[j];
+  const fit=X.map(r=>dot(r,b));
+  const res=y.map((v,i)=>v-fit[i]);
+  const SSR=res.reduce((s,v)=>s+v*v,0);
+  const ybar=mean(y);
+  const SST=y.reduce((s,v)=>s+(v-ybar)**2,0);
+  const df=n-k, s2=SSR/df;
+  const se=b.map((_,i)=>Math.sqrt(s2*inv[i][i]));
+  // White HC1
+  const meat=zeros2(k);
+  for(let i=0;i<n;i++){
+    const e2=res[i]*res[i], xi=X[i];
+    for(let a=0;a<k;a++) for(let c=0;c<k;c++) meat[a][c]+=e2*xi[a]*xi[c];
+  }
+  const seR=b.map((_,j)=>{
+    let v=0;
+    for(let a=0;a<k;a++) for(let c=0;c<k;c++) v+=inv[j][a]*meat[a][c]*inv[c][j];
+    return Math.sqrt(v*n/df);
+  });
+  return {b, se, seR, fit, res, n, k, df, SSR, SST, R2:SST>0?1-SSR/SST:0};
+}
+
+/* ══════════ Formato ══════════ */
+const fmt=(v,d=3)=>{ if(!isFinite(v)) return '—'; const s=v.toFixed(d); return Number(s)===0?(0).toFixed(d):s; };
+const fmtS=(v,d)=>{ if(!isFinite(v)) return '—'; const s=fmt(v,d); return (Number(s)>0?'+':'')+s; };
+function fmtCoef(v){
+  if(!isFinite(v)) return '—';
+  const a=Math.abs(v);
+  if(a!==0 && a<0.01) return v.toFixed(5);
+  return v.toFixed(4);
+}
+const pp=v=>(isFinite(v)?(v*100).toFixed(1):'—');
+const fmtP=p=>p<0.0005?'&lt;0.001':fmt(p,3);
+const stars=p=>p<0.01?'***':(p<0.05?'**':(p<0.10?'*':''));
+function statCards(items){
+  return items.map(s=>`<div class="stat-card"><div class="stat-label">${s.l}</div><div class="stat-value ${s.c||''} ${s.sm?'sm':''}">${s.v}</div>${s.note?`<div class="stat-note">${s.note}</div>`:''}</div>`).join('');
+}
+function noteBox(cls, title, html){
+  return `<div class="${cls}" style="margin-bottom:0">${title?`<div class="${cls}-title">${title}</div>`:''}${html}</div>`;
+}
+
+/* ══════════ Canvas ══════════ */
+function setupCanvas(id, ratio, maxH, minH){
+  const canvas=document.getElementById(id);
+  const dpr=window.devicePixelRatio||1;
+  const cw=canvas.parentElement.clientWidth||760;
+  const ch=Math.min(maxH||420, Math.max(minH||(cw<520?250:200), cw*ratio));
+  canvas.width=Math.round(cw*dpr);
+  canvas.height=Math.round(ch*dpr);
+  canvas.style.width=cw+'px';
+  canvas.style.height=ch+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {canvas, ctx, cw, ch};
+}
+function tickFmt(lo, hi, n){
+  const step=(hi-lo)/n;
+  if(!isFinite(step)||step<=0) return v=>String(v);
+  const d=Math.min(6, Math.max(0, Math.ceil(-Math.log10(step))+1));
+  return v=>{ const s=(Math.abs(v)<step/1e6?0:v).toFixed(d); return s==='-0'?'0':s; };
+}
+function niceTicks(lo, hi, n){
+  const raw=(hi-lo)/n, mag=Math.pow(10, Math.floor(Math.log10(raw)));
+  const f=raw/mag, step=(f<1.5?1:f<3?2:f<7?5:10)*mag;
+  const out=[];
+  for(let v=Math.ceil(lo/step-1e-9)*step; v<=hi+step*1e-9; v+=step) out.push(Math.abs(v)<step*1e-9?0:v);
+  return out;
+}
+function frame(ctx, cw, ch, pad, xr, yr, opts){
+  opts=opts||{};
+  const pw=cw-pad.l-pad.r, ph=ch-pad.t-pad.b;
+  const [x0,x1]=xr, [y0,y1]=yr;
+  const sx=v=>pad.l+(v-x0)/(x1-x0)*pw;
+  const sy=v=>pad.t+ph-(v-y0)/(y1-y0)*ph;
+  const ix=px=>x0+(px-pad.l)/pw*(x1-x0);
+  const iy=py=>y0+(pad.t+ph-py)/ph*(y1-y0);
+  ctx.fillStyle=col('--bg-canvas'); ctx.fillRect(0,0,cw,ch);
+  const nx=opts.nx||6, ny=opts.ny||5;
+  const yt=opts.yticks||niceTicks(y0,y1,ny);
+  const xt=opts.xticks||niceTicks(x0,x1,nx);
+  const fx=opts.fx||tickFmt(x0,x1,Math.max(1,(x1-x0)/((xt[1]-xt[0])||1)));
+  const fy=opts.fy||tickFmt(y0,y1,Math.max(1,(y1-y0)/((yt[1]-yt[0])||1)));
+  ctx.strokeStyle=col('--border'); ctx.lineWidth=0.5; ctx.font='11px sans-serif';
+  xt.forEach(v=>{
+    const px=sx(v);
+    ctx.beginPath(); ctx.moveTo(px,pad.t); ctx.lineTo(px,pad.t+ph); ctx.stroke();
+    ctx.fillStyle=col('--text-sec'); ctx.textAlign='center';
+    ctx.fillText(fx(v), px, pad.t+ph+16);
+  });
+  yt.forEach(v=>{
+    const py=sy(v);
+    ctx.beginPath(); ctx.moveTo(pad.l,py); ctx.lineTo(pad.l+pw,py); ctx.stroke();
+    ctx.fillStyle=col('--text-sec'); ctx.textAlign='right';
+    ctx.fillText(fy(v), pad.l-8, py+4);
+  });
+  ctx.strokeStyle=col('--text-sec'); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t+ph); ctx.lineTo(pad.l+pw,pad.t+ph); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+ph); ctx.stroke();
+  ctx.fillStyle=col('--heading'); ctx.font='bold 12px sans-serif'; ctx.textAlign='center';
+  if(opts.xlab) ctx.fillText(opts.xlab, pad.l+pw/2, ch-4);
+  if(opts.ylab){
+    ctx.save(); ctx.translate(13, pad.t+ph/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText(opts.ylab, 0, 0); ctx.restore();
+  }
+  return {sx, sy, ix, iy, pw, ph, x0, x1, y0, y1, pad};
+}
+function clipTo(ctx, sc){
+  ctx.save();
+  ctx.beginPath(); ctx.rect(sc.pad.l, sc.pad.t, sc.pw, sc.ph); ctx.clip();
+}
+function curve(ctx, sc, f, x0, x1, color, width, dash, steps){
+  ctx.save();
+  ctx.strokeStyle=col(color); ctx.lineWidth=width||2.4;
+  if(dash) ctx.setLineDash(dash);
+  ctx.beginPath();
+  steps=steps||160;
+  let started=false;
+  for(let i=0;i<=steps;i++){
+    const x=x0+(x1-x0)*i/steps, y=f(x);
+    if(!isFinite(y)){ started=false; continue; }
+    const px=sc.sx(x), py=sc.sy(y);
+    if(!started){ ctx.moveTo(px,py); started=true; } else ctx.lineTo(px,py);
+  }
+  ctx.stroke(); ctx.restore();
+}
+function hband(ctx, sc, ya, yb, color, alpha){
+  const a=Math.max(sc.y0, Math.min(ya,yb)), b=Math.min(sc.y1, Math.max(ya,yb));
+  if(b<=a) return;
+  ctx.save(); ctx.globalAlpha=alpha; ctx.fillStyle=col(color);
+  ctx.fillRect(sc.pad.l, sc.sy(b), sc.pw, sc.sy(a)-sc.sy(b));
+  ctx.restore();
+}
+function hline(ctx, sc, y, color, dash, w){
+  ctx.save(); ctx.strokeStyle=col(color); ctx.lineWidth=w||1; if(dash) ctx.setLineDash(dash);
+  ctx.beginPath(); ctx.moveTo(sc.pad.l, sc.sy(y)); ctx.lineTo(sc.pad.l+sc.pw, sc.sy(y)); ctx.stroke(); ctx.restore();
+}
+function vline(ctx, sc, x, color, dash, w){
+  ctx.save(); ctx.strokeStyle=col(color); ctx.lineWidth=w||1; if(dash) ctx.setLineDash(dash);
+  ctx.beginPath(); ctx.moveTo(sc.sx(x), sc.pad.t); ctx.lineTo(sc.sx(x), sc.pad.t+sc.ph); ctx.stroke(); ctx.restore();
+}
+function dotAt(ctx, sc, x, y, color, r){
+  ctx.save(); ctx.fillStyle=col(color); ctx.strokeStyle=col('--bg-canvas'); ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(sc.sx(x), sc.sy(y), r||5, 0, 2*Math.PI); ctx.fill(); ctx.stroke(); ctx.restore();
+}
+function hex2rgb(h){
+  h=h.replace('#','');
+  if(h.length===3) h=h.split('').map(c=>c+c).join('');
+  const n=parseInt(h,16);
+  return [n>>16&255, n>>8&255, n&255];
+}
+function setActive(ids, on){ ids.forEach(id=>$('#'+id).classList.toggle('active', id===on)); }
+const isNarrow=()=>window.innerWidth<600;
+
+/* ══════════ Extras de esta página ══════════ */
+function randnGen(rng){
+  let spare=null;
+  return ()=>{
+    if(spare!==null){ const s=spare; spare=null; return s; }
+    let u,v,s;
+    do{ u=rng()*2-1; v=rng()*2-1; s=u*u+v*v; }while(s>=1||s===0);
+    const m=Math.sqrt(-2*Math.log(s)/s);
+    spare=v*m; return u*m;
+  };
+}
+const Fsf=(F,d1,d2)=>F<=0?1:betai(d2/2, d1/2, d2/(d2+d1*F));   // P(F_{d1,d2} > F)
+const sdv=a=>{ const m=mean(a); return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/(a.length-1)); };
+const range=(a,padF)=>{ let lo=Math.min(...a), hi=Math.max(...a); const p=(hi-lo)*(padF||0.05)||1; return [lo-p, hi+p]; };
+function fmtC(v){
+  if(!isFinite(v)) return '—';
+  const a=Math.abs(v);
+  if(a!==0 && a<0.001) return v.toExponential(2);
+  if(a<0.01) return v.toFixed(5);
+  return v.toFixed(4);
+}
+/* Residuos de y sobre las columnas de X (para gráficos de regresión parcial) */
+function residualize(y, X){ return fitOLS(X, y).res; }
+/* Test RESET: agrega potencias del ajustado (estandarizado: no cambia el F) */
+function resetTest(X, y, base, maxPow){
+  const m=mean(base.fit), s=Math.sqrt(mean(base.fit.map(v=>(v-m)**2)))||1;
+  const pw=[]; for(let p=2;p<=maxPow;p++) pw.push(p);
+  const Xa=X.map((r,i)=>{ const z=(base.fit[i]-m)/s; return [...r, ...pw.map(p=>z**p)]; });
+  const aug=fitOLS(Xa, y), q=pw.length;
+  const F=((base.SSR-aug.SSR)/q)/(aug.SSR/aug.df);
+  return {F, q, df2:aug.df, p:Fsf(F,q,aug.df), aug};
+}
+function lerpCol(c1, c2, t){
+  const a=hex2rgb(col(c1)), b=hex2rgb(col(c2));
+  return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(',')})`;
+}
+/* azul (bajo) → gris → rojo (alto), t en [-1, 1] */
+function divCol(t){
+  t=Math.max(-1, Math.min(1, t));
+  return t<0 ? lerpCol('--text-sec','--accent',-t) : lerpCol('--text-sec','--red',t);
+}
+function lineAB(ctx, sc, a, b, color, width, dash){
+  curve(ctx, sc, x=>a+b*x, sc.x0, sc.x1, color, width, dash, 2);
+}
+function binMeans(xs, ys, nb){
+  const [lo,hi]=[Math.min(...xs), Math.max(...xs)], w=(hi-lo)/nb, out=[];
+  for(let k=0;k<nb;k++){
+    const a=lo+k*w, b=a+w, sel=ys.filter((_,i)=>xs[i]>=a && (k===nb-1 ? xs[i]<=b : xs[i]<b));
+    if(sel.length>=3) out.push({x:a+w/2, y:mean(sel)});
+  }
+  return out;
+}
+function squares(ctx, sc, pts, color){
+  ctx.save(); ctx.fillStyle=col(color); ctx.globalAlpha=0.9;
+  pts.forEach(p=>ctx.fillRect(sc.sx(p.x)-5, sc.sy(p.y)-5, 10, 10));
+  ctx.restore();
+}
+const decide=(p,a)=>p<a?'<span class="badge no">Se rechaza H₀</span>':'<span class="badge ok">No se rechaza H₀</span>';
+
+/* ══════════════════════════════════════════════════════
+   LAB 1 — Intuición visual
+   ══════════════════════════════════════════════════════ */
+const S1={seed:7, showTrue:true, showLong:false, d:null};
+function newSample1(){ S1.seed=Math.floor(Math.random()*1e9); run1(); }
+function tog1(k){ S1[k]=!S1[k]; $(k==='showTrue'?'#m1T':'#m1L').classList.toggle('active',S1[k]); draw1(); }
+function run1(){
+  const r=+$('#m1r').value, g=+$('#m1g').value, n=200;
+  $('#m1rV').textContent=r.toFixed(2); $('#m1gV').textContent=g.toFixed(1);
+  const rn=randnGen(mulberry32(S1.seed));
+  const ab=[], ed=[], w=[];
+  for(let i=0;i<n;i++){
+    const a=rn(), z=rn(), e=13+2.5*(r*a+Math.sqrt(1-r*r)*z);
+    ab.push(a); ed.push(e); w.push(5+0.5*e+g*a+0.8*rn());
+  }
+  const short=fitOLS(ed.map(e=>[1,e]), w), long=fitOLS(ed.map((e,i)=>[1,e,ab[i]]), w);
+  S1.d={ab, ed, w, short, long, abm:mean(ab)};
+  draw1();
+  const bS=short.b[1], bL=long.b[1], plim=0.5+g*r/2.5, bias=bS-0.5;
+  $('#st1').innerHTML=statCards([
+    {l:'Pendiente MCO sin habilidad', v:fmt(bS,3), c:Math.abs(bias)>0.08?'orange':'accent', note:'Lo que estimaríamos con datos reales'},
+    {l:'Efecto verdadero', v:'0.500', note:'Un año más de educación'},
+    {l:'Sesgo en esta muestra', v:fmtS(bias,3), c:Math.abs(bias)>0.08?'orange':'green', note:`Sesgo teórico: ${fmtS(plim-0.5,3)}`},
+    {l:'MCO controlando por habilidad', v:fmt(bL,3), c:'green', note:'Sólo posible si la observáramos'}
+  ]);
+  let msg;
+  if(Math.abs(plim-0.5)<0.03) msg=noteBox('tip','', 'Con estos valores la habilidad omitida casi no contamina el coeficiente: o no afecta al salario, o no se mueve con la educación.');
+  else if(plim>0.5) msg=noteBox('callout','Sesgo hacia arriba', `La pendiente de MCO mezcla dos efectos: el de la educación y el de la habilidad que viaja con ella. Como las personas más hábiles estudian ${r>0?'más':'menos'} y la habilidad ${g>0?'sube':'baja'} el salario, MCO <strong>sobreestima</strong> el efecto de la educación.`);
+  else msg=noteBox('callout','Sesgo hacia abajo', `Ahora la habilidad ${g>0?'sube':'baja'} el salario y se mueve en sentido ${r>0?'igual':'contrario'} a la educación, así que MCO <strong>subestima</strong> el efecto. ${plim<0?'Fijate que la pendiente estimada hasta puede salir con <strong>el signo invertido</strong>.':''}`);
+  $('#nt1').innerHTML=msg;
+}
+function draw1(){
+  const d=S1.d; if(!d) return;
+  const {ctx,cw,ch}=setupCanvas('cv1', 0.5, 380);
+  const pad={l:50,r:14,t:14,b:40};
+  const sc=frame(ctx,cw,ch,pad,range(d.ed),range(d.w),{xlab:'Años de educación', ylab:'Salario'});
+  clipTo(ctx,sc);
+  ctx.globalAlpha=0.75;
+  d.ed.forEach((e,i)=>{ ctx.fillStyle=divCol(d.ab[i]/2); ctx.beginPath(); ctx.arc(sc.sx(e), sc.sy(d.w[i]), 3, 0, 2*Math.PI); ctx.fill(); });
+  ctx.globalAlpha=1;
+  if(S1.showTrue) lineAB(ctx,sc,5,0.5,'--text-sec',2,[6,4]);
+  if(S1.showLong){ const b=d.long.b; lineAB(ctx,sc,b[0]+b[2]*d.abm,b[1],'--green',2.4); }
+  lineAB(ctx,sc,d.short.b[0],d.short.b[1],'--heading',2.6);
+  ctx.restore();
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 2 — Forma funcional simulada
+   ══════════════════════════════════════════════════════ */
+const S2={seed:3, view:'fit', d:null};
+function newSample2(){ S2.seed=Math.floor(Math.random()*1e9); run2(); }
+function set2view(v){ S2.view=v; setActive(['m2vF','m2vR'], v==='fit'?'m2vF':'m2vR'); draw2(); }
+function run2(){
+  const c=+$('#m2c').value, n=+$('#m2n').value;
+  $('#m2cV').textContent=c.toFixed(2); $('#m2nV').textContent=n;
+  const rng=mulberry32(S2.seed), rn=randnGen(mulberry32(S2.seed+1));
+  const x=[], y=[];
+  for(let i=0;i<n;i++){ const xi=rng()*10; x.push(xi); y.push(10+1.5*xi+c*(xi-5)**2+2*rn()); }
+  const X=x.map(v=>[1,v]);
+  const lin=fitOLS(X,y), rs=resetTest(X,y,lin,3);
+  const q=fitOLS(x.map(v=>[1,v,v*v]),y), tq=q.b[2]/q.se[2], pq=tTail2(tq,q.df);
+  S2.d={x,y,c,lin};
+  draw2();
+  $('#st2').innerHTML=statCards([
+    {l:'Pendiente estimada', v:fmt(lin.b[1],3), note:'Recta MCO'},
+    {l:'RESET (F)', v:fmt(rs.F,2), c:'accent', note:`F con ${rs.q} y ${rs.df2} gl`},
+    {l:'p-valor RESET', v:fmtP(rs.p), c:rs.p<0.05?'orange':'green', note:rs.p<0.05?'Se rechaza: hay problemas de forma':'No hay evidencia contra la recta'},
+    {l:'p-valor de X² (test t = F)', v:fmtP(pq), c:pq<0.05?'orange':'green', note:'Agregar el cuadrado y testearlo'}
+  ]);
+  let msg;
+  if(Math.abs(c)<0.03) msg=noteBox('tip','', 'La relación verdadera es prácticamente lineal: la recta es la especificación correcta y lo esperable es que ningún test rechace.');
+  else if(rs.p<0.05) msg=noteBox('callout','El RESET detecta el problema', `La recta deja una forma de ${c>0?'U':'U invertida'} en los residuos: son ${c>0?'positivos':'negativos'} en los extremos y ${c>0?'negativos':'positivos'} en el centro. Mirá la vista de residuos. El RESET y el test de <span class="math">X²</span> rechazan.`);
+  else msg=noteBox('note','Hay curvatura, pero el test no la ve', 'La relación verdadera no es lineal, pero con esta muestra el RESET no rechaza. No es que la recta esté bien: el test no tiene potencia suficiente. Probá con más observaciones.');
+  $('#nt2').innerHTML=msg;
+}
+function draw2(){
+  const d=S2.d; if(!d) return;
+  const {ctx,cw,ch}=setupCanvas('cv2', 0.48, 360);
+  const pad={l:50,r:14,t:14,b:40};
+  if(S2.view==='fit'){
+    const sc=frame(ctx,cw,ch,pad,[0,10],range(d.y),{xlab:'X', ylab:'Y'});
+    clipTo(ctx,sc);
+    ctx.fillStyle=col('--blue'); ctx.globalAlpha=0.5;
+    d.x.forEach((x,i)=>{ ctx.beginPath(); ctx.arc(sc.sx(x), sc.sy(d.y[i]), 2.8, 0, 2*Math.PI); ctx.fill(); });
+    ctx.globalAlpha=1;
+    curve(ctx,sc,x=>10+1.5*x+d.c*(x-5)**2,0,10,'--text-sec',2,[6,4]);
+    lineAB(ctx,sc,d.lin.b[0],d.lin.b[1],'--red',2.6);
+    ctx.restore();
+    $('#lg2').innerHTML='<span class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>Recta MCO</span><span class="legend-item"><span class="legend-dot" style="background:var(--text-sec)"></span>Relación verdadera</span>';
+  } else {
+    const f=d.lin.fit, r=d.lin.res, m=Math.max(...r.map(Math.abs))*1.1;
+    const sc=frame(ctx,cw,ch,pad,range(f),[-m,m],{xlab:'Valor ajustado Ŷ', ylab:'Residuo'});
+    hline(ctx,sc,0,'--text-sec',[4,3]);
+    clipTo(ctx,sc);
+    ctx.fillStyle=col('--blue'); ctx.globalAlpha=0.5;
+    f.forEach((v,i)=>{ ctx.beginPath(); ctx.arc(sc.sx(v), sc.sy(r[i]), 2.8, 0, 2*Math.PI); ctx.fill(); });
+    ctx.globalAlpha=1;
+    squares(ctx,sc,binMeans(f,r,8),'--green');
+    ctx.restore();
+    $('#lg2').innerHTML='<span class="legend-item"><span class="legend-box" style="background:var(--green);opacity:.9"></span>Residuo promedio por tramo</span>';
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 3 — hprice1: RESET y Davidson-MacKinnon
+   ══════════════════════════════════════════════════════ */
+const NH=HP.price.length;
+const H3={
+  lin:{y:HP.price, X:HP.price.map((_,i)=>[1,HP.lotsize[i],HP.sqrft[i],HP.bdrms[i]]),
+       names:['(Intercepto)','lotsize','sqrft','bdrms'], eq:'price ~ lotsize + sqrft + bdrms'},
+  log:{y:HP.price.map(Math.log), X:HP.price.map((_,i)=>[1,Math.log(HP.lotsize[i]),Math.log(HP.sqrft[i]),HP.bdrms[i]]),
+       names:['(Intercepto)','log(lotsize)','log(sqrft)','bdrms'], eq:'log(price) ~ log(lotsize) + log(sqrft) + bdrms'}
+};
+Object.values(H3).forEach(m=>m.fit=fitOLS(m.X,m.y));
+const S3={mod:'lin', pow:3, open:null, alpha:0.05};
+function set3mod(m){ S3.mod=m; S3.open=null; setActive(['m3lin','m3log'], m==='lin'?'m3lin':'m3log'); render3(); }
+function set3pow(p){ S3.pow=p; setActive(['m3p23','m3p2'], p===3?'m3p23':'m3p2'); render3(); }
+function open3(n){ S3.open=S3.open===n?null:n; render3(); }
+function interp3(name, b){
+  switch(name){
+    case '(Intercepto)': return 'Precio predicho con todas las regresoras en cero. No tiene lectura útil: no hay casas sin terreno ni superficie.';
+    case 'lotsize': return `Cada pie cuadrado adicional de terreno se asocia con <strong>US$ ${(b*1000).toFixed(2)}</strong> más de precio (el precio está en miles), ceteris paribus.`;
+    case 'sqrft': return `Cada pie cuadrado adicional de superficie cubierta se asocia con <strong>US$ ${(b*1000).toFixed(0)}</strong> más de precio, ceteris paribus.`;
+    case 'bdrms': return S3.mod==='lin'
+      ? `Un dormitorio más, <em>manteniendo constante la superficie</em>, se asocia con <strong>US$ ${(b*1000).toFixed(0)}</strong> más de precio. Revisá la significancia.`
+      : `Un dormitorio más, con la misma superficie, se asocia con un precio <strong>≈ ${(b*100).toFixed(1)}%</strong> ${b>0?'mayor':'menor'} (semielasticidad). Revisá la significancia.`;
+    case 'log(lotsize)': return `Elasticidad: un terreno 1% más grande se asocia con un precio <strong>${b.toFixed(3)}%</strong> mayor, ceteris paribus.`;
+    case 'log(sqrft)': return `Elasticidad: una casa con 1% más de superficie cuesta <strong>${b.toFixed(3)}%</strong> más, ceteris paribus.`;
+  }
+  return '';
+}
+function render3(){
+  const m=H3[S3.mod], f=m.fit, rs=resetTest(m.X,m.y,f,S3.pow);
+  $('#chip3').innerHTML='Modelo actual: '+m.eq;
+  let h=`<div class="reg-out-head">${S3.mod==='lin'?'Modelo lineal':'Modelo log-log'} · n = ${f.n}</div>`;
+  m.names.forEach((nm,j)=>{
+    const t=f.b[j]/f.se[j], p=tTail2(t,f.df), open=S3.open===nm;
+    h+=`<div class="reg-row ${open?'open':''}" onclick="open3('${nm}')"><span class="reg-var">${nm}</span>
+      <span class="reg-coef">${fmtC(f.b[j])} <b style="color:var(--accent)">${stars(p)}</b><span class="reg-se">(${fmtC(f.se[j])}) · p = ${fmtP(p)}</span></span></div>
+      <div class="reg-explain ${open?'open':''}">${interp3(nm,f.b[j])}</div>`;
+  });
+  h+=`<div class="reg-foot"><span>R² = ${fmt(f.R2,3)}</span><span>R² aumentado = ${fmt(rs.aug.R2,3)}</span></div>`;
+  $('#out3').innerHTML=h;
+  $('#st3').innerHTML=statCards([
+    {l:'Estadístico RESET', v:fmt(rs.F,2), c:'accent', note:`F con ${rs.q} y ${rs.df2} gl`},
+    {l:'p-valor', v:fmtP(rs.p), c:rs.p<0.05?'orange':'green', note:'H₀: los δ son todos cero'},
+    {l:'Decisión al 5%', v:rs.p<0.05?'Rechazo':'No rechazo', c:rs.p<0.05?'orange':'green', sm:true, note:rs.p<0.05?'Evidencia de mala especificación':'Sin evidencia contra esta forma'}
+  ]);
+  const other=H3[S3.mod==='lin'?'log':'lin'], ro=resetTest(other.X,other.y,other.fit,S3.pow);
+  $('#nt3').innerHTML = S3.mod==='lin'
+    ? noteBox('callout','El modelo en niveles no pasa el filtro', `Con el modelo lineal el RESET rechaza al 5% (p = ${fmtP(rs.p)}). En el gráfico se ve por qué: los residuos se abren y se curvan a medida que crece el precio ajustado. Pasá al modelo log-log (p = ${fmtP(ro.p)}).`)
+    : noteBox('tip','', `Con el modelo log-log el RESET <strong>no rechaza</strong> al 5% (p = ${fmtP(rs.p)}), contra p = ${fmtP(ro.p)} del modelo lineal. Para esta base la forma log-log es preferible, y coincide con la intuición económica: elasticidades constantes en el tamaño del terreno y de la casa. Ojo: al 10% también rechazaría, así que es un "aprobado" ajustado.`);
+  draw3();
+}
+function draw3(){
+  const f=H3[S3.mod].fit;
+  const {ctx,cw,ch}=setupCanvas('cv3', 0.75, 340, 240);
+  const pad={l:52,r:12,t:12,b:40};
+  const m=Math.max(...f.res.map(Math.abs))*1.1;
+  const sc=frame(ctx,cw,ch,pad,range(f.fit),[-m,m],{xlab:'Valor ajustado', ylab:'Residuo', nx:5});
+  hline(ctx,sc,0,'--text-sec',[4,3]);
+  clipTo(ctx,sc);
+  ctx.fillStyle=col('--blue'); ctx.globalAlpha=0.6;
+  f.fit.forEach((v,i)=>{ ctx.beginPath(); ctx.arc(sc.sx(v), sc.sy(f.res[i]), 3, 0, 2*Math.PI); ctx.fill(); });
+  ctx.globalAlpha=1;
+  squares(ctx,sc,binMeans(f.fit,f.res,6),'--green');
+  ctx.restore();
+}
+/* Davidson-MacKinnon: ambos modelos con price como dependiente */
+const DM=(()=>{
+  const y=HP.price;
+  const XA=H3.lin.X, XB=HP.price.map((_,i)=>[1,Math.log(HP.lotsize[i]),Math.log(HP.sqrft[i]),HP.bdrms[i]]);
+  const fA=fitOLS(XA,y), fB=fitOLS(XB,y);
+  const tA=fitOLS(XA.map((r,i)=>[...r,fB.fit[i]]),y), tB=fitOLS(XB.map((r,i)=>[...r,fA.fit[i]]),y);
+  const pack=f=>{ const t=f.b[4]/f.se[4]; return {b:f.b[4], se:f.se[4], t, p:tTail2(t,f.df)}; };
+  return {A:pack(tA), B:pack(tB), R2A:fA.R2, R2B:fB.R2};
+})();
+function set3alpha(a){ S3.alpha=a; setActive(['m3a05','m3a10'], a===0.05?'m3a05':'m3a10'); renderDM(); }
+function renderDM(){
+  const a=S3.alpha;
+  const row=(lab,r)=>`<tr><td class="lbl">${lab}</td><td>${fmt(r.b,3)}</td><td>${fmt(r.se,3)}</td><td>${fmt(r.t,2)}</td><td>${fmtP(r.p)}</td><td>${decide(r.p,a)}</td></tr>`;
+  $('#tb3dm').innerHTML=`<tr><th style="text-align:left">Hipótesis</th><th>Coef. de Ŷ del otro</th><th>EE</th><th>t</th><th>p-valor</th><th>Decisión</th></tr>`+
+    row('H₀: A (niveles) es correcto · se agrega Ŷ<sub>B</sub> a A', DM.A)+
+    row('H₀: B (logs) es correcto · se agrega Ŷ<sub>A</sub> a B', DM.B);
+  const rA=DM.A.p<a, rB=DM.B.p<a, pct=Math.round(a*100);
+  let msg;
+  if(!rA && !rB) msg=noteBox('note','No se rechaza ninguno', `Al ${pct}% ninguno de los dos modelos es rechazado: la prueba no logra discriminar entre ellos. Pasá al 10% y vas a ver el caso opuesto.`);
+  else if(rA && rB) msg=noteBox('note','Se rechazan los dos', `Al ${pct}% cada modelo agrega información al otro, así que se rechazan ambos. Sugiere que quizás ninguno de los dos es la especificación adecuada.`);
+  else msg=noteBox('tip','', `Al ${pct}% se rechaza ${rA?'A':'B'} y no ${rA?'B':'A'}: la evidencia favorece ${rA?'la especificación en logs':'la especificación en niveles'}.`);
+  $('#nt3dm').innerHTML=msg+'<p class="hint">Así es la prueba en la práctica: pueden rechazarse ambos o ninguno. No da un veredicto definitivo, pero suma evidencia.</p>';
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 4 — Monte Carlo: omitida e irrelevante
+   ══════════════════════════════════════════════════════ */
+const S4={mode:'omit', seed:21, d:null};
+function newSample4(){ S4.seed=Math.floor(Math.random()*1e9); run4(); }
+function set4mode(m){
+  S4.mode=m; setActive(['m4om','m4ir'], m==='omit'?'m4om':'m4ir');
+  $('#g4b2').classList.toggle('hidden', m!=='omit');
+  $('#m4rLab').innerHTML = m==='omit' ? 'Corr(X<sub>1</sub>, X<sub>2</sub>)' : 'Corr(X<sub>1</sub>, X<sub>3</sub>)';
+  if(m==='irr' && +$('#m4r').value<0.5) $('#m4r').value=0.8;
+  run4();
+}
+/* Pendiente de x1 en una regresión con x1 y x2 (sumas centradas) */
+function slope2(x1, x2, y){
+  const n=y.length, m1=mean(x1), m2=mean(x2), my=mean(y);
+  let s11=0,s22=0,s12=0,s1y=0,s2y=0;
+  for(let i=0;i<n;i++){
+    const a=x1[i]-m1, b=x2[i]-m2, c=y[i]-my;
+    s11+=a*a; s22+=b*b; s12+=a*b; s1y+=a*c; s2y+=b*c;
+  }
+  return {short:s1y/s11, long:(s22*s1y-s12*s2y)/(s11*s22-s12*s12)};
+}
+function run4(){
+  const b2=+$('#m4b2').value, r=+$('#m4r').value, n=+$('#m4n').value, R=400;
+  $('#m4b2V').textContent=b2.toFixed(1); $('#m4rV').textContent=r.toFixed(2); $('#m4nV').textContent=n;
+  const rn=randnGen(mulberry32(S4.seed));
+  const A=[], B=[];
+  const bb2=S4.mode==='omit'?b2:0;
+  for(let k=0;k<R;k++){
+    const x1=[], x2=[], y=[];
+    for(let i=0;i<n;i++){
+      const a=rn(), z=rn(), x2i=r*a+Math.sqrt(1-r*r)*z;
+      x1.push(a); x2.push(x2i); y.push(1+1*a+bb2*x2i+rn());
+    }
+    const s=slope2(x1,x2,y);
+    A.push(s.short); B.push(s.long);
+  }
+  S4.d={A,B,b2,r};
+  draw4();
+  const mA=mean(A), mB=mean(B), sA=sdv(A), sB=sdv(B);
+  if(S4.mode==='omit'){
+    const bias=b2*r;
+    $('#lg4').innerHTML='<span class="legend-item"><span class="legend-box" style="background:var(--red);opacity:.5"></span>Regresión corta (omite X₂)</span><span class="legend-item"><span class="legend-box" style="background:var(--accent);opacity:.5"></span>Regresión larga (incluye X₂)</span><span class="legend-item"><span class="legend-dot" style="background:var(--heading)"></span>β₁ = 1</span><span class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>β₁ + β₂δ₁</span>';
+    $('#st4').innerHTML=statCards([
+      {l:'Promedio sin X₂', v:fmt(mA,3), c:Math.abs(bias)>0.02?'orange':'green', note:`Teórico: 1 + β₂·δ₁ = ${fmt(1+bias,3)}`},
+      {l:'Promedio con X₂', v:fmt(mB,3), c:'accent', note:'Insesgado: centrado en 1'},
+      {l:'Sesgo β₂·δ₁', v:fmtS(bias,3), c:Math.abs(bias)>0.02?'orange':'green', note:`δ₁ = ${r.toFixed(2)} (pendiente de X₂ sobre X₁)`},
+      {l:'Desvío de cada estimador', v:`${fmt(sA,3)} · ${fmt(sB,3)}`, sm:true, note:'Corta · larga'}
+    ]);
+    const sg=v=>v>0?1:(v<0?-1:0), rs=sg(b2), cs=sg(r);
+    const cell=(rr,cc,txt,cls)=>`<div class="${cls} ${rs===rr&&cs===cc?'on':''}">${txt}</div>`;
+    $('#sign4').innerHTML=`<div class="sign-tbl">
+      <div class="hd"></div><div class="hd">Corr(X₁, X₂) &gt; 0</div><div class="hd">Corr(X₁, X₂) &lt; 0</div>
+      <div class="hd">β₂ &gt; 0</div>${cell(1,1,'Sesgo positivo','pos')}${cell(1,-1,'Sesgo negativo','neg')}
+      <div class="hd">β₂ &lt; 0</div>${cell(-1,1,'Sesgo negativo','neg')}${cell(-1,-1,'Sesgo positivo','pos')}
+    </div>`;
+    let msg;
+    if(rs===0||cs===0) msg=noteBox('tip','', `Con ${rs===0?'β₂ = 0 la variable omitida no afecta a Y':'correlación cero X₂ no se mueve con X₁'}: aunque la dejemos afuera, <strong>no hay sesgo</strong>. Los dos histogramas quedan centrados en 1.`);
+    else msg=noteBox('callout', `Sesgo ${bias>0?'positivo':'negativo'}`, `β₂ ${b2>0?'&gt;':'&lt;'} 0 y Corr(X₁, X₂) ${r>0?'&gt;':'&lt;'} 0: la regresión corta ${bias>0?'<strong>sobreestima</strong>':'<strong>subestima</strong>'} β₁ en ${fmt(Math.abs(bias),2)} en promedio. ${1+bias<0?'¡El estimador ni siquiera tiene el signo correcto!':''}`);
+    $('#nt4').innerHTML=msg;
+  } else {
+    const th=1/Math.sqrt(1-r*r);
+    $('#lg4').innerHTML='<span class="legend-item"><span class="legend-box" style="background:var(--accent);opacity:.5"></span>Modelo correcto (sólo X₁)</span><span class="legend-item"><span class="legend-box" style="background:var(--orange);opacity:.5"></span>Incluye X₃ irrelevante</span><span class="legend-item"><span class="legend-dot" style="background:var(--heading)"></span>β₁ = 1</span>';
+    $('#sign4').innerHTML='';
+    $('#st4').innerHTML=statCards([
+      {l:'Promedio sin X₃', v:fmt(mA,3), c:'accent', note:'Insesgado'},
+      {l:'Promedio con X₃', v:fmt(mB,3), c:'green', note:'También insesgado'},
+      {l:'Desvío sin X₃', v:fmt(sA,3), c:'accent', note:'Precisión del modelo correcto'},
+      {l:'Desvío con X₃', v:fmt(sB,3), c:'orange', note:`${fmt(sB/sA,2)} veces más grande (teórico ≈ ${fmt(th,2)})`}
+    ]);
+    $('#nt4').innerHTML=noteBox('note','Sin sesgo, pero con más ruido', `Incluir una variable irrelevante no corre el centro de la distribución, pero la ensancha. El factor teórico es <span class="math">1/&radic;(1 − &rho;²)</span>: cuanto más correlacionada está X₃ con X₁, más difícil es separar sus efectos (es la multicolinealidad de la clase 10). Errores estándar más grandes implican tests <span class="math">t</span> más chicos y menos potencia.`);
+  }
+}
+function draw4(){
+  const d=S4.d; if(!d) return;
+  const {ctx,cw,ch}=setupCanvas('cv4', 0.42, 330);
+  const pad={l:44,r:14,t:14,b:40};
+  const all=[...d.A, ...d.B, 1];
+  let [lo,hi]=range(all, 0.08);
+  const nb=45, w=(hi-lo)/nb;
+  const hist=a=>{ const h=Array(nb).fill(0); a.forEach(v=>{ const k=Math.min(nb-1, Math.max(0, Math.floor((v-lo)/w))); h[k]++; }); return h; };
+  const hA=hist(d.A), hB=hist(d.B), top=Math.max(...hA, ...hB)*1.12;
+  const sc=frame(ctx,cw,ch,pad,[lo,hi],[0,top],{xlab:'Estimación de β₁ en cada muestra', ylab:'Frecuencia', ny:4});
+  const cA=S4.mode==='omit'?'--red':'--accent', cB=S4.mode==='omit'?'--accent':'--orange';
+  [[hA,cA],[hB,cB]].forEach(([h,c])=>{
+    ctx.save(); ctx.fillStyle=col(c); ctx.globalAlpha=0.45;
+    h.forEach((v,k)=>{ if(v) ctx.fillRect(sc.sx(lo+k*w)+0.5, sc.sy(v), Math.max(1, sc.sx(lo+(k+1)*w)-sc.sx(lo+k*w)-1), sc.sy(0)-sc.sy(v)); });
+    ctx.restore();
+  });
+  vline(ctx,sc,1,'--heading',null,2);
+  if(S4.mode==='omit' && Math.abs(d.b2*d.r)>1e-9) vline(ctx,sc,1+d.b2*d.r,'--red',[6,4],2);
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 5 — wage2: proxies de la habilidad
+   ══════════════════════════════════════════════════════ */
+const BASE5=['educ','exper','tenure','married','south','urban','black'];
+const MODS5=[
+  {k:'sin', lab:'(1) Sin proxy', add:[]},
+  {k:'iq', lab:'(2) Con IQ', add:['IQ']},
+  {k:'kww', lab:'(3) Con KWW', add:['KWW']},
+  {k:'both', lab:'(4) IQ y KWW', add:['IQ','KWW']}
+];
+const NW=W2.lwage.length;
+MODS5.forEach(m=>{
+  m.vars=[...BASE5, ...m.add];
+  m.fit=fitOLS(Array.from({length:NW},(_,i)=>[1, ...m.vars.map(v=>W2[v][i])]), W2.lwage);
+  m.get=v=>{ const j=m.vars.indexOf(v); if(j<0) return null; const b=m.fit.b[j+1], se=m.fit.se[j+1]; return {b, se, p:tTail2(b/se, m.fit.df)}; };
+});
+let SEL5='iq';
+function set5(k){ SEL5=k; MODS5.forEach(m=>$('#b5'+m.k).classList.toggle('active', m.k===k)); render5(); }
+function render5(){
+  const rows=[...BASE5,'IQ','KWW'];
+  let h='<tr><th style="text-align:left">Variable</th>'+MODS5.map(m=>`<th class="${m.k===SEL5?'selcol':''}">${m.lab}</th>`).join('')+'</tr>';
+  rows.forEach(v=>{
+    h+=`<tr><td class="lbl">${v}</td>`+MODS5.map(m=>{
+      const g=m.get(v), cls=m.k===SEL5?'selcol':'';
+      return g?`<td class="${cls}">${fmt(g.b,4)}<b style="color:var(--accent)">${stars(g.p)}</b><span class="se">(${fmt(g.se,4)})</span></td>`:`<td class="${cls}">—</td>`;
+    }).join('')+'</tr>';
+  });
+  h+='<tr><td class="lbl">R²</td>'+MODS5.map(m=>`<td class="${m.k===SEL5?'selcol':''}">${fmt(m.fit.R2,4)}</td>`).join('')+'</tr>';
+  h+='<tr><td class="lbl">n</td>'+MODS5.map(m=>`<td class="${m.k===SEL5?'selcol':''}">${m.fit.n}</td>`).join('')+'</tr>';
+  $('#tb5').innerHTML=h;
+  const m=MODS5.find(x=>x.k===SEL5), e0=MODS5[0].get('educ'), e=m.get('educ');
+  const cards=[
+    {l:'Retorno de un año de educación', v:'≈ '+fmt(e.b*100,2)+'%', c:'accent', note:'100·β̂_educ en un modelo log-nivel'},
+    {l:'Cambio respecto del modelo (1)', v:fmtS((e.b-e0.b)*100,2)+' pp', c:m.k==='sin'?'':'orange', note:m.k==='sin'?'Es el modelo de referencia':`${fmt((1-e.b/e0.b)*100,0)}% menos que sin proxy`}
+  ];
+  if(m.add.includes('IQ')){ const g=m.get('IQ'); cards.push({l:'IQ: 10 puntos más', v:'≈ '+fmtS(g.b*1000,1)+'%', c:'green', note:'Efecto de la proxy, no de la habilidad "pura"'}); }
+  if(m.add.includes('KWW')){ const g=m.get('KWW'); cards.push({l:'KWW: 10 puntos más', v:'≈ '+fmtS(g.b*1000,1)+'%', c:'green', note:'Efecto de la proxy'}); }
+  cards.push({l:'R²', v:fmt(m.fit.R2,4), note:m.k==='sin'?'':`Sube ${fmt((m.fit.R2-MODS5[0].fit.R2)*100,1)} puntos`});
+  $('#st5').innerHTML=statCards(cards);
+  $('#nt5').innerHTML = m.k==='sin'
+    ? noteBox('note','Punto de partida', `Sin controlar por habilidad, un año más de educación se asocia con ≈ ${fmt(e0.b*100,2)}% más de salario. Si la habilidad omitida sesga hacia arriba, este número es demasiado alto. Elegí un modelo con proxy.`)
+    : noteBox('tip','', `Al incluir ${m.add.join(' y ')}, el retorno estimado de la educación <strong>baja</strong> de ${fmt(e0.b*100,2)}% a ${fmt(e.b*100,2)}%. Es justo lo que predice el sesgo positivo por omitir la habilidad. El R² sube poco: la proxy explica poca varianza adicional, pero <strong>corrige el sesgo</strong>, que es lo que nos importaba.${m.k==='both'?' Con las dos proxies juntas la corrección es mayor: cada una captura una parte distinta de la habilidad.':''}`);
+  draw5();
+}
+function draw5(){
+  const {ctx,cw,ch}=setupCanvas('cv5', 0.32, 230, 200);
+  const pad={l:isNarrow()?96:110,r:18,t:10,b:38};
+  const pts=MODS5.map(m=>{ const e=m.get('educ'); return {lab:m.lab, k:m.k, b:e.b*100, lo:(e.b-1.96*e.se)*100, hi:(e.b+1.96*e.se)*100}; });
+  const lo=Math.min(...pts.map(p=>p.lo))-0.3, hi=Math.max(...pts.map(p=>p.hi))+0.3;
+  const sc=frame(ctx,cw,ch,pad,[lo,hi],[0.4,4.6],{xlab:'Retorno de la educación (%)', yticks:[], nx:6});
+  const e0=pts[0].b;
+  vline(ctx,sc,e0,'--text-sec',[4,3]);
+  pts.forEach((p,i)=>{
+    const y=4-i, c=p.k===SEL5?'--accent':'--text-sec';
+    ctx.save(); ctx.strokeStyle=col(c); ctx.lineWidth=p.k===SEL5?3:2;
+    ctx.beginPath(); ctx.moveTo(sc.sx(p.lo),sc.sy(y)); ctx.lineTo(sc.sx(p.hi),sc.sy(y)); ctx.stroke(); ctx.restore();
+    dotAt(ctx,sc,p.b,y,c,p.k===SEL5?6:5);
+    ctx.fillStyle=col(p.k===SEL5?'--heading':'--text-sec'); ctx.font=(p.k===SEL5?'bold ':'')+'12px sans-serif'; ctx.textAlign='right';
+    ctx.fillText(p.lab, pad.l-8, sc.sy(y)+4);
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 6 — Calidad de la proxy (simulación)
+   ══════════════════════════════════════════════════════ */
+const P6=(()=>{
+  const rn=randnGen(mulberry32(606)), n=5000, ab=[], v=[], w=[], u=[];
+  for(let i=0;i<n;i++){ ab.push(rn()); v.push(rn()); w.push(rn()); u.push(rn()); }
+  const ed=ab.map((a,i)=>13+2*(0.6*a+0.8*v[i]));
+  const y=ab.map((a,i)=>1+0.06*ed[i]+0.10*a+0.35*u[i]);
+  const sin=fitOLS(ed.map(e=>[1,e]),y).b[1];
+  const inf=fitOLS(ed.map((e,i)=>[1,e,ab[i]]),y).b[1];
+  return {n, ab, v, w, ed, y, sin, inf};
+})();
+function run6(){
+  const q=+$('#m6q').value, k=+$('#m6k').value;
+  $('#m6qV').textContent=q.toFixed(2); $('#m6kV').textContent=k.toFixed(2);
+  const d=P6;
+  const px=d.ab.map((a,i)=>q*a+Math.sqrt(1-q*q)*d.w[i]+k*d.v[i]);
+  const con=fitOLS(d.ed.map((e,i)=>[1,e,px[i]]),d.y).b[1];
+  const items=[
+    {n:'Verdadero', v:0.06, c:'--heading'},
+    {n:'Sin proxy', v:d.sin, c:'--red'},
+    {n:'Con la proxy', v:con, c:'--orange'},
+    {n:'Con la habilidad real', v:d.inf, c:'--green'}
+  ];
+  const mx=Math.max(0.11, ...items.map(i=>i.v))*1.05;
+  $('#bars6').innerHTML=items.map(it=>`<div class="bar-row"><span class="bar-name">${it.n}</span><span class="bar-track"><span class="bar-fill" style="display:block;width:${Math.max(0,it.v)/mx*100}%;background:var(${it.c})"></span></span><span class="bar-val">${fmt(it.v*100,2)}%</span></div>`).join('');
+  const bS=d.sin-0.06, bC=con-0.06, corr=(1-bC/bS)*100;
+  $('#st6').innerHTML=statCards([
+    {l:'Sesgo sin proxy', v:fmtS(bS*100,2)+' pp', c:'orange'},
+    {l:'Sesgo con la proxy', v:fmtS(bC*100,2)+' pp', c:Math.abs(bC)<0.003?'green':'orange'},
+    {l:'Parte del sesgo corregida', v:fmt(corr,0)+'%', c:corr>50?'green':'accent', note:'1 − sesgo con / sesgo sin'}
+  ]);
+  let msg;
+  if(q<0.05 && k<0.05) msg=noteBox('callout','Una proxy irrelevante no sirve', 'Si la proxy no tiene ninguna relación con la habilidad, agregarla no corrige nada: falla la condición de relevancia.');
+  else if(k>0.25 && bC>bS) msg=noteBox('callout','La proxy empeora las cosas', 'Como la proxy está ligada a la educación por otras vías, al controlar por ella le quitamos a la educación parte de su propia variación. Falla la redundancia y el estimador queda incluso más lejos que sin proxy.');
+  else if(k>0.25) msg=noteBox('note','Se viola la redundancia', 'La proxy está correlacionada con la educación más allá de su relación con la habilidad. El estimador ya no es consistente: puede quedar por debajo del verdadero. Por eso la condición se defiende con teoría.');
+  else if(q>0.95) msg=noteBox('tip','', 'Con una proxy casi perfecta el sesgo desaparece: es como si observáramos la habilidad.');
+  else msg=noteBox('tip','', `Con una proxy imperfecta (correlación ${q.toFixed(2)}) se corrige el ${fmt(corr,0)}% del sesgo. No llega a cero porque parte de la habilidad queda en el error, pero es mucho mejor que ignorar el problema.`);
+  $('#nt6').innerHTML=msg;
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 7 — crime2: variable dependiente rezagada
+   ══════════════════════════════════════════════════════ */
+const NC=CR.lcrmrte.length;
+const C7=(()=>{
+  const X1=Array.from({length:NC},(_,i)=>[1,CR.unem[i],CR.llawexpc[i]]);
+  const X2=X1.map((r,i)=>[...r,CR.lcrmrte82[i]]);
+  const m1=fitOLS(X1,CR.lcrmrte), m2=fitOLS(X2,CR.lcrmrte);
+  const Z1=X1.map(r=>[r[0],r[1]]), Z2=X2.map(r=>[r[0],r[1],r[3]]);
+  return {m1, m2,
+    sin:{x:residualize(CR.llawexpc,Z1), y:residualize(CR.lcrmrte,Z1), b:m1.b[2]},
+    con:{x:residualize(CR.llawexpc,Z2), y:residualize(CR.lcrmrte,Z2), b:m2.b[2]},
+    quien:fitOLS(CR.lcrmrte82.map(v=>[1,v]), CR.llawexpc)};
+})();
+let VIEW7='sin';
+function set7view(v){ VIEW7=v; setActive(['m7q','m7s','m7c'], {quien:'m7q',sin:'m7s',con:'m7c'}[v]); draw7(); note7(); }
+function render7tbl(){
+  const cell=(m,j)=>{ const t=m.b[j]/m.se[j], p=tTail2(t,m.df); return `<td>${fmt(m.b[j],3)}<b style="color:var(--accent)">${stars(p)}</b><span class="se">(${fmt(m.se[j],3)})</span></td>`; };
+  const {m1,m2}=C7;
+  $('#tb7').innerHTML=`<tr><th style="text-align:left">Variable</th><th>(1) Sin rezago</th><th>(2) Con delito de 1982</th></tr>
+    <tr><td class="lbl">unem (desempleo, 1987)</td>${cell(m1,1)}${cell(m2,1)}</tr>
+    <tr><td class="lbl">log(lawexpc) (gasto, 1987)</td>${cell(m1,2)}${cell(m2,2)}</tr>
+    <tr><td class="lbl">log(crmrte) de 1982</td><td>—</td>${cell(m2,3)}</tr>
+    <tr><td class="lbl">R²</td><td>${fmt(m1.R2,3)}</td><td>${fmt(m2.R2,3)}</td></tr>`;
+}
+function note7(){
+  const {m1,m2}=C7;
+  const msgs={
+    quien:noteBox('note','El origen del problema', `Las ciudades que en 1982 tenían más delito gastan más en seguridad en 1987 (pendiente ${fmt(C7.quien.b[1],2)}, correlación ${fmt(Math.sqrt(C7.quien.R2),2)}). El delito pasado y los factores persistentes que lo causan están en el error del modelo (1) y se mueven con el gasto: el gasto es endógeno.`),
+    sin:noteBox('callout','Un signo contraintuitivo', `Sin el rezago, el coeficiente del gasto es <strong>positivo</strong> (${fmt(m1.b[2],3)}): más gasto, más delito. No es que la policía cause delitos; es que las ciudades con más delito "de siempre" gastan más. Mirá cómo los puntos oscuros (mucho delito en 1982) tienden a quedar más arriba.`),
+    con:noteBox('tip','', `Al controlar por el delito de 1982, el coeficiente del gasto se vuelve <strong>negativo</strong> (${fmt(m2.b[2],3)}): un 10% más de gasto se asocia con ≈ ${fmt(Math.abs(m2.b[2])*10,1)}% menos de delito. No es significativo a los niveles usuales (p = ${fmtP(tTail2(m2.b[2]/m2.se[2],m2.df))}), pero el signo ahora tiene sentido. El rezago está absorbiendo los no observables persistentes de cada ciudad, y el R² salta de ${fmt(m1.R2,2)} a ${fmt(m2.R2,2)}.`)
+  };
+  $('#nt7').innerHTML=msgs[VIEW7];
+}
+function draw7(){
+  const {ctx,cw,ch}=setupCanvas('cv7', 0.46, 360);
+  const pad={l:56,r:14,t:14,b:40};
+  const c82=CR.lcrmrte82, lo=Math.min(...c82), hi=Math.max(...c82);
+  const shade=i=>lerpCol('--accent-light','--heading',(c82[i]-lo)/(hi-lo));
+  let x, y, a, b, xl, yl;
+  if(VIEW7==='quien'){ x=c82; y=CR.llawexpc; a=C7.quien.b[0]; b=C7.quien.b[1]; xl='log(tasa de delito) en 1982'; yl='log(gasto) 1987'; }
+  else { const v=C7[VIEW7]; x=v.x; y=v.y; b=v.b; a=mean(y)-b*mean(x);
+         xl=VIEW7==='sin'?'log(gasto), descontado unem':'log(gasto), descontados unem y delito 82';
+         yl=VIEW7==='sin'?'log(delito), desc. unem':'log(delito), desc. controles'; }
+  const sc=frame(ctx,cw,ch,pad,range(x,0.08),range(y,0.1),{xlab:xl, ylab:yl, nx:6});
+  clipTo(ctx,sc);
+  lineAB(ctx,sc,a,b,VIEW7==='sin'?'--red':(VIEW7==='con'?'--green':'--purple'),2.6);
+  x.forEach((xv,i)=>{ ctx.fillStyle=shade(i); ctx.strokeStyle=col('--text-sec'); ctx.lineWidth=0.6; ctx.beginPath(); ctx.arc(sc.sx(xv), sc.sy(y[i]), 5, 0, 2*Math.PI); ctx.fill(); ctx.stroke(); });
+  ctx.restore();
+  ctx.fillStyle=col('--heading'); ctx.font='bold 12px sans-serif'; ctx.textAlign='right';
+  ctx.fillText(`pendiente = ${fmt(b,3)}`, pad.l+sc.pw-6, pad.t+16);
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 8 — Error de medición
+   ══════════════════════════════════════════════════════ */
+const S8={mode:'x', seed:42, d:null};
+function newSample8(){ S8.seed=Math.floor(Math.random()*1e9); run8(); }
+function set8mode(m){ S8.mode=m; setActive(['m8x','m8y','m8yc'], {x:'m8x',y:'m8y',yc:'m8yc'}[m]); run8(); }
+const plim8=(mode,s)=>mode==='x'?1.5*4/(4+s*s):(mode==='y'?1.5:1.5-0.15*s);
+function run8(){
+  const s=+$('#m8s').value, n=+$('#m8n').value;
+  $('#m8sV').textContent=s.toFixed(1); $('#m8nV').textContent=n;
+  const rn=randnGen(mulberry32(S8.seed));
+  const xo=[], yo=[];
+  for(let i=0;i<n;i++){
+    const xr=10+2*rn(), ys=2+1.5*xr+rn(), e=rn();
+    if(S8.mode==='x'){ xo.push(xr+s*e); yo.push(ys); }
+    else if(S8.mode==='y'){ xo.push(xr); yo.push(ys+s*e); }
+    else { xo.push(xr); yo.push(ys-0.15*s*(xr-10)+s*e); }
+  }
+  const f=fitOLS(xo.map(v=>[1,v]),yo);
+  S8.d={xo,yo,f,s};
+  draw8();
+  const pl=plim8(S8.mode,s), lam=4/(4+s*s), t=f.b[1]/f.se[1];
+  const cards=[
+    {l:'Pendiente estimada', v:fmt(f.b[1],3), c:Math.abs(pl-1.5)>0.05?'orange':'accent', note:'Verdadera: 1.5'},
+    {l:'plim teórico', v:fmt(pl,3), c:'accent', note:S8.mode==='x'?'1.5 × factor de atenuación':(S8.mode==='y'?'Sin sesgo':'1.5 − 0.15·σₑ')}
+  ];
+  if(S8.mode==='x') cards.push({l:'Factor σ²ₓ* / (σ²ₓ* + σ²ₑ)', v:fmt(lam,3), c:'purple', note:`4 / (4 + ${fmt(s*s,2)})`});
+  cards.push({l:'Error estándar', v:fmt(f.se[1],3), note:`t = ${fmt(t,1)}`});
+  $('#st8').innerHTML=statCards(cards);
+  let msg;
+  if(s<0.05) msg=noteBox('tip','', 'Sin error de medición: estimamos sobre los datos verdaderos y la pendiente ronda 1.5.');
+  else if(S8.mode==='x') msg=noteBox('callout','Sesgo de atenuación', `El ruido en X estira la nube en horizontal sin agregarle pendiente, así que la recta se aplana. El coeficiente converge a <strong>${fmt(lam*100,0)}%</strong> del verdadero, y esto <strong>no se corrige con más datos</strong>: probá subir la muestra.`);
+  else if(S8.mode==='y') msg=noteBox('tip','', 'El error en Y estira la nube en vertical, simétricamente alrededor de la recta verdadera. La pendiente sigue siendo insesgada; lo único que empeora es la precisión: el error estándar crece con σₑ.');
+  else msg=noteBox('callout','Error en Y que depende de X', 'Acá quienes tienen más X reportan su Y con un error sistemáticamente más negativo (subdeclaran más). Como el error de medición está correlacionado con X, ahora sí hay sesgo, aunque el error esté en la variable dependiente.');
+  $('#nt8').innerHTML=msg;
+}
+function draw8(){
+  const d=S8.d; if(!d) return;
+  let r=setupCanvas('cv8a', 0.8, 330, 240);
+  let pad={l:44,r:10,t:12,b:40};
+  const sc=frame(r.ctx,r.cw,r.ch,pad,[0,20],[-5,45],{xlab:'X observada', ylab:'Y observada', nx:5, ny:5});
+  clipTo(r.ctx,sc);
+  r.ctx.fillStyle=col('--blue'); r.ctx.globalAlpha=0.4;
+  d.xo.forEach((x,i)=>{ r.ctx.beginPath(); r.ctx.arc(sc.sx(x), sc.sy(d.yo[i]), 2.4, 0, 2*Math.PI); r.ctx.fill(); });
+  r.ctx.globalAlpha=1;
+  lineAB(r.ctx,sc,2,1.5,'--text-sec',2,[6,4]);
+  lineAB(r.ctx,sc,d.f.b[0],d.f.b[1],'--red',2.6);
+  r.ctx.restore();
+  r=setupCanvas('cv8b', 0.8, 330, 240);
+  pad={l:44,r:12,t:12,b:40};
+  const sc2=frame(r.ctx,r.cw,r.ch,pad,[0,4],[0,1.8],{xlab:'σₑ (desvío del error)', ylab:'Pendiente', nx:4, ny:6});
+  hline(r.ctx,sc2,1.5,'--text-sec',[6,4]);
+  curve(r.ctx,sc2,s=>plim8(S8.mode,s),0,4,'--accent',2.4);
+  vline(r.ctx,sc2,d.s,'--border',[3,3]);
+  dotAt(r.ctx,sc2,d.s,plim8(S8.mode,d.s),'--accent',5);
+  dotAt(r.ctx,sc2,d.s,Math.max(0,Math.min(1.8,d.f.b[1])),'--red',5);
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 9 — Selección muestral
+   ══════════════════════════════════════════════════════ */
+const P9=(()=>{
+  const rng=mulberry32(909), rn=randnGen(mulberry32(910)), N=1000, x=[], y=[], u=[];
+  for(let i=0;i<N;i++){ const e=6+rng()*14; x.push(e); y.push(2+0.8*e+3*rn()); u.push(rng()); }
+  const pop=fitOLS(x.map(v=>[1,v]),y);
+  return {N,x,y,u,pop, ybar:mean(y)};
+})();
+const S9={mode:'rand', keep:null, f:null};
+function set9mode(m){ S9.mode=m; setActive(['m9r','m9x','m9h','m9l'], {rand:'m9r',x:'m9x',yhi:'m9h',ylo:'m9l'}[m]); run9(); }
+function run9(){
+  const p=+$('#m9p').value/100, d=P9;
+  $('#m9pV').textContent=Math.round(p*100)+'%';
+  const qtl=(a,q)=>{ const s=[...a].sort((u,v)=>u-v); return s[Math.min(s.length-1, Math.floor(q*s.length))]; };
+  let keep;
+  if(S9.mode==='rand') keep=d.u.map(v=>v>=p);
+  else if(S9.mode==='x'){ const c=qtl(d.x,p); keep=d.x.map(v=>p===0||v>=c); }
+  else if(S9.mode==='yhi'){ const c=qtl(d.y,1-p); keep=d.y.map(v=>p===0||v<c); }
+  else { const c=qtl(d.y,p); keep=d.y.map(v=>p===0||v>=c); }
+  const xs=d.x.filter((_,i)=>keep[i]), ys=d.y.filter((_,i)=>keep[i]);
+  const f=fitOLS(xs.map(v=>[1,v]),ys);
+  S9.keep=keep; S9.f=f;
+  draw9();
+  const bias=f.b[1]-d.pop.b[1], ym=mean(ys);
+  $('#st9').innerHTML=statCards([
+    {l:'Pendiente en la población', v:fmt(d.pop.b[1],3), note:'Verdadera: 0.8'},
+    {l:'Pendiente en la muestra', v:fmt(f.b[1],3), c:Math.abs(bias)>0.06?'orange':'green', note:`Diferencia: ${fmtS(bias,3)}`},
+    {l:'Salario medio', v:`${fmt(ym,2)}`, c:Math.abs(ym-d.ybar)>0.3?'orange':'', note:`Población: ${fmt(d.ybar,2)}`},
+    {l:'Observaciones', v:`${xs.length}`, note:'de 1.000'}
+  ]);
+  const msgs={
+    rand:'Si los datos faltan al azar, la muestra es una versión más chica de la población: la pendiente y el promedio no cambian en promedio. Sólo perdemos precisión.',
+    x:'La selección depende de la regresora: perdemos a los de menos educación, pero para cada nivel de educación que sí observamos, la relación con el salario es la misma. <strong>La pendiente no se sesga.</strong> El salario promedio de la muestra sí es más alto, pero eso no es un problema de la regresión.',
+    yhi:'Quedan afuera los de salario alto. Entre los más educados, sólo vemos a los que ganan relativamente poco: la nube se "corta" por arriba y la pendiente se <strong>aplana</strong>. Además el salario promedio subestima al de la población.',
+    ylo:'Sólo vemos a quienes ganan lo suficiente para trabajar. Entre los menos educados quedan sólo los que tienen un error grande y positivo, así que la nube se corta por abajo y la pendiente se <strong>aplana</strong>. Es el sesgo de selección de Heckman.'
+  };
+  const bad=(S9.mode==='yhi'||S9.mode==='ylo') && p>0;
+  $('#nt9').innerHTML=noteBox(bad?'callout':'tip', bad?'Selección endógena':'', msgs[S9.mode]);
+}
+function draw9(){
+  const d=P9;
+  const {ctx,cw,ch}=setupCanvas('cv9', 0.48, 360);
+  const pad={l:50,r:14,t:14,b:40};
+  const sc=frame(ctx,cw,ch,pad,[5.5,20.5],range(d.y),{xlab:'Años de educación', ylab:'Salario'});
+  clipTo(ctx,sc);
+  d.x.forEach((x,i)=>{
+    const k=S9.keep[i];
+    ctx.fillStyle=col(k?'--blue':'--border'); ctx.globalAlpha=k?0.55:0.7;
+    ctx.beginPath(); ctx.arc(sc.sx(x), sc.sy(d.y[i]), 2.4, 0, 2*Math.PI); ctx.fill();
+  });
+  ctx.globalAlpha=1;
+  lineAB(ctx,sc,d.pop.b[0],d.pop.b[1],'--text-sec',2,[6,4]);
+  lineAB(ctx,sc,S9.f.b[0],S9.f.b[1],'--red',2.6);
+  ctx.restore();
+}
+
+/* ══════════════════════════════════════════════════════
+   LAB 10 — rdchem: outliers
+   ══════════════════════════════════════════════════════ */
+const NR=RD.sales.length;
+const S10={ex:new Set(), inf:false, sc:null};
+const fit10=keepIdx=>fitOLS(keepIdx.map(i=>[1,RD.sales[i],RD.profmarg[i]]), keepIdx.map(i=>RD.rdintens[i]));
+const ALL10=Array.from({length:NR},(_,i)=>i);
+const FULL10=fit10(ALL10);
+function drop10big(){ let j=0; RD.sales.forEach((s,i)=>{ if(s>RD.sales[j]) j=i; }); S10.ex.add(j); render10(); }
+function reset10(){ S10.ex.clear(); render10(); }
+function tog10inf(){ S10.inf=!S10.inf; $('#m10inf').classList.toggle('active',S10.inf); draw10(); }
+function render10(){
+  const keep=ALL10.filter(i=>!S10.ex.has(i));
+  if(keep.length<5){ S10.ex.clear(); return render10(); }
+  const f=fit10(keep);
+  S10.f=f; S10.keep=keep;
+  // influencia: cambio en el coef. de sales al sacar cada observación de la muestra actual
+  S10.dfb=ALL10.map(i=>{ if(S10.ex.has(i)) return 0; return fit10(keep.filter(j=>j!==i)).b[1]-f.b[1]; });
+  draw10();
+  const row=(lab,j,fm)=>{
+    const c=m=>{ const t=m.b[j]/m.se[j], p=tTail2(t,m.df); return `<td>${fm(m.b[j])}<b style="color:var(--accent)">${stars(p)}</b><span class="se">(${fm(m.se[j])}) · p = ${fmtP(p)}</span></td>`; };
+    return `<tr><td class="lbl">${lab}</td>${c(FULL10)}${c(f)}</tr>`;
+  };
+  $('#tb10').innerHTML=`<tr><th style="text-align:left">Variable</th><th>Las 32 empresas</th><th class="selcol">Tu muestra (n = ${f.n})</th></tr>`+
+    row('sales',1,v=>v.toExponential(2))+row('profmarg',2,v=>v.toFixed(4))+
+    `<tr><td class="lbl">R²</td><td>${fmt(FULL10.R2,3)}</td><td>${fmt(f.R2,3)}</td></tr>`;
+  const top=keep.map(i=>({i, d:S10.dfb[i]})).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d)).slice(0,3);
+  $('#inf10').innerHTML='<strong>Las tres observaciones más influyentes de tu muestra</strong> (cuánto cambiaría β̂<sub>sales</sub> si sacaras cada una):<ul style="margin:.3rem 0 0 1.2rem">'+
+    top.map(t=>`<li>Empresa con ventas de US$ ${Math.round(RD.sales[t.i]).toLocaleString('es-AR')} M e intensidad ${fmt(RD.rdintens[t.i],2)}%: ${fmtS(t.d,6)} (${fmtS(t.d/f.b[1]*100,0)}%)</li>`).join('')+'</ul>';
+  const p=tTail2(f.b[1]/f.se[1],f.df), p0=tTail2(FULL10.b[1]/FULL10.se[1],FULL10.df);
+  let msg;
+  if(S10.ex.size===0) msg=noteBox('note','Con todas las empresas', `<span class="math">sales</span> no es significativa (p = ${fmtP(p0)}). Fijate en la empresa del extremo derecho: vende casi el doble que la siguiente. Probá sacarla.`);
+  else msg=noteBox(p<0.05&&p0>=0.05?'callout':'tip', p<0.05&&p0>=0.05?'Una observación cambia la conclusión':'', `Sacaste ${S10.ex.size} ${S10.ex.size===1?'empresa':'empresas'}. El coeficiente de <span class="math">sales</span> pasa de ${FULL10.b[1].toExponential(2)} a ${f.b[1].toExponential(2)} (${fmt(f.b[1]/FULL10.b[1],1)} veces) y su p-valor de ${fmtP(p0)} a ${fmtP(p)}. ${p<0.05&&p0>=0.05?'Ahora es significativa al 5%: <strong>una sola observación entre 32</strong> definía la conclusión.':''}`);
+  $('#nt10').innerHTML=msg;
+}
+function draw10(){
+  const {ctx,cw,ch}=setupCanvas('cv10', 0.46, 360);
+  const pad={l:50,r:14,t:14,b:40};
+  const ymax=Math.max(...RD.rdintens)*1.1;
+  const sc=frame(ctx,cw,ch,pad,[0,42000],[0,ymax],{xlab:'Ventas (millones de US$)', ylab:'I+D (% de ventas)', fx:v=>(v/1000)+(v?' mil':''), nx:7});
+  S10.sc=sc;
+  clipTo(ctx,sc);
+  const pmAll=mean(RD.profmarg), pmK=mean(S10.keep.map(i=>RD.profmarg[i]));
+  if(S10.ex.size) lineAB(ctx,sc,FULL10.b[0]+FULL10.b[2]*pmAll,FULL10.b[1],'--text-sec',2,[6,4]);
+  lineAB(ctx,sc,S10.f.b[0]+S10.f.b[2]*pmK,S10.f.b[1],'--red',2.6);
+  const md=Math.max(...S10.dfb.map(Math.abs))||1;
+  ALL10.forEach(i=>{
+    const out=S10.ex.has(i), x=sc.sx(RD.sales[i]), y=sc.sy(RD.rdintens[i]);
+    ctx.beginPath(); ctx.arc(x,y,out?5:6,0,2*Math.PI);
+    if(out){ ctx.strokeStyle=col('--text-sec'); ctx.setLineDash([2,2]); ctx.lineWidth=1.2; ctx.stroke(); ctx.setLineDash([]);
+      ctx.strokeStyle=col('--red'); ctx.beginPath(); ctx.moveTo(x-4,y-4); ctx.lineTo(x+4,y+4); ctx.moveTo(x+4,y-4); ctx.lineTo(x-4,y+4); ctx.stroke(); }
+    else { ctx.fillStyle=S10.inf?lerpCol('--accent-light','--orange',Math.abs(S10.dfb[i])/md):col('--accent'); ctx.globalAlpha=0.85; ctx.fill(); ctx.globalAlpha=1;
+      ctx.strokeStyle=col('--bg-canvas'); ctx.lineWidth=1.5; ctx.stroke(); }
+  });
+  ctx.restore();
+}
+function click10(ev){
+  const sc=S10.sc; if(!sc) return;
+  const rc=ev.target.getBoundingClientRect(), px=ev.clientX-rc.left, py=ev.clientY-rc.top;
+  let best=-1, bd=14;
+  ALL10.forEach(i=>{ const d=Math.hypot(sc.sx(RD.sales[i])-px, sc.sy(RD.rdintens[i])-py); if(d<bd){ bd=d; best=i; } });
+  if(best<0) return;
+  S10.ex.has(best)?S10.ex.delete(best):S10.ex.add(best);
+  render10();
+}
+
+/* ══════════════════════════════════════════════════════
+   Autoevaluación
+   ══════════════════════════════════════════════════════ */
+const QUIZ=[
+  {id:'a', q:'Si una regresora está correlacionada con el error, el sesgo de MCO desaparece cuando la muestra es lo suficientemente grande.',
+   ans:false, why:'Con endogeneidad MCO es <strong>inconsistente</strong>: al crecer la muestra el estimador se concentra, pero alrededor de un valor equivocado. Lo viste en el Laboratorio 4 con <span class="math">n = 1000</span>.'},
+  {id:'b', q:'Omitir una variable que afecta a Y siempre sesga el coeficiente de las demás regresoras.',
+   ans:false, why:'El sesgo es <span class="math">&beta;<sub>2</sub>&sdot;&delta;<sub>1</sub></span>. Si la omitida no está correlacionada con <span class="math">X<sub>1</sub></span> (<span class="math">&delta;<sub>1</sub> = 0</span>), no hay sesgo aunque <span class="math">&beta;<sub>2</sub> &ne; 0</span>. Va al error y sólo agranda su varianza.'},
+  {id:'c', q:'En una ecuación de salarios sin habilidad, es esperable que MCO sobreestime el retorno de la educación.',
+   ans:true, why:'La habilidad sube el salario (<span class="math">&beta;<sub>2</sub> &gt; 0</span>) y se mueve con la educación (<span class="math">Corr &gt; 0</span>): sesgo positivo. En <span class="math">wage2</span>, agregar IQ baja el retorno de 6.5% a 5.4%.'},
+  {id:'d', q:'Incluir una variable irrelevante sesga los coeficientes de las demás variables.',
+   ans:false, why:'No genera sesgo: el estimador sigue centrado en el valor verdadero. El costo es <strong>más varianza</strong>, sobre todo si la variable irrelevante está correlacionada con las otras.'},
+  {id:'e', q:'Si el test RESET no rechaza, podemos concluir que la forma funcional del modelo es la correcta.',
+   ans:false, why:'Un <span class="math">p</span>-valor grande sólo dice que el test no encontró evidencia en contra. Puede faltarle potencia (muestra chica, curvatura suave) o el problema puede ser otro que el RESET no detecta.'},
+  {id:'f', q:'El RESET sirve para detectar heteroscedasticidad.',
+   ans:false, why:'No. El RESET apunta a la forma funcional. Para heteroscedasticidad están Breusch-Pagan y White (clase 11).'},
+  {id:'g', q:'La prueba de Davidson-MacKinnon puede terminar rechazando los dos modelos que se comparan.',
+   ans:true, why:'Sí: pueden rechazarse ambos o ninguno. En <span class="math">hprice1</span>, al 5% no se rechaza ninguno y al 10% se rechazan los dos (Laboratorio 3b). Suma evidencia, pero no siempre da un ganador.'},
+  {id:'h', q:'Al usar IQ como proxy de la habilidad, el coeficiente del IQ estima el efecto de la habilidad sobre el salario.',
+   ans:false, why:'Con una proxy renunciamos a estimar <span class="math">&beta;<sub>3</sub></span>. El coeficiente <span class="math">&gamma;<sub>3</sub></span> mide el efecto del IQ, no de la habilidad "pura". Lo que buscamos son estimaciones consistentes de los <em>otros</em> coeficientes, como el de educación.'},
+  {id:'i', q:'Un error de medición aleatorio en la variable dependiente no sesga MCO, pero aumenta los errores estándar.',
+   ans:true, why:'Si <span class="math">e<sub>0</sub></span> no está correlacionado con las <span class="math">X</span>, se suma al error y MCO sigue siendo insesgado. Sólo crece la varianza del error y, con ella, los errores estándar (Laboratorio 8, "Error en Y").'},
+  {id:'j', q:'Con errores clásicos en una regresora, el coeficiente estimado tiende a acercarse a cero.',
+   ans:true, why:'Es el sesgo de atenuación: <span class="math">plim(&beta;&#770;<sub>1</sub>) = &beta;<sub>1</sub>&sdot;&sigma;²<sub>X*</sub>/(&sigma;²<sub>X*</sub> + &sigma;²<sub>e</sub>)</span>, con un factor entre 0 y 1.'},
+  {id:'k', q:'Si sólo encuestamos a mayores de 35 años y la edad es una regresora, MCO queda sesgado.',
+   ans:false, why:'Es selección <strong>exógena</strong>: depende de una <span class="math">X</span>. Para las edades que observamos, la relación entre las variables es la misma que en la población, así que MCO funciona. Sólo perdemos datos.'},
+  {id:'l', q:'Si una observación cambia mucho los resultados, lo correcto es eliminarla y reportar sólo la regresión sin ella.',
+   ans:false, why:'La buena práctica es estimar <strong>con y sin</strong> las observaciones sospechosas y reportar ambas, discutiendo si pertenecen a la población. Sólo se elimina sin más un error de carga evidente.'}
+];
+let quizAnswers={};
+function renderQuiz(){
+  $('#quizWrap').innerHTML=QUIZ.map((q,i)=>
+    `<div class="quiz-item">
+      <div class="quiz-q"><span class="qid">${q.id})</span>${q.q}</div>
+      <div class="quiz-btns">
+        <button class="btn btn-sm" onclick="answerQuiz(${i},true)">Verdadero</button>
+        <button class="btn btn-sm" onclick="answerQuiz(${i},false)">Falso</button>
+      </div>
+      <div class="quiz-fb" id="qfb-${i}"></div>
+    </div>`).join('');
+  updateQuizScore();
+}
+function answerQuiz(i, val){
+  const q=QUIZ[i], ok=(val===q.ans);
+  quizAnswers[i]=ok;
+  const fb=$('#qfb-'+i);
+  fb.className='quiz-fb show '+(ok?'ok':'no');
+  fb.innerHTML=`<span class="quiz-verdict" style="color:var(${ok?'--green':'--red'})">${ok?'Correcto':'Incorrecto'}: la afirmación es ${q.ans?'VERDADERA':'FALSA'}</span>${q.why}`;
+  updateQuizScore();
+}
+function updateQuizScore(){
+  const done=Object.keys(quizAnswers).length, right=Object.values(quizAnswers).filter(Boolean).length;
+  $('#quizScore').textContent=done===0?'':`Respondidas: ${done} de ${QUIZ.length} · Correctas: ${right}`;
+}
+function resetQuiz(){ quizAnswers={}; renderQuiz(); }
+
+/* ══════════════════════════════════════════════════════
+   Init y listeners
+   ══════════════════════════════════════════════════════ */
+['m1r','m1g'].forEach(id=>$('#'+id).addEventListener('input', run1));
+['m2c','m2n'].forEach(id=>$('#'+id).addEventListener('input', run2));
+['m4b2','m4r','m4n'].forEach(id=>$('#'+id).addEventListener('input', run4));
+['m6q','m6k'].forEach(id=>$('#'+id).addEventListener('input', run6));
+['m8s','m8n'].forEach(id=>$('#'+id).addEventListener('input', run8));
+$('#m9p').addEventListener('input', run9);
+$('#cv10').addEventListener('click', click10);
+$('#seg5').innerHTML=MODS5.map(m=>`<button class="btn btn-sm ${m.k===SEL5?'active':''}" id="b5${m.k}" onclick="set5('${m.k}')">${m.lab}</button>`).join('');
+
+function redrawAll(){
+  draw1(); draw2(); draw3(); draw4(); draw5(); draw7(); draw8(); draw9(); draw10();
+}
+let rzTimer=null, lastW=window.innerWidth;
+window.addEventListener('resize', ()=>{
+  if(window.innerWidth===lastW) return;
+  lastW=window.innerWidth;
+  clearTimeout(rzTimer); rzTimer=setTimeout(redrawAll, 120);
+});
+const mqDark=window.matchMedia('(prefers-color-scheme:dark)');
+if(mqDark.addEventListener) mqDark.addEventListener('change', redrawAll);
+
+run1(); run2(); render3(); renderDM(); run4(); render5(); run6();
+render7tbl(); set7view('sin'); run8(); run9(); render10(); renderQuiz();
+</script>
+</body>
+</html>
